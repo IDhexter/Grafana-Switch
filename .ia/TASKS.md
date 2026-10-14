@@ -27,7 +27,8 @@
 - [x] Item 2: Widget compacto Top Talkers ajustado estritamente para **Top 3** consumidores com ranking de medalhas (1º, 2º, 3º).
 - [x] Item 3: Drag-to-Zoom interativo no gráfico Canvas com brush selection, botão flutuante `[ ↺ RESET ZOOM ]` e atalho de duplo clique.
 - [x] Alinhamento vertical perfeito do grid inferior: card esquerdo (gráfico Canvas) e cards direitos (Top 3 + Alertas) nivelados na mesma linha reta com zero espaço desperdiçado (versão 54).
-- [x] Deploy bem-sucedido no Grafana (v54, status 200 OK) e exportação sanitizada para o repositório.
+- [x] Correção do botão `[ ↺ RESET ZOOM ]` com bind direto de eventos de DOM (`onclick`, `onmousedown`, `ontouchend`) contornando a sanitização do Grafana e preservação de zoom ativo durante o polling periódico de telemetria (versão 55).
+- [x] Deploy bem-sucedido no Grafana (v55, status 200 OK) e exportação sanitizada para o repositório.
 
 ## 🔜 Backlog Imediato (Próximos Passos)
 - [ ] Criar estrutura base de pastas do repositório (`docker/`, `zabbix/`, `grafana/`, `scripts/`, `.gitignore`).

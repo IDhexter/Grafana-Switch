@@ -788,7 +788,7 @@ $null = $sb.AppendLine(@"
             <button id="btn-range-12" type="button" onclick="if(window.__arubaChangeRange)window.__arubaChangeRange(12);" style="background: transparent; color: #94a3b8; border: none; border-radius: 4px; padding: 2px 8px; font-size: 10px; font-weight: 700; cursor: pointer; transition: all 0.2s ease;">12h</button>
             <button id="btn-range-24" type="button" onclick="if(window.__arubaChangeRange)window.__arubaChangeRange(24);" style="background: transparent; color: #94a3b8; border: none; border-radius: 4px; padding: 2px 8px; font-size: 10px; font-weight: 700; cursor: pointer; transition: all 0.2s ease;">24h</button>
           </div>
-          <button id="btn-reset-zoom" type="button" onclick="if(window.__arubaResetZoom)window.__arubaResetZoom();" style="display: none; background: rgba(0, 176, 255, 0.15); color: #38bdf8; border: 1px solid #00b0ff; border-radius: 4px; padding: 2px 8px; font-size: 10px; font-weight: 700; cursor: pointer; transition: all 0.2s ease;">&#x21bb; RESET ZOOM</button>
+          <button id="btn-reset-zoom" type="button" onclick="if(window.__arubaResetZoom)window.__arubaResetZoom();" style="display: none; background: rgba(0, 176, 255, 0.15); color: #38bdf8; border: 1px solid #00b0ff; border-radius: 4px; padding: 2px 8px; font-size: 10px; font-weight: 700; cursor: pointer; transition: all 0.2s ease; position: relative; z-index: 999; pointer-events: auto;">&#x21bb; RESET ZOOM</button>
           <span id="canvas-hint-label" style="font-size: 9px; color: #64748b; font-family: monospace;">&#10022; arraste para zoom &bull; duplo clique reset</span>
         </div>
       </div>
@@ -1074,8 +1074,23 @@ $jsCodeTemplate = @'
         chartState.isDragging = false;
         chartState.dragStartX = null;
         chartState.dragCurrentX = null;
-        chartState.inPts = (chartState.fullInPts && chartState.fullInPts.length) ? [...chartState.fullInPts] : [];
-        chartState.outPts = (chartState.fullOutPts && chartState.fullOutPts.length) ? [...chartState.fullOutPts] : [];
+
+        let restoredIn = (chartState.fullInPts && chartState.fullInPts.length) ? [...chartState.fullInPts] : [];
+        let restoredOut = (chartState.fullOutPts && chartState.fullOutPts.length) ? [...chartState.fullOutPts] : [];
+
+        if (restoredIn.length === 0 || restoredOut.length === 0) {
+          const cacheKey = selectedPortNum + '_' + selectedTimeRangeHours;
+          if (historyCache[cacheKey]) {
+            restoredIn = [...(historyCache[cacheKey].inPts || [])];
+            restoredOut = [...(historyCache[cacheKey].outPts || [])];
+            chartState.fullInPts = restoredIn;
+            chartState.fullOutPts = restoredOut;
+          }
+        }
+
+        chartState.inPts = restoredIn;
+        chartState.outPts = restoredOut;
+
         const btn = getEl('btn-reset-zoom');
         if (btn) btn.style.display = 'none';
         safeSetText('canvas-hint-label', '\u2726 arraste para zoom \u2022 duplo clique reset');
@@ -1491,7 +1506,12 @@ $jsCodeTemplate = @'
               chartState.inPts = chartState.inPts.slice(idxStart, idxEnd + 1);
               chartState.outPts = chartState.outPts.slice(idxStart, idxEnd + 1);
               const btn = getEl('btn-reset-zoom');
-              if (btn) btn.style.display = 'inline-block';
+              if (btn) {
+                btn.style.display = 'inline-block';
+                if (typeof bindResetZoomButton === 'function') {
+                  bindResetZoomButton();
+                }
+              }
               safeSetText('canvas-hint-label', 'Zoom: ' + chartState.inPts.length + ' pts \u2022 duplo clique p/ reset');
               chartState.hoveredIdx = null;
               if (tooltip) tooltip.style.display = 'none';
@@ -1507,6 +1527,10 @@ $jsCodeTemplate = @'
       };
 
       canvas.ondblclick = function(e) {
+        if (e) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
         if (window.__arubaResetZoom) window.__arubaResetZoom();
       };
 
@@ -1543,35 +1567,39 @@ $jsCodeTemplate = @'
       }
     }
 
-    function drawRealChart(inPts, outPts, currentInBps, currentOutBps) {
+    function drawRealChart(inPts, outPts, currentInBps, currentOutBps, preserveZoom) {
       chartState.fullInPts = inPts || [];
       chartState.fullOutPts = outPts || [];
-      chartState.inPts = [...chartState.fullInPts];
-      chartState.outPts = [...chartState.fullOutPts];
       chartState.currentInBps = currentInBps || 0;
       chartState.currentOutBps = currentOutBps || 0;
-      chartState.isZoomed = false;
-      const btn = getEl('btn-reset-zoom');
-      if (btn) btn.style.display = 'none';
-      safeSetText('canvas-hint-label', '\u2726 arraste para zoom \u2022 duplo clique reset');
+
+      if (!preserveZoom || !chartState.isZoomed) {
+        chartState.inPts = [...chartState.fullInPts];
+        chartState.outPts = [...chartState.fullOutPts];
+        chartState.isZoomed = false;
+        const btn = getEl('btn-reset-zoom');
+        if (btn) btn.style.display = 'none';
+        safeSetText('canvas-hint-label', '\u2726 arraste para zoom \u2022 duplo clique reset');
+      }
+
       initChartInteractivity();
       renderCanvas();
     }
 
     // Fetch granular history for selected port based on selectedTimeRangeHours
-    async function fetchPortHistory(pNum) {
+    async function fetchPortHistory(pNum, preserveZoom) {
       const p = ports[pNum];
       if (!p) return;
 
       if (!p.InItemId || !p.OutItemId) {
-        drawRealChart([], [], p.InBps || 0, p.OutBps || 0);
+        drawRealChart([], [], p.InBps || 0, p.OutBps || 0, preserveZoom);
         return;
       }
 
       const cacheKey = pNum + '_' + selectedTimeRangeHours;
       if (historyCache[cacheKey]) {
         if (selectedPortNum === pNum) {
-          drawRealChart(historyCache[cacheKey].inPts, historyCache[cacheKey].outPts, p.InBps || 0, p.OutBps || 0);
+          drawRealChart(historyCache[cacheKey].inPts, historyCache[cacheKey].outPts, p.InBps || 0, p.OutBps || 0, preserveZoom);
         }
         return;
       }
@@ -1627,13 +1655,17 @@ $jsCodeTemplate = @'
 
         historyCache[cacheKey] = { inPts, outPts };
         if (selectedPortNum === pNum) {
-          drawRealChart(inPts, outPts, p.InBps || 0, p.OutBps || 0);
+          drawRealChart(inPts, outPts, p.InBps || 0, p.OutBps || 0, preserveZoom);
         }
-        safeSetText('canvas-hint-label', '\u2726 passe o mouse');
+        if (!chartState.isZoomed) {
+          safeSetText('canvas-hint-label', '\u2726 passe o mouse');
+        }
       } catch (e) {
         console.warn('History fetch error for port ' + pNum, e);
-        drawRealChart([], [], p.InBps || 0, p.OutBps || 0);
-        safeSetText('canvas-hint-label', '\u2726 passe o mouse');
+        drawRealChart([], [], p.InBps || 0, p.OutBps || 0, preserveZoom);
+        if (!chartState.isZoomed) {
+          safeSetText('canvas-hint-label', '\u2726 passe o mouse');
+        }
       }
     }
 
@@ -1704,8 +1736,9 @@ $jsCodeTemplate = @'
       }
     }
 
-    function selectPort(pNum) {
+    function selectPort(pNum, isBackgroundPoll) {
       try {
+        const isSamePort = (selectedPortNum === pNum);
         selectedPortNum = pNum;
         const p = ports[pNum];
         if (!p) return;
@@ -1808,12 +1841,13 @@ $jsCodeTemplate = @'
 
         // Check if we have cached history for this range, else fetch fresh
         const portCacheKey = pNum + '_' + selectedTimeRangeHours;
+        const shouldPreserveZoom = (isSamePort && isBackgroundPoll && chartState.isZoomed);
         if (historyCache[portCacheKey]) {
-          drawRealChart(historyCache[portCacheKey].inPts, historyCache[portCacheKey].outPts, p.InBps || 0, p.OutBps || 0);
-        } else {
-          drawRealChart([], [], p.InBps || 0, p.OutBps || 0);
+          drawRealChart(historyCache[portCacheKey].inPts, historyCache[portCacheKey].outPts, p.InBps || 0, p.OutBps || 0, shouldPreserveZoom);
+        } else if (!shouldPreserveZoom) {
+          drawRealChart([], [], p.InBps || 0, p.OutBps || 0, false);
         }
-        fetchPortHistory(pNum);
+        fetchPortHistory(pNum, shouldPreserveZoom);
       } catch (err) {
         console.warn('selectPort caught:', err);
       }
@@ -2149,7 +2183,7 @@ $jsCodeTemplate = @'
           updateTopTalkers();
 
           // Refresh selected port view & historical traffic
-          selectPort(selectedPortNum);
+          selectPort(selectedPortNum, true);
         }
       } catch (e) {
         console.warn('Zabbix polling caught:', e);
@@ -2202,6 +2236,29 @@ $jsCodeTemplate = @'
       safeSetText('live-clock', new Date().toTimeString().split(' ')[0]);
     }, 1000);
 
+    // Bind Reset Zoom button explicitly via JS (prevent DOMPurify/React click drop)
+    function bindResetZoomButton() {
+      try {
+        const btn = getEl('btn-reset-zoom');
+        if (btn) {
+          const doReset = function(e) {
+            if (e) {
+              e.preventDefault();
+              e.stopPropagation();
+            }
+            if (window.__arubaResetZoom) {
+              window.__arubaResetZoom();
+            }
+          };
+          btn.onclick = doReset;
+          btn.onmousedown = doReset;
+          btn.ontouchend = doReset;
+        }
+      } catch (e) {
+        console.warn('bindResetZoom error:', e);
+      }
+    }
+
     // Bind time range buttons
     function bindRangeButtons() {
       [3, 6, 12, 24].forEach(h => {
@@ -2210,11 +2267,13 @@ $jsCodeTemplate = @'
           btn.onclick = function() { window.__arubaChangeRange(h); };
         }
       });
+      bindResetZoomButton();
     }
 
     // Initial binding & selection
     bindPortEvents();
     bindRangeButtons();
+    bindResetZoomButton();
     bindDrawerControls();
     updateTopTalkers();
     selectPort(24);
@@ -2223,6 +2282,7 @@ $jsCodeTemplate = @'
     setTimeout(() => {
       bindPortEvents();
       bindRangeButtons();
+      bindResetZoomButton();
       bindDrawerControls();
       updateTopTalkers();
       selectPort(selectedPortNum);

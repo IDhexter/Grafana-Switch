@@ -15,7 +15,7 @@ Implantar, automatizar e manter uma infraestrutura completa de observabilidade, 
   - Credenciais e segredos isolados em variáveis de ambiente, nunca versionados em repositório.
 
 ## Estado Atual do Projeto
-- **Fase:** Produção / POC Avançada de Gêmeo Digital (Digital Twin) de Ativos de Rede (v54).
+- **Fase:** Produção / POC Avançada de Gêmeo Digital (Digital Twin) de Ativos de Rede (v55).
 - **Ambientes Conectados (Ativos):**
   - **Zabbix API:** `http://10.0.0.26/api_jsonrpc.php` (Host ID do Switch mapeado via `.env`, IP de gerência descoberto dinamicamente via `host.get`).
   - **Grafana:** `http://10.0.0.25:3000` (Dashboard UID: `alpt2p5`).
@@ -39,9 +39,11 @@ Implantar, automatizar e manter uma infraestrutura completa de observabilidade, 
     - Ao clicar em qualquer item do ranking, a porta é imediatamente selecionada no switch, atualizando os KPIs, cards de velocidade e o osciloscópio histórico Canvas.
   - **Alinhamento Reto e Perfeito de Altura (Zero Espaço Desperdiçado):**
     - O card esquerdo (Gráfico Canvas + Controles + Estatísticas) e os cards direitos (Top 3 + Alertas/Eventos de Porta) estão nivelados na mesma linha reta inferior, replicando com precisão a referência visual enviada pelo usuário (sem espaços pretos vazios ou bordas esticadas).
-  - **Drag-to-Zoom Interativo no Gráfico Canvas (Brush Zoom):**
+  - **Drag-to-Zoom Interativo no Gráfico Canvas (Brush Zoom & Reset Zoom):**
     - Seleção de intervalo com arraste do mouse (caixa translúcida ciano com borda tracejada `#00b0ff`).
-    - Ao soltar o mouse, o gráfico dá zoom instantâneo nos pontos de amostragem selecionados, reajustando automaticamente os eixos X e Y. Botão `[ ↺ RESET ZOOM ]` visível e atalho de duplo clique.
+    - Ao soltar o mouse, o gráfico dá zoom instantâneo nos pontos de amostragem selecionados, reajustando automaticamente os eixos X e Y.
+    - Botão `[ ↺ RESET ZOOM ]` com bind explícito de eventos JS (`onclick`, `onmousedown`, `ontouchend`) contornando a sanitização do Grafana Business Text, com atalho complementar de duplo clique.
+    - Preservação inteligente de zoom contra colisões do polling periódico em background (15s).
   - **Painel de Eventos de Porta em Tempo Real (`event.get`):**
     - Eventos cronológicos reais retornados pelo Zabbix (Top 5 eventos compactos para perfeito equilíbrio de altura).
   - **Escala Dinâmica e Adaptativa de Tráfego de Rede (bps, Kb/s, Mb/s, Gb/s):**
@@ -50,7 +52,7 @@ Implantar, automatizar e manter uma infraestrutura completa de observabilidade, 
     - `scripts/build_aruba_interactive_twin.v51.backup.ps1`
     - `grafana/dashboards/aruba_instant_on_1930.v51.backup.json`
     - `grafana/dashboards/aruba_interactive_twin.v51.backup.html`
-  - **Script de automação:** `scripts/build_aruba_interactive_twin.ps1` (versão 54 publicada com sucesso no Grafana) e exportação sanitizada em `grafana/dashboards/aruba_instant_on_1930.json`.
+  - **Script de automação:** `scripts/build_aruba_interactive_twin.ps1` (versão 55 publicada com sucesso no Grafana) e exportação sanitizada em `grafana/dashboards/aruba_instant_on_1930.json`.
   - **Repositório GitHub:** `https://github.com/IDhexter/Grafana-Switch` (branch `main`).
 
 ---
