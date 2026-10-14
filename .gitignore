@@ -1,0 +1,40 @@
+# Environment & Credentials
+.env
+*.env.local
+.credentials
+
+# Logs
+*.log
+logs/
+
+# Temporary / OS / Scratch
+scratch/
+.DS_Store
+Thumbs.db
+
+# Legacy Prototype Files
+scripts/test_*
+scripts/check_*
+scripts/deploy_*
+scripts/inspect_*
+scripts/render_*
+scripts/generate_*
+scripts/download_*
+scripts/enable_*
+scripts/find_*
+scripts/fix_*
+scripts/get_*
+scripts/list_*
+scripts/search_*
+scripts/explore_*
+scripts/query_*
+scripts/revert_*
+scripts/debug_*
+scripts/analyze_*
+scripts/build_and_deploy_replica.ps1
+scripts/build_aruba_production_twin.ps1
+scripts/capture_*
+scripts/grafana_screenshot_cdp.ps1
+scripts/poc_switch_dash.json
+grafana/dashboards/switch_*
+grafana/dashboards/aruba_production_twin.html

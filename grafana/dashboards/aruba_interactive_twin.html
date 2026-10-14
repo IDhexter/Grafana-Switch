@@ -1,0 +1,642 @@
+<div class="aruba-switch-view" style="background-color: #0c0f17; color: #f1f5f9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; padding: 20px 24px; border-radius: 8px; width: 100%; box-sizing: border-box; user-select: none;">
+<!-- TOP HEADER -->
+<div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
+<div>
+<div style="font-size: 11px; font-weight: 700; letter-spacing: 1.2px; color: #ff8300; margin-bottom: 5px; display: flex; align-items: center;">
+<span style="width: 7px; height: 7px; border-radius: 50%; background-color: #00e676; box-shadow: 0 0 8px #00e676; display: inline-block; margin-right: 6px;"></span>
+BAMEX &bull; RACK CPD &bull; COLETA SNMP VIA ZABBIX
+</div>
+<h1 style="font-size: 28px; font-weight: 800; margin: 0 0 6px 0; color: #ffffff; letter-spacing: -0.5px;">SW01-BAMEX &bull; Aruba Instant On 1930 24G 4SFP+</h1>
+<div style="font-size: 12px; color: #8b949e; display: flex; align-items: center; gap: 8px;">
+<span id="header-switch-ip">24x GbE RJ45 + 4x SFP+ 10G &bull; L2+ Managed &bull; JL682A &bull; IP: 10.0.0.1</span>
+<span style="background: rgba(0, 230, 118, 0.12); color: #00e676; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px; border: 1px solid rgba(0, 230, 118, 0.25);">PRODUCAO LIVE</span>
+<span id="zabbix-sync-badge" style="background: rgba(0, 176, 255, 0.12); color: #00b0ff; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px; border: 1px solid rgba(0, 176, 255, 0.25); cursor: pointer;" title="Clique para sincronizar agora com o Zabbix">&#x21bb; ZABBIX SYNC: ATIVO</span>
+</div>
+</div>
+<div style="text-align: right;">
+<div id="live-clock" style="font-size: 24px; font-weight: 700; font-family: monospace; color: #ffffff; letter-spacing: 1px;">01:42:54</div>
+<div style="font-size: 11px; color: #8b949e; margin-top: 4px;">SNMPv2 &bull; Intervalo 15 s &bull; Uptime 41d 08h</div>
+</div>
+</div>
+<!-- KPI CARDS ROW -->
+<div style="display: flex; background: #121620; border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 8px; padding: 14px 20px; margin-bottom: 22px;">
+<div style="flex: 1; border-right: 1px solid rgba(255, 255, 255, 0.08); padding-right: 16px;">
+<div style="font-size: 10.5px; font-weight: 700; letter-spacing: 0.8px; color: #8b949e; text-transform: uppercase; margin-bottom: 6px;">PORTAS ATIVAS</div>
+<div style="font-size: 26px; font-weight: 800; color: #00e676; display: flex; align-items: baseline;">
+<span id="kpi-active-ports">7</span> <span style="font-size: 14px; font-weight: 500; color: #8b949e; margin-left: 4px;">/ 28</span>
+</div>
+<div style="width: 100%; height: 4px; background: #1c2230; border-radius: 2px; margin-top: 8px; overflow: hidden;">
+<div id="kpi-active-bar" style="height: 100%; background: #00e676; border-radius: 2px; box-shadow: 0 0 10px #00e676; width: 25%;"></div>
+</div>
+</div>
+<div style="flex: 1; border-right: 1px solid rgba(255, 255, 255, 0.08); padding-left: 16px; padding-right: 16px;">
+<div style="font-size: 10.5px; font-weight: 700; letter-spacing: 0.8px; color: #8b949e; text-transform: uppercase; margin-bottom: 6px;">ALERTAS DE PORTA</div>
+<div id="kpi-alert-count" style="font-size: 26px; font-weight: 800; color: #00e676;">0</div>
+</div>
+<div style="flex: 1; border-right: 1px solid rgba(255, 255, 255, 0.08); padding-left: 16px; padding-right: 16px;">
+<div style="font-size: 10.5px; font-weight: 700; letter-spacing: 0.8px; color: #8b949e; text-transform: uppercase; margin-bottom: 6px;">VELOCIDADE DEGRADADA</div>
+<div id="kpi-degraded-ports" style="font-size: 26px; font-weight: 800; color: #f59e0b;">4</div>
+</div>
+<div style="flex: 1; border-right: 1px solid rgba(255, 255, 255, 0.08); padding-left: 16px; padding-right: 16px;">
+<div style="font-size: 10.5px; font-weight: 700; letter-spacing: 0.8px; color: #8b949e; text-transform: uppercase; margin-bottom: 6px;">TR&Aacute;FEGO TOTAL</div>
+<div id="kpi-total-traffic" style="font-size: 26px; font-weight: 800; color: #ffffff; display: flex; align-items: baseline;">
+272.4 Kb/s
+</div>
+</div>
+<div style="flex: 1; padding-left: 16px;">
+<div style="font-size: 10.5px; font-weight: 700; letter-spacing: 0.8px; color: #8b949e; text-transform: uppercase; margin-bottom: 6px;">UPLINKS SFP+ 10G</div>
+<div style="font-size: 26px; font-weight: 800; color: #ffffff; display: flex; align-items: baseline;">
+0 <span style="font-size: 14px; font-weight: 500; color: #8b949e; margin-left: 4px;">/ 4 em uso</span>
+</div>
+</div>
+</div>
+<!-- ARUBA CHASSIS -->
+<div style="background: linear-gradient(180deg, #181d26 0%, #10141b 100%); border: 2px solid #2d3848; border-radius: 8px; padding: 16px 22px; box-shadow: 0 12px 36px rgba(0, 0, 0, 0.75); display: flex; align-items: center; justify-content: space-between; gap: 18px; margin-bottom: 16px; position: relative;">
+<!-- Left Rack Ear -->
+<div style="width: 18px; height: 118px; background: #1c222e; border: 1px solid #333f52; border-radius: 4px; display: flex; flex-direction: column; justify-content: space-around; align-items: center; box-shadow: inset 0 0 6px rgba(0,0,0,0.6); flex-shrink: 0;">
+<div style="width: 10px; height: 10px; border-radius: 50%; background: radial-gradient(circle, #5b6980 20%, #202733 90%); border: 1px solid #111;"></div>
+<div style="width: 10px; height: 10px; border-radius: 50%; background: radial-gradient(circle, #5b6980 20%, #202733 90%); border: 1px solid #111;"></div>
+</div>
+<!-- Aruba Branding & System LEDs -->
+<div style="min-width: 195px; flex-shrink: 0;">
+<div style="display: flex; align-items: center; gap: 8px;">
+<span style="font-size: 21px; font-weight: 900; color: #ff8300; letter-spacing: -0.5px;">aruba</span>
+<span style="font-size: 13px; font-weight: 700; color: #ffffff;">Instant On</span>
+</div>
+<div style="font-size: 10px; font-weight: 700; color: #8b949e; letter-spacing: 0.5px; margin-top: 2px; margin-bottom: 12px;">1930 24G 4SFP+ &bull; JL682A</div>
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px 14px;">
+<div id="led-cloud-wrap" onclick="if(window.__arubaSyncNow)window.__arubaSyncNow();" title="Cloud: Conectado com Zabbix API (Clique para sincronizar agora)" style="display: flex; align-items: center; gap: 7px; cursor: pointer;">
+<span id="led-cloud" style="width: 6px; height: 6px; border-radius: 50%; background-color: #00e676; box-shadow: 0 0 7px #00e676; display: inline-block; transition: all 0.3s ease;"></span>
+<span style="font-size: 9px; font-weight: 700; color: #94a3b8;">Cloud</span>
+</div>
+<div id="led-power-wrap" title="Power: ON | Switch operacional e respondendo ao Ping" style="display: flex; align-items: center; gap: 7px;">
+<span id="led-power" style="width: 6px; height: 6px; border-radius: 50%; background-color: #00e676; box-shadow: 0 0 7px #00e676; display: inline-block; transition: all 0.3s ease;"></span>
+<span style="font-size: 9px; font-weight: 700; color: #94a3b8;">Power</span>
+</div>
+<div id="led-fault-wrap" title="Fault: Saudavel | Sem alarmes ativos no Zabbix" style="display: flex; align-items: center; gap: 7px;">
+<span id="led-fault" style="width: 6px; height: 6px; border-radius: 50%; background-color: #374151;  display: inline-block; transition: all 0.3s ease;"></span>
+<span style="font-size: 9px; font-weight: 700; color: #94a3b8;">Fault</span>
+</div>
+<div id="led-loc-wrap" onclick="if(window.__arubaToggleLoc)window.__arubaToggleLoc();" title="Informa&ccedil;&otilde;es e Invent&aacute;rio do Ativo no Zabbix (Clique para abrir/fechar)" style="display: flex; align-items: center; gap: 7px; cursor: pointer;">
+<span id="led-loc" style="width: 6px; height: 6px; border-radius: 50%; background-color: #1e293b; display: inline-block; transition: all 0.3s ease;"></span>
+<span style="font-size: 9px; font-weight: 700; color: #00b0ff; text-decoration: underline;">Loc</span>
+</div>
+</div>
+<div style="font-size: 8px; font-weight: 700; color: #475569; letter-spacing: 0.8px; margin-top: 10px;">L2+ MANAGED &bull; 1U RACKMOUNT</div>
+</div>
+<!-- Center 24 RJ45 Ports (Distributed in 2 Banks of 12 Ports across full bay) -->
+<div style="flex: 1; margin: 0 16px; background: #080c14; border: 1.5px solid #1c2636; border-radius: 8px; padding: 12px 24px; box-shadow: inset 0 3px 12px rgba(0,0,0,0.9); display: flex; align-items: center; justify-content: space-around;">
+<div style="display: flex; flex-direction: column; gap: 6px;">
+<div style="font-size: 9px; font-weight: 700; color: #64748b; letter-spacing: 1px; text-align: center; text-transform: uppercase;">PORTAS 1 &ndash; 12 &bull; 10/100/1000M</div>
+<div style="display: flex; gap: 18px;">
+<div class="sw-port" data-port="1" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(1);" title="Porta 1 | GigabitEthernet1&#10;Status: UP&#10;Velocidade: 1 Gb/s&#10;Entrada: 22.5 Kb/s&#10;Saida: 76.4 Kb/s" style="width: 50px; height: 60px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
+<div style="width: 100%; display: flex; justify-content: space-between; padding: 0 3px;">
+<span class="sw-led-1" style="width: 6px; height: 4px; border-radius: 1px; background-color: #00e676; box-shadow: 0 0 5px #00e676; display: inline-block;"></span>
+<span class="sw-led-2" style="width: 6px; height: 4px; border-radius: 1px; background-color: #00e676; opacity: 0.85; box-shadow: 0 0 5px #00e676; display: inline-block;"></span>
+</div>
+<div style="width: 34px; height: 28px; background: #05070a; border: 1.5px solid #1a2332; border-radius: 2px; position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: space-between;">
+<div style="width: 24px; height: 4px; background: repeating-linear-gradient(90deg, #d4af37 0px, #d4af37 1px, transparent 1px, transparent 2.5px); opacity: 0.85; margin-top: 1px;"></div>
+<div style="width: 14px; height: 6px; background: #0d1420; border-top: 1px solid #192332; border-left: 1px solid #192332; border-right: 1px solid #192332; border-radius: 1px 1px 0 0;"></div>
+</div>
+<div style="font-size: 10.5px; font-weight: 800; color: #8b949e; line-height: 1; font-family: monospace; margin-bottom: 1px;">1</div>
+</div>
+<div class="sw-port" data-port="3" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(3);" title="Porta 3 | GigabitEthernet3&#10;Status: UP (DEGRADADO)&#10;Velocidade: 10 Mb/s&#10;Entrada: 0 Kb/s&#10;Saida: 14.8 Kb/s" style="width: 50px; height: 60px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
+<div style="width: 100%; display: flex; justify-content: space-between; padding: 0 3px;">
+<span class="sw-led-1" style="width: 6px; height: 4px; border-radius: 1px; background-color: #f59e0b; box-shadow: 0 0 5px #f59e0b; display: inline-block;"></span>
+<span class="sw-led-2" style="width: 6px; height: 4px; border-radius: 1px; background-color: #f59e0b; opacity: 0.85; box-shadow: 0 0 5px #f59e0b; display: inline-block;"></span>
+</div>
+<div style="width: 34px; height: 28px; background: #05070a; border: 1.5px solid #1a2332; border-radius: 2px; position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: space-between;">
+<div style="width: 24px; height: 4px; background: repeating-linear-gradient(90deg, #d4af37 0px, #d4af37 1px, transparent 1px, transparent 2.5px); opacity: 0.85; margin-top: 1px;"></div>
+<div style="width: 14px; height: 6px; background: #0d1420; border-top: 1px solid #192332; border-left: 1px solid #192332; border-right: 1px solid #192332; border-radius: 1px 1px 0 0;"></div>
+</div>
+<div style="font-size: 10.5px; font-weight: 800; color: #8b949e; line-height: 1; font-family: monospace; margin-bottom: 1px;">3</div>
+</div>
+<div class="sw-port" data-port="5" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(5);" title="Porta 5 | GigabitEthernet5&#10;Status: DOWN&#10;Velocidade: --&#10;Entrada: 0 Kb/s&#10;Saida: 0 Kb/s" style="width: 50px; height: 60px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
+<div style="width: 100%; display: flex; justify-content: space-between; padding: 0 3px;">
+<span class="sw-led-1" style="width: 6px; height: 4px; border-radius: 1px; background-color: #27303f;  display: inline-block;"></span>
+<span class="sw-led-2" style="width: 6px; height: 4px; border-radius: 1px; background-color: #27303f; opacity: 0.85;  display: inline-block;"></span>
+</div>
+<div style="width: 34px; height: 28px; background: #05070a; border: 1.5px solid #1a2332; border-radius: 2px; position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: space-between;">
+<div style="width: 24px; height: 4px; background: repeating-linear-gradient(90deg, #d4af37 0px, #d4af37 1px, transparent 1px, transparent 2.5px); opacity: 0.85; margin-top: 1px;"></div>
+<div style="width: 14px; height: 6px; background: #0d1420; border-top: 1px solid #192332; border-left: 1px solid #192332; border-right: 1px solid #192332; border-radius: 1px 1px 0 0;"></div>
+</div>
+<div style="font-size: 10.5px; font-weight: 800; color: #8b949e; line-height: 1; font-family: monospace; margin-bottom: 1px;">5</div>
+</div>
+<div class="sw-port" data-port="7" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(7);" title="Porta 7 | GigabitEthernet7&#10;Status: DOWN&#10;Velocidade: --&#10;Entrada: 0 Kb/s&#10;Saida: 0 Kb/s" style="width: 50px; height: 60px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
+<div style="width: 100%; display: flex; justify-content: space-between; padding: 0 3px;">
+<span class="sw-led-1" style="width: 6px; height: 4px; border-radius: 1px; background-color: #27303f;  display: inline-block;"></span>
+<span class="sw-led-2" style="width: 6px; height: 4px; border-radius: 1px; background-color: #27303f; opacity: 0.85;  display: inline-block;"></span>
+</div>
+<div style="width: 34px; height: 28px; background: #05070a; border: 1.5px solid #1a2332; border-radius: 2px; position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: space-between;">
+<div style="width: 24px; height: 4px; background: repeating-linear-gradient(90deg, #d4af37 0px, #d4af37 1px, transparent 1px, transparent 2.5px); opacity: 0.85; margin-top: 1px;"></div>
+<div style="width: 14px; height: 6px; background: #0d1420; border-top: 1px solid #192332; border-left: 1px solid #192332; border-right: 1px solid #192332; border-radius: 1px 1px 0 0;"></div>
+</div>
+<div style="font-size: 10.5px; font-weight: 800; color: #8b949e; line-height: 1; font-family: monospace; margin-bottom: 1px;">7</div>
+</div>
+<div class="sw-port" data-port="9" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(9);" title="Porta 9 | GigabitEthernet9&#10;Status: DOWN&#10;Velocidade: --&#10;Entrada: 0 Kb/s&#10;Saida: 0 Kb/s" style="width: 50px; height: 60px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
+<div style="width: 100%; display: flex; justify-content: space-between; padding: 0 3px;">
+<span class="sw-led-1" style="width: 6px; height: 4px; border-radius: 1px; background-color: #27303f;  display: inline-block;"></span>
+<span class="sw-led-2" style="width: 6px; height: 4px; border-radius: 1px; background-color: #27303f; opacity: 0.85;  display: inline-block;"></span>
+</div>
+<div style="width: 34px; height: 28px; background: #05070a; border: 1.5px solid #1a2332; border-radius: 2px; position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: space-between;">
+<div style="width: 24px; height: 4px; background: repeating-linear-gradient(90deg, #d4af37 0px, #d4af37 1px, transparent 1px, transparent 2.5px); opacity: 0.85; margin-top: 1px;"></div>
+<div style="width: 14px; height: 6px; background: #0d1420; border-top: 1px solid #192332; border-left: 1px solid #192332; border-right: 1px solid #192332; border-radius: 1px 1px 0 0;"></div>
+</div>
+<div style="font-size: 10.5px; font-weight: 800; color: #8b949e; line-height: 1; font-family: monospace; margin-bottom: 1px;">9</div>
+</div>
+<div class="sw-port" data-port="11" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(11);" title="Porta 11 | GigabitEthernet11&#10;Status: DOWN&#10;Velocidade: --&#10;Entrada: 0 Kb/s&#10;Saida: 0 Kb/s" style="width: 50px; height: 60px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
+<div style="width: 100%; display: flex; justify-content: space-between; padding: 0 3px;">
+<span class="sw-led-1" style="width: 6px; height: 4px; border-radius: 1px; background-color: #27303f;  display: inline-block;"></span>
+<span class="sw-led-2" style="width: 6px; height: 4px; border-radius: 1px; background-color: #27303f; opacity: 0.85;  display: inline-block;"></span>
+</div>
+<div style="width: 34px; height: 28px; background: #05070a; border: 1.5px solid #1a2332; border-radius: 2px; position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: space-between;">
+<div style="width: 24px; height: 4px; background: repeating-linear-gradient(90deg, #d4af37 0px, #d4af37 1px, transparent 1px, transparent 2.5px); opacity: 0.85; margin-top: 1px;"></div>
+<div style="width: 14px; height: 6px; background: #0d1420; border-top: 1px solid #192332; border-left: 1px solid #192332; border-right: 1px solid #192332; border-radius: 1px 1px 0 0;"></div>
+</div>
+<div style="font-size: 10.5px; font-weight: 800; color: #8b949e; line-height: 1; font-family: monospace; margin-bottom: 1px;">11</div>
+</div>
+</div>
+<div style="display: flex; gap: 18px;">
+<div class="sw-port" data-port="2" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(2);" title="Porta 2 | GigabitEthernet2&#10;Status: UP (DEGRADADO)&#10;Velocidade: 10 Mb/s&#10;Entrada: 0 Kb/s&#10;Saida: 14.8 Kb/s" style="width: 50px; height: 60px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
+<div style="width: 100%; display: flex; justify-content: space-between; padding: 0 3px;">
+<span class="sw-led-1" style="width: 6px; height: 4px; border-radius: 1px; background-color: #f59e0b; box-shadow: 0 0 5px #f59e0b; display: inline-block;"></span>
+<span class="sw-led-2" style="width: 6px; height: 4px; border-radius: 1px; background-color: #f59e0b; opacity: 0.85; box-shadow: 0 0 5px #f59e0b; display: inline-block;"></span>
+</div>
+<div style="width: 34px; height: 28px; background: #05070a; border: 1.5px solid #1a2332; border-radius: 2px; position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: space-between;">
+<div style="width: 24px; height: 4px; background: repeating-linear-gradient(90deg, #d4af37 0px, #d4af37 1px, transparent 1px, transparent 2.5px); opacity: 0.85; margin-top: 1px;"></div>
+<div style="width: 14px; height: 6px; background: #0d1420; border-top: 1px solid #192332; border-left: 1px solid #192332; border-right: 1px solid #192332; border-radius: 1px 1px 0 0;"></div>
+</div>
+<div style="font-size: 10.5px; font-weight: 800; color: #8b949e; line-height: 1; font-family: monospace; margin-bottom: 1px;">2</div>
+</div>
+<div class="sw-port" data-port="4" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(4);" title="Porta 4 | GigabitEthernet4&#10;Status: DOWN&#10;Velocidade: --&#10;Entrada: 0 Kb/s&#10;Saida: 0 Kb/s" style="width: 50px; height: 60px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
+<div style="width: 100%; display: flex; justify-content: space-between; padding: 0 3px;">
+<span class="sw-led-1" style="width: 6px; height: 4px; border-radius: 1px; background-color: #27303f;  display: inline-block;"></span>
+<span class="sw-led-2" style="width: 6px; height: 4px; border-radius: 1px; background-color: #27303f; opacity: 0.85;  display: inline-block;"></span>
+</div>
+<div style="width: 34px; height: 28px; background: #05070a; border: 1.5px solid #1a2332; border-radius: 2px; position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: space-between;">
+<div style="width: 24px; height: 4px; background: repeating-linear-gradient(90deg, #d4af37 0px, #d4af37 1px, transparent 1px, transparent 2.5px); opacity: 0.85; margin-top: 1px;"></div>
+<div style="width: 14px; height: 6px; background: #0d1420; border-top: 1px solid #192332; border-left: 1px solid #192332; border-right: 1px solid #192332; border-radius: 1px 1px 0 0;"></div>
+</div>
+<div style="font-size: 10.5px; font-weight: 800; color: #8b949e; line-height: 1; font-family: monospace; margin-bottom: 1px;">4</div>
+</div>
+<div class="sw-port" data-port="6" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(6);" title="Porta 6 | GigabitEthernet6&#10;Status: DOWN&#10;Velocidade: --&#10;Entrada: 0 Kb/s&#10;Saida: 0 Kb/s" style="width: 50px; height: 60px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
+<div style="width: 100%; display: flex; justify-content: space-between; padding: 0 3px;">
+<span class="sw-led-1" style="width: 6px; height: 4px; border-radius: 1px; background-color: #27303f;  display: inline-block;"></span>
+<span class="sw-led-2" style="width: 6px; height: 4px; border-radius: 1px; background-color: #27303f; opacity: 0.85;  display: inline-block;"></span>
+</div>
+<div style="width: 34px; height: 28px; background: #05070a; border: 1.5px solid #1a2332; border-radius: 2px; position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: space-between;">
+<div style="width: 24px; height: 4px; background: repeating-linear-gradient(90deg, #d4af37 0px, #d4af37 1px, transparent 1px, transparent 2.5px); opacity: 0.85; margin-top: 1px;"></div>
+<div style="width: 14px; height: 6px; background: #0d1420; border-top: 1px solid #192332; border-left: 1px solid #192332; border-right: 1px solid #192332; border-radius: 1px 1px 0 0;"></div>
+</div>
+<div style="font-size: 10.5px; font-weight: 800; color: #8b949e; line-height: 1; font-family: monospace; margin-bottom: 1px;">6</div>
+</div>
+<div class="sw-port" data-port="8" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(8);" title="Porta 8 | GigabitEthernet8&#10;Status: DOWN&#10;Velocidade: --&#10;Entrada: 0 Kb/s&#10;Saida: 0 Kb/s" style="width: 50px; height: 60px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
+<div style="width: 100%; display: flex; justify-content: space-between; padding: 0 3px;">
+<span class="sw-led-1" style="width: 6px; height: 4px; border-radius: 1px; background-color: #27303f;  display: inline-block;"></span>
+<span class="sw-led-2" style="width: 6px; height: 4px; border-radius: 1px; background-color: #27303f; opacity: 0.85;  display: inline-block;"></span>
+</div>
+<div style="width: 34px; height: 28px; background: #05070a; border: 1.5px solid #1a2332; border-radius: 2px; position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: space-between;">
+<div style="width: 24px; height: 4px; background: repeating-linear-gradient(90deg, #d4af37 0px, #d4af37 1px, transparent 1px, transparent 2.5px); opacity: 0.85; margin-top: 1px;"></div>
+<div style="width: 14px; height: 6px; background: #0d1420; border-top: 1px solid #192332; border-left: 1px solid #192332; border-right: 1px solid #192332; border-radius: 1px 1px 0 0;"></div>
+</div>
+<div style="font-size: 10.5px; font-weight: 800; color: #8b949e; line-height: 1; font-family: monospace; margin-bottom: 1px;">8</div>
+</div>
+<div class="sw-port" data-port="10" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(10);" title="Porta 10 | GigabitEthernet10&#10;Status: DOWN&#10;Velocidade: --&#10;Entrada: 0 Kb/s&#10;Saida: 0 Kb/s" style="width: 50px; height: 60px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
+<div style="width: 100%; display: flex; justify-content: space-between; padding: 0 3px;">
+<span class="sw-led-1" style="width: 6px; height: 4px; border-radius: 1px; background-color: #27303f;  display: inline-block;"></span>
+<span class="sw-led-2" style="width: 6px; height: 4px; border-radius: 1px; background-color: #27303f; opacity: 0.85;  display: inline-block;"></span>
+</div>
+<div style="width: 34px; height: 28px; background: #05070a; border: 1.5px solid #1a2332; border-radius: 2px; position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: space-between;">
+<div style="width: 24px; height: 4px; background: repeating-linear-gradient(90deg, #d4af37 0px, #d4af37 1px, transparent 1px, transparent 2.5px); opacity: 0.85; margin-top: 1px;"></div>
+<div style="width: 14px; height: 6px; background: #0d1420; border-top: 1px solid #192332; border-left: 1px solid #192332; border-right: 1px solid #192332; border-radius: 1px 1px 0 0;"></div>
+</div>
+<div style="font-size: 10.5px; font-weight: 800; color: #8b949e; line-height: 1; font-family: monospace; margin-bottom: 1px;">10</div>
+</div>
+<div class="sw-port" data-port="12" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(12);" title="Porta 12 | GigabitEthernet12&#10;Status: UP (DEGRADADO)&#10;Velocidade: 100 Mb/s&#10;Entrada: 0 Kb/s&#10;Saida: 14.7 Kb/s" style="width: 50px; height: 60px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
+<div style="width: 100%; display: flex; justify-content: space-between; padding: 0 3px;">
+<span class="sw-led-1" style="width: 6px; height: 4px; border-radius: 1px; background-color: #f59e0b; box-shadow: 0 0 5px #f59e0b; display: inline-block;"></span>
+<span class="sw-led-2" style="width: 6px; height: 4px; border-radius: 1px; background-color: #f59e0b; opacity: 0.85; box-shadow: 0 0 5px #f59e0b; display: inline-block;"></span>
+</div>
+<div style="width: 34px; height: 28px; background: #05070a; border: 1.5px solid #1a2332; border-radius: 2px; position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: space-between;">
+<div style="width: 24px; height: 4px; background: repeating-linear-gradient(90deg, #d4af37 0px, #d4af37 1px, transparent 1px, transparent 2.5px); opacity: 0.85; margin-top: 1px;"></div>
+<div style="width: 14px; height: 6px; background: #0d1420; border-top: 1px solid #192332; border-left: 1px solid #192332; border-right: 1px solid #192332; border-radius: 1px 1px 0 0;"></div>
+</div>
+<div style="font-size: 10.5px; font-weight: 800; color: #8b949e; line-height: 1; font-family: monospace; margin-bottom: 1px;">12</div>
+</div>
+</div>
+</div>
+<!-- Vertical Bay Separator -->
+<div style="width: 1px; height: 95px; background: linear-gradient(180deg, transparent, #283548, transparent);"></div>
+<!-- Bank 2: Ports 13 - 24 (6 columns) -->
+<div style="display: flex; flex-direction: column; gap: 6px;">
+<div style="font-size: 9px; font-weight: 700; color: #64748b; letter-spacing: 1px; text-align: center; text-transform: uppercase;">PORTAS 13 &ndash; 24 &bull; 10/100/1000M</div>
+<div style="display: flex; gap: 18px;">
+<div class="sw-port" data-port="13" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(13);" title="Porta 13 | GigabitEthernet13&#10;Status: DOWN&#10;Velocidade: --&#10;Entrada: 0 Kb/s&#10;Saida: 0 Kb/s" style="width: 50px; height: 60px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
+<div style="width: 100%; display: flex; justify-content: space-between; padding: 0 3px;">
+<span class="sw-led-1" style="width: 6px; height: 4px; border-radius: 1px; background-color: #27303f;  display: inline-block;"></span>
+<span class="sw-led-2" style="width: 6px; height: 4px; border-radius: 1px; background-color: #27303f; opacity: 0.85;  display: inline-block;"></span>
+</div>
+<div style="width: 34px; height: 28px; background: #05070a; border: 1.5px solid #1a2332; border-radius: 2px; position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: space-between;">
+<div style="width: 24px; height: 4px; background: repeating-linear-gradient(90deg, #d4af37 0px, #d4af37 1px, transparent 1px, transparent 2.5px); opacity: 0.85; margin-top: 1px;"></div>
+<div style="width: 14px; height: 6px; background: #0d1420; border-top: 1px solid #192332; border-left: 1px solid #192332; border-right: 1px solid #192332; border-radius: 1px 1px 0 0;"></div>
+</div>
+<div style="font-size: 10.5px; font-weight: 800; color: #8b949e; line-height: 1; font-family: monospace; margin-bottom: 1px;">13</div>
+</div>
+<div class="sw-port" data-port="15" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(15);" title="Porta 15 | GigabitEthernet15&#10;Status: DOWN&#10;Velocidade: --&#10;Entrada: 0 Kb/s&#10;Saida: 0 Kb/s" style="width: 50px; height: 60px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
+<div style="width: 100%; display: flex; justify-content: space-between; padding: 0 3px;">
+<span class="sw-led-1" style="width: 6px; height: 4px; border-radius: 1px; background-color: #27303f;  display: inline-block;"></span>
+<span class="sw-led-2" style="width: 6px; height: 4px; border-radius: 1px; background-color: #27303f; opacity: 0.85;  display: inline-block;"></span>
+</div>
+<div style="width: 34px; height: 28px; background: #05070a; border: 1.5px solid #1a2332; border-radius: 2px; position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: space-between;">
+<div style="width: 24px; height: 4px; background: repeating-linear-gradient(90deg, #d4af37 0px, #d4af37 1px, transparent 1px, transparent 2.5px); opacity: 0.85; margin-top: 1px;"></div>
+<div style="width: 14px; height: 6px; background: #0d1420; border-top: 1px solid #192332; border-left: 1px solid #192332; border-right: 1px solid #192332; border-radius: 1px 1px 0 0;"></div>
+</div>
+<div style="font-size: 10.5px; font-weight: 800; color: #8b949e; line-height: 1; font-family: monospace; margin-bottom: 1px;">15</div>
+</div>
+<div class="sw-port" data-port="17" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(17);" title="Porta 17 | GigabitEthernet17&#10;Status: DOWN&#10;Velocidade: --&#10;Entrada: 0 Kb/s&#10;Saida: 0 Kb/s" style="width: 50px; height: 60px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
+<div style="width: 100%; display: flex; justify-content: space-between; padding: 0 3px;">
+<span class="sw-led-1" style="width: 6px; height: 4px; border-radius: 1px; background-color: #27303f;  display: inline-block;"></span>
+<span class="sw-led-2" style="width: 6px; height: 4px; border-radius: 1px; background-color: #27303f; opacity: 0.85;  display: inline-block;"></span>
+</div>
+<div style="width: 34px; height: 28px; background: #05070a; border: 1.5px solid #1a2332; border-radius: 2px; position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: space-between;">
+<div style="width: 24px; height: 4px; background: repeating-linear-gradient(90deg, #d4af37 0px, #d4af37 1px, transparent 1px, transparent 2.5px); opacity: 0.85; margin-top: 1px;"></div>
+<div style="width: 14px; height: 6px; background: #0d1420; border-top: 1px solid #192332; border-left: 1px solid #192332; border-right: 1px solid #192332; border-radius: 1px 1px 0 0;"></div>
+</div>
+<div style="font-size: 10.5px; font-weight: 800; color: #8b949e; line-height: 1; font-family: monospace; margin-bottom: 1px;">17</div>
+</div>
+<div class="sw-port" data-port="19" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(19);" title="Porta 19 | GigabitEthernet19&#10;Status: DOWN&#10;Velocidade: --&#10;Entrada: 0 Kb/s&#10;Saida: 0 Kb/s" style="width: 50px; height: 60px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
+<div style="width: 100%; display: flex; justify-content: space-between; padding: 0 3px;">
+<span class="sw-led-1" style="width: 6px; height: 4px; border-radius: 1px; background-color: #27303f;  display: inline-block;"></span>
+<span class="sw-led-2" style="width: 6px; height: 4px; border-radius: 1px; background-color: #27303f; opacity: 0.85;  display: inline-block;"></span>
+</div>
+<div style="width: 34px; height: 28px; background: #05070a; border: 1.5px solid #1a2332; border-radius: 2px; position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: space-between;">
+<div style="width: 24px; height: 4px; background: repeating-linear-gradient(90deg, #d4af37 0px, #d4af37 1px, transparent 1px, transparent 2.5px); opacity: 0.85; margin-top: 1px;"></div>
+<div style="width: 14px; height: 6px; background: #0d1420; border-top: 1px solid #192332; border-left: 1px solid #192332; border-right: 1px solid #192332; border-radius: 1px 1px 0 0;"></div>
+</div>
+<div style="font-size: 10.5px; font-weight: 800; color: #8b949e; line-height: 1; font-family: monospace; margin-bottom: 1px;">19</div>
+</div>
+<div class="sw-port" data-port="21" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(21);" title="Porta 21 | GigabitEthernet21&#10;Status: DOWN&#10;Velocidade: --&#10;Entrada: 0 Kb/s&#10;Saida: 0 Kb/s" style="width: 50px; height: 60px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
+<div style="width: 100%; display: flex; justify-content: space-between; padding: 0 3px;">
+<span class="sw-led-1" style="width: 6px; height: 4px; border-radius: 1px; background-color: #27303f;  display: inline-block;"></span>
+<span class="sw-led-2" style="width: 6px; height: 4px; border-radius: 1px; background-color: #27303f; opacity: 0.85;  display: inline-block;"></span>
+</div>
+<div style="width: 34px; height: 28px; background: #05070a; border: 1.5px solid #1a2332; border-radius: 2px; position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: space-between;">
+<div style="width: 24px; height: 4px; background: repeating-linear-gradient(90deg, #d4af37 0px, #d4af37 1px, transparent 1px, transparent 2.5px); opacity: 0.85; margin-top: 1px;"></div>
+<div style="width: 14px; height: 6px; background: #0d1420; border-top: 1px solid #192332; border-left: 1px solid #192332; border-right: 1px solid #192332; border-radius: 1px 1px 0 0;"></div>
+</div>
+<div style="font-size: 10.5px; font-weight: 800; color: #8b949e; line-height: 1; font-family: monospace; margin-bottom: 1px;">21</div>
+</div>
+<div class="sw-port" data-port="23" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(23);" title="Porta 23 | GigabitEthernet23&#10;Status: UP&#10;Velocidade: 1 Gb/s&#10;Entrada: 0.2 Kb/s&#10;Saida: 14.8 Kb/s" style="width: 50px; height: 60px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
+<div style="width: 100%; display: flex; justify-content: space-between; padding: 0 3px;">
+<span class="sw-led-1" style="width: 6px; height: 4px; border-radius: 1px; background-color: #00e676; box-shadow: 0 0 5px #00e676; display: inline-block;"></span>
+<span class="sw-led-2" style="width: 6px; height: 4px; border-radius: 1px; background-color: #00e676; opacity: 0.85; box-shadow: 0 0 5px #00e676; display: inline-block;"></span>
+</div>
+<div style="width: 34px; height: 28px; background: #05070a; border: 1.5px solid #1a2332; border-radius: 2px; position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: space-between;">
+<div style="width: 24px; height: 4px; background: repeating-linear-gradient(90deg, #d4af37 0px, #d4af37 1px, transparent 1px, transparent 2.5px); opacity: 0.85; margin-top: 1px;"></div>
+<div style="width: 14px; height: 6px; background: #0d1420; border-top: 1px solid #192332; border-left: 1px solid #192332; border-right: 1px solid #192332; border-radius: 1px 1px 0 0;"></div>
+</div>
+<div style="font-size: 10.5px; font-weight: 800; color: #8b949e; line-height: 1; font-family: monospace; margin-bottom: 1px;">23</div>
+</div>
+</div>
+<div style="display: flex; gap: 18px;">
+<div class="sw-port" data-port="14" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(14);" title="Porta 14 | GigabitEthernet14&#10;Status: DOWN&#10;Velocidade: --&#10;Entrada: 0 Kb/s&#10;Saida: 0 Kb/s" style="width: 50px; height: 60px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
+<div style="width: 100%; display: flex; justify-content: space-between; padding: 0 3px;">
+<span class="sw-led-1" style="width: 6px; height: 4px; border-radius: 1px; background-color: #27303f;  display: inline-block;"></span>
+<span class="sw-led-2" style="width: 6px; height: 4px; border-radius: 1px; background-color: #27303f; opacity: 0.85;  display: inline-block;"></span>
+</div>
+<div style="width: 34px; height: 28px; background: #05070a; border: 1.5px solid #1a2332; border-radius: 2px; position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: space-between;">
+<div style="width: 24px; height: 4px; background: repeating-linear-gradient(90deg, #d4af37 0px, #d4af37 1px, transparent 1px, transparent 2.5px); opacity: 0.85; margin-top: 1px;"></div>
+<div style="width: 14px; height: 6px; background: #0d1420; border-top: 1px solid #192332; border-left: 1px solid #192332; border-right: 1px solid #192332; border-radius: 1px 1px 0 0;"></div>
+</div>
+<div style="font-size: 10.5px; font-weight: 800; color: #8b949e; line-height: 1; font-family: monospace; margin-bottom: 1px;">14</div>
+</div>
+<div class="sw-port" data-port="16" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(16);" title="Porta 16 | GigabitEthernet16&#10;Status: UP (DEGRADADO)&#10;Velocidade: 100 Mb/s&#10;Entrada: 0 Kb/s&#10;Saida: 14.8 Kb/s" style="width: 50px; height: 60px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
+<div style="width: 100%; display: flex; justify-content: space-between; padding: 0 3px;">
+<span class="sw-led-1" style="width: 6px; height: 4px; border-radius: 1px; background-color: #f59e0b; box-shadow: 0 0 5px #f59e0b; display: inline-block;"></span>
+<span class="sw-led-2" style="width: 6px; height: 4px; border-radius: 1px; background-color: #f59e0b; opacity: 0.85; box-shadow: 0 0 5px #f59e0b; display: inline-block;"></span>
+</div>
+<div style="width: 34px; height: 28px; background: #05070a; border: 1.5px solid #1a2332; border-radius: 2px; position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: space-between;">
+<div style="width: 24px; height: 4px; background: repeating-linear-gradient(90deg, #d4af37 0px, #d4af37 1px, transparent 1px, transparent 2.5px); opacity: 0.85; margin-top: 1px;"></div>
+<div style="width: 14px; height: 6px; background: #0d1420; border-top: 1px solid #192332; border-left: 1px solid #192332; border-right: 1px solid #192332; border-radius: 1px 1px 0 0;"></div>
+</div>
+<div style="font-size: 10.5px; font-weight: 800; color: #8b949e; line-height: 1; font-family: monospace; margin-bottom: 1px;">16</div>
+</div>
+<div class="sw-port" data-port="18" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(18);" title="Porta 18 | GigabitEthernet18&#10;Status: DOWN&#10;Velocidade: --&#10;Entrada: 0 Kb/s&#10;Saida: 0 Kb/s" style="width: 50px; height: 60px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
+<div style="width: 100%; display: flex; justify-content: space-between; padding: 0 3px;">
+<span class="sw-led-1" style="width: 6px; height: 4px; border-radius: 1px; background-color: #27303f;  display: inline-block;"></span>
+<span class="sw-led-2" style="width: 6px; height: 4px; border-radius: 1px; background-color: #27303f; opacity: 0.85;  display: inline-block;"></span>
+</div>
+<div style="width: 34px; height: 28px; background: #05070a; border: 1.5px solid #1a2332; border-radius: 2px; position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: space-between;">
+<div style="width: 24px; height: 4px; background: repeating-linear-gradient(90deg, #d4af37 0px, #d4af37 1px, transparent 1px, transparent 2.5px); opacity: 0.85; margin-top: 1px;"></div>
+<div style="width: 14px; height: 6px; background: #0d1420; border-top: 1px solid #192332; border-left: 1px solid #192332; border-right: 1px solid #192332; border-radius: 1px 1px 0 0;"></div>
+</div>
+<div style="font-size: 10.5px; font-weight: 800; color: #8b949e; line-height: 1; font-family: monospace; margin-bottom: 1px;">18</div>
+</div>
+<div class="sw-port" data-port="20" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(20);" title="Porta 20 | GigabitEthernet20&#10;Status: DOWN&#10;Velocidade: --&#10;Entrada: 0 Kb/s&#10;Saida: 0 Kb/s" style="width: 50px; height: 60px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
+<div style="width: 100%; display: flex; justify-content: space-between; padding: 0 3px;">
+<span class="sw-led-1" style="width: 6px; height: 4px; border-radius: 1px; background-color: #27303f;  display: inline-block;"></span>
+<span class="sw-led-2" style="width: 6px; height: 4px; border-radius: 1px; background-color: #27303f; opacity: 0.85;  display: inline-block;"></span>
+</div>
+<div style="width: 34px; height: 28px; background: #05070a; border: 1.5px solid #1a2332; border-radius: 2px; position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: space-between;">
+<div style="width: 24px; height: 4px; background: repeating-linear-gradient(90deg, #d4af37 0px, #d4af37 1px, transparent 1px, transparent 2.5px); opacity: 0.85; margin-top: 1px;"></div>
+<div style="width: 14px; height: 6px; background: #0d1420; border-top: 1px solid #192332; border-left: 1px solid #192332; border-right: 1px solid #192332; border-radius: 1px 1px 0 0;"></div>
+</div>
+<div style="font-size: 10.5px; font-weight: 800; color: #8b949e; line-height: 1; font-family: monospace; margin-bottom: 1px;">20</div>
+</div>
+<div class="sw-port" data-port="22" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(22);" title="Porta 22 | GigabitEthernet22&#10;Status: DOWN&#10;Velocidade: --&#10;Entrada: 0 Kb/s&#10;Saida: 0 Kb/s" style="width: 50px; height: 60px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
+<div style="width: 100%; display: flex; justify-content: space-between; padding: 0 3px;">
+<span class="sw-led-1" style="width: 6px; height: 4px; border-radius: 1px; background-color: #27303f;  display: inline-block;"></span>
+<span class="sw-led-2" style="width: 6px; height: 4px; border-radius: 1px; background-color: #27303f; opacity: 0.85;  display: inline-block;"></span>
+</div>
+<div style="width: 34px; height: 28px; background: #05070a; border: 1.5px solid #1a2332; border-radius: 2px; position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: space-between;">
+<div style="width: 24px; height: 4px; background: repeating-linear-gradient(90deg, #d4af37 0px, #d4af37 1px, transparent 1px, transparent 2.5px); opacity: 0.85; margin-top: 1px;"></div>
+<div style="width: 14px; height: 6px; background: #0d1420; border-top: 1px solid #192332; border-left: 1px solid #192332; border-right: 1px solid #192332; border-radius: 1px 1px 0 0;"></div>
+</div>
+<div style="font-size: 10.5px; font-weight: 800; color: #8b949e; line-height: 1; font-family: monospace; margin-bottom: 1px;">22</div>
+</div>
+<div class="sw-port sw-selected" data-port="24" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(24);" title="Porta 24 | GigabitEthernet24&#10;Status: UP&#10;Velocidade: 1 Gb/s&#10;Entrada: 76.5 Kb/s&#10;Saida: 23 Kb/s" style="width: 50px; height: 60px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 2px solid #00b0ff; box-shadow: 0 0 14px rgba(0, 176, 255, 0.9); box-sizing: border-box;">
+<div style="width: 100%; display: flex; justify-content: space-between; padding: 0 3px;">
+<span class="sw-led-1" style="width: 6px; height: 4px; border-radius: 1px; background-color: #00e676; box-shadow: 0 0 5px #00e676; display: inline-block;"></span>
+<span class="sw-led-2" style="width: 6px; height: 4px; border-radius: 1px; background-color: #00e676; opacity: 0.85; box-shadow: 0 0 5px #00e676; display: inline-block;"></span>
+</div>
+<div style="width: 34px; height: 28px; background: #05070a; border: 1.5px solid #1a2332; border-radius: 2px; position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: space-between;">
+<div style="width: 24px; height: 4px; background: repeating-linear-gradient(90deg, #d4af37 0px, #d4af37 1px, transparent 1px, transparent 2.5px); opacity: 0.85; margin-top: 1px;"></div>
+<div style="width: 14px; height: 6px; background: #0d1420; border-top: 1px solid #192332; border-left: 1px solid #192332; border-right: 1px solid #192332; border-radius: 1px 1px 0 0;"></div>
+</div>
+<div style="font-size: 10.5px; font-weight: 800; color: #8b949e; line-height: 1; font-family: monospace; margin-bottom: 1px;">24</div>
+</div>
+</div>
+</div>
+</div> <!-- End 24 Ports Bay -->
+<!-- Right 4x SFP+ 10G Ports (Aruba Ports 25 to 28) -->
+<div style="min-width: 185px; background: #080c14; border: 1.5px solid #1c2636; border-radius: 8px; padding: 12px 18px; box-shadow: inset 0 3px 12px rgba(0,0,0,0.9); flex-shrink: 0; display: flex; flex-direction: column; align-items: center;">
+<div style="font-size: 9px; font-weight: 700; color: #8b949e; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px;">UPLINKS SFP+ 10G</div>
+<div style="display: flex; flex-direction: column; gap: 8px;">
+<!-- Row 1: 25, 27 -->
+<div style="display: flex; gap: 14px;">
+<div class="sw-port" data-port="25" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(25);" title="SFP+ 25 | SFP+ 10G&#10;Status: DOWN&#10;Velocidade: --&#10;Entrada: 0 Kb/s&#10;Saida: 0 Kb/s" style="width: 72px; height: 44px; background: #101622; border: 1px solid #283344; border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 7px; position: relative; cursor: pointer; box-sizing: border-box;">
+<div style="width: 100%; display: flex; justify-content: space-between; align-items: center;">
+<span class="sw-led-1" style="width: 6px; height: 4px; border-radius: 1px; background: #27303f;  display: inline-block;"></span>
+<span style="font-size: 8px; font-weight: 700; color: #64748b; letter-spacing: 0.5px;">10G</span>
+</div>
+<div style="width: 48px; height: 10px; border-radius: 2px; background: #2d3748; border: 1px solid rgba(0,0,0,0.5);"></div>
+<div style="font-size: 10.5px; font-weight: 800; color: #8b949e; font-family: monospace; line-height: 1;">25</div>
+</div>
+<div class="sw-port" data-port="27" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(27);" title="SFP+ 27 | SFP+ 10G&#10;Status: DOWN&#10;Velocidade: --&#10;Entrada: 0 Kb/s&#10;Saida: 0 Kb/s" style="width: 72px; height: 44px; background: #101622; border: 1px solid #283344; border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 7px; position: relative; cursor: pointer; box-sizing: border-box;">
+<div style="width: 100%; display: flex; justify-content: space-between; align-items: center;">
+<span class="sw-led-1" style="width: 6px; height: 4px; border-radius: 1px; background: #27303f;  display: inline-block;"></span>
+<span style="font-size: 8px; font-weight: 700; color: #64748b; letter-spacing: 0.5px;">10G</span>
+</div>
+<div style="width: 48px; height: 10px; border-radius: 2px; background: #2d3748; border: 1px solid rgba(0,0,0,0.5);"></div>
+<div style="font-size: 10.5px; font-weight: 800; color: #8b949e; font-family: monospace; line-height: 1;">27</div>
+</div>
+</div>
+<!-- Row 2: 26, 28 -->
+<div style="display: flex; gap: 14px;">
+<div class="sw-port" data-port="26" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(26);" title="SFP+ 26 | SFP+ 10G&#10;Status: DOWN&#10;Velocidade: --&#10;Entrada: 0 Kb/s&#10;Saida: 0 Kb/s" style="width: 72px; height: 44px; background: #101622; border: 1px solid #283344; border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 7px; position: relative; cursor: pointer; box-sizing: border-box;">
+<div style="width: 100%; display: flex; justify-content: space-between; align-items: center;">
+<span class="sw-led-1" style="width: 6px; height: 4px; border-radius: 1px; background: #27303f;  display: inline-block;"></span>
+<span style="font-size: 8px; font-weight: 700; color: #64748b; letter-spacing: 0.5px;">10G</span>
+</div>
+<div style="width: 48px; height: 10px; border-radius: 2px; background: #2d3748; border: 1px solid rgba(0,0,0,0.5);"></div>
+<div style="font-size: 10.5px; font-weight: 800; color: #8b949e; font-family: monospace; line-height: 1;">26</div>
+</div>
+<div class="sw-port" data-port="28" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(28);" title="SFP+ 28 | SFP+ 10G&#10;Status: DOWN&#10;Velocidade: --&#10;Entrada: 0 Kb/s&#10;Saida: 0 Kb/s" style="width: 72px; height: 44px; background: #101622; border: 1px solid #283344; border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 7px; position: relative; cursor: pointer; box-sizing: border-box;">
+<div style="width: 100%; display: flex; justify-content: space-between; align-items: center;">
+<span class="sw-led-1" style="width: 6px; height: 4px; border-radius: 1px; background: #27303f;  display: inline-block;"></span>
+<span style="font-size: 8px; font-weight: 700; color: #64748b; letter-spacing: 0.5px;">10G</span>
+</div>
+<div style="width: 48px; height: 10px; border-radius: 2px; background: #2d3748; border: 1px solid rgba(0,0,0,0.5);"></div>
+<div style="font-size: 10.5px; font-weight: 800; color: #8b949e; font-family: monospace; line-height: 1;">28</div>
+</div>
+</div>
+</div>
+<div style="font-size: 8px; font-weight: 700; color: #64748b; margin-top: 8px;">Portas 25 &ndash; 28</div>
+</div>
+<!-- Right Rack Ear -->
+<div style="width: 18px; height: 120px; background: #1c222e; border: 1px solid #333f52; border-radius: 4px; display: flex; flex-direction: column; justify-content: space-around; align-items: center; box-shadow: inset 0 0 6px rgba(0,0,0,0.6); flex-shrink: 0;">
+<div style="width: 10px; height: 10px; border-radius: 50%; background: radial-gradient(circle, #5b6980 20%, #202733 90%); border: 1px solid #111;"></div>
+<div style="width: 10px; height: 10px; border-radius: 50%; background: radial-gradient(circle, #5b6980 20%, #202733 90%); border: 1px solid #111;"></div>
+</div>
+</div> <!-- End Aruba Chassis -->
+<!-- ASSET INVENTORY DRAWER (ZABBIX sysDescr) -->
+<div id="aruba-loc-drawer" style="display: none; background: #0c121e; border: 1.5px solid #00b0ff; border-radius: 8px; padding: 16px 20px; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0, 176, 255, 0.22); transition: all 0.3s ease;">
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; border-bottom: 1px solid rgba(0, 176, 255, 0.25); padding-bottom: 10px;">
+<div style="display: flex; align-items: center; gap: 10px;">
+<span style="width: 9px; height: 9px; border-radius: 50%; background: #00b0ff; box-shadow: 0 0 10px #00b0ff; display: inline-block;"></span>
+<span style="font-size: 12px; font-weight: 800; letter-spacing: 1px; color: #00b0ff; text-transform: uppercase;">INFORMA&Ccedil;&Otilde;ES E INVENT&Aacute;RIO DO ATIVO &bull; ZABBIX SNMP</span>
+<span style="background: rgba(0, 176, 255, 0.15); color: #38bdf8; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px; border: 1px solid rgba(0, 176, 255, 0.3);">CADASTRO SNMP</span>
+</div>
+<div style="display: flex; align-items: center; gap: 10px;">
+<a id="drawer-gui-link" href="http://10.0.0.1" target="_blank" rel="noopener noreferrer" style="background: rgba(0, 230, 118, 0.15); color: #00e676; text-decoration: none; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 4px; border: 1px solid rgba(0, 230, 118, 0.3); display: flex; align-items: center; gap: 4px;">
+<span>Abrir Web GUI Aruba (10.0.0.1)</span> &#x2197;
+</a>
+<button id="btn-close-drawer" type="button" onclick="if(window.__arubaCloseLoc)window.__arubaCloseLoc();" style="background: #1e293b; border: 1px solid #334155; color: #94a3b8; padding: 4px 12px; border-radius: 4px; font-size: 11px; font-weight: 700; cursor: pointer; transition: all 0.2s ease;">Fechar &times;</button>
+</div>
+</div>
+<div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+<div style="background: #111724; padding: 10px 14px; border-radius: 6px; border: 1px solid #1c2638;">
+<div style="font-size: 9px; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 4px;">HOSTNAME (sysName)</div>
+<div id="drawer-sysname" style="font-size: 14px; font-weight: 800; color: #ffffff;">SW01</div>
+</div>
+<div style="background: #111724; padding: 10px 14px; border-radius: 6px; border: 1px solid #1c2638;">
+<div style="font-size: 9px; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 4px;">LOCAL FISICO (sysLocation)</div>
+<div id="drawer-syslocation" style="font-size: 14px; font-weight: 800; color: #00e676;">Rack CPD</div>
+</div>
+<div style="background: #111724; padding: 10px 14px; border-radius: 6px; border: 1px solid #1c2638;">
+<div style="font-size: 9px; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 4px;">CONTATO / RESPONSAVEL</div>
+<div id="drawer-syscontact" style="font-size: 14px; font-weight: 800; color: #ffffff;">Bamex</div>
+</div>
+<div style="background: #111724; padding: 10px 14px; border-radius: 6px; border: 1px solid #1c2638;">
+<div style="font-size: 9px; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 4px;">IP GERENCIA / SNMP</div>
+<div id="drawer-switch-ip" style="font-size: 14px; font-weight: 800; color: #38bdf8;">10.0.0.1</div>
+</div>
+</div>
+<div style="background: #111724; padding: 12px 14px; border-radius: 6px; border: 1px solid #1c2638;">
+<div style="font-size: 9px; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 4px;">DESCRICAO DO ATIVO NO ZABBIX (sysDescr)</div>
+<div id="drawer-sysdescr" style="font-size: 12px; font-family: monospace; color: #cbd5e1; line-height: 1.5; word-break: break-all;">
+Aruba Instant On 1930 24G 4SFP/SFP+ Switch JL682A, InstantOn_1930_2.8.0.0 (17), Linux 4.4.120, U-Boot 2013.01 (V1.0.1.41)
+</div>
+<div style="margin-top: 6px; font-size: 10px; color: #64748b; display: flex; gap: 14px;">
+<span>OID: SNMPv2-SMI::enterprises.11.2.3.7.11.196</span>
+<span>&bull;</span>
+<span>Template: SNMP Network Device</span>
+<span>&bull;</span>
+<span>Host ID Zabbix: 10682</span>
+</div>
+</div>
+</div>
+<!-- LEGEND ROW -->
+<div style="display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: #8b949e; padding: 2px 4px; margin-bottom: 22px;">
+<div style="display: flex; align-items: center; gap: 20px;">
+<div style="display: flex; align-items: center; gap: 6px;">
+<span style="width: 14px; height: 3px; border-radius: 2px; background-color: #00e676; display: inline-block;"></span>
+<span>Link 1 Gb/s ou 10 Gb/s</span>
+</div>
+<div style="display: flex; align-items: center; gap: 6px;">
+<span style="width: 14px; height: 3px; border-radius: 2px; background-color: #f59e0b; display: inline-block;"></span>
+<span>Link 10/100 Mb/s (degradado)</span>
+</div>
+<div style="display: flex; align-items: center; gap: 6px;">
+<span style="width: 14px; height: 3px; border-radius: 2px; background-color: #ef4444; display: inline-block;"></span>
+<span>Porta monitorada ca&iacute;da</span>
+</div>
+<div style="display: flex; align-items: center; gap: 6px;">
+<span style="width: 14px; height: 3px; border-radius: 2px; background-color: #374151; display: inline-block;"></span>
+<span>Sem link / dispon&iacute;vel</span>
+</div>
+</div>
+<div style="display: flex; align-items: center; gap: 6px; color: #64748b; font-size: 10.5px;">
+<span>&#9758; Clique em qualquer porta para inspecionar &bull; Clique no bot&atilde;o 'Loc' para abrir as informa&ccedil;&otilde;es do ativo</span>
+</div>
+</div>
+<!-- BOTTOM GRID: SELECTED PORT DETAIL + EVENTS -->
+<div style="display: grid; grid-template-columns: 1.6fr 1.1fr; gap: 18px;">
+<!-- Selected Port Detail Panel -->
+<div style="background: #121620; border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 8px; padding: 18px 22px;">
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+<div style="font-size: 10.5px; font-weight: 700; letter-spacing: 0.8px; color: #8b949e; text-transform: uppercase;">DETALHE DA PORTA SELECIONADA</div>
+<div id="sel-port-type" style="font-size: 11px; font-weight: 700; color: #ff8300; letter-spacing: 0.5px;">ARUBA 1GBE RJ45</div>
+</div>
+<div style="display: flex; align-items: baseline; gap: 10px; margin-bottom: 16px;">
+<h2 id="sel-port-title" style="font-size: 26px; font-weight: 800; color: #ffffff; margin: 0; letter-spacing: -0.5px;">Porta 24</h2>
+<span id="sel-port-name" style="font-size: 13px; color: #8b949e; font-weight: 500;">GigabitEthernet24 &bull; Uplink LAN</span>
+<span id="sel-port-status" style="background: rgba(0, 230, 118, 0.15); color: #00e676; font-size: 10.5px; font-weight: 800; padding: 2px 8px; border-radius: 4px; border: 1px solid rgba(0, 230, 118, 0.3);">UP</span>
+</div>
+<!-- 5 Stats Cards -->
+<div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 16px;">
+<div>
+<div style="font-size: 9.5px; font-weight: 700; color: #8b949e; text-transform: uppercase; margin-bottom: 4px;">VELOCIDADE</div>
+<div id="sel-port-speed" style="font-size: 17px; font-weight: 800; color: #ffffff;">1 Gb/s</div>
+</div>
+<div>
+<div style="font-size: 9.5px; font-weight: 700; color: #8b949e; text-transform: uppercase; margin-bottom: 4px;">ENTRADA</div>
+<div id="sel-port-in" style="font-size: 17px; font-weight: 800; color: #ffffff;">25.8 Kb/s</div>
+</div>
+<div>
+<div style="font-size: 9.5px; font-weight: 700; color: #8b949e; text-transform: uppercase; margin-bottom: 4px;">SA&Iacute;DA</div>
+<div id="sel-port-out" style="font-size: 17px; font-weight: 800; color: #ffffff;">7.8 Kb/s</div>
+</div>
+<div>
+<div style="font-size: 9.5px; font-weight: 700; color: #8b949e; text-transform: uppercase; margin-bottom: 4px;">UTILIZA&Ccedil;&Atilde;O</div>
+<div id="sel-port-util" style="font-size: 17px; font-weight: 800; color: #ffffff;">0,01%</div>
+</div>
+<div>
+<div style="font-size: 9.5px; font-weight: 700; color: #8b949e; text-transform: uppercase; margin-bottom: 4px;">ERROS RX</div>
+<div id="sel-port-errors" style="font-size: 17px; font-weight: 800; color: #ffffff;">0</div>
+</div>
+</div>
+<!-- Real Historical Traffic Canvas -->
+<div id="chart-card-container" style="background: #090c12; border: 1px solid #1a2230; border-radius: 6px; padding: 12px 14px; position: relative;">
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+<div style="display: flex; align-items: center; gap: 8px;">
+<span style="font-size: 10px; font-weight: 800; letter-spacing: 0.6px; color: #94a3b8; text-transform: uppercase;">HIST&Oacute;RICO DE TR&Aacute;FEGO (SNMP)</span>
+<span id="canvas-max-label" style="font-size: 9.5px; color: #38bdf8; font-family: monospace; font-weight: 700; background: rgba(0, 176, 255, 0.1); padding: 1px 6px; border-radius: 3px; border: 1px solid rgba(0, 176, 255, 0.2);">Hist&oacute;rico Real Zabbix</span>
+</div>
+<div style="display: flex; align-items: center; gap: 10px;">
+<div style="display: flex; align-items: center; gap: 4px; background: #0c121e; border: 1px solid #1e293b; border-radius: 6px; padding: 2px 4px;">
+<span style="font-size: 8.5px; font-weight: 800; color: #64748b; margin-right: 4px; letter-spacing: 0.5px;">JANELA:</span>
+<button id="btn-range-3" type="button" onclick="if(window.__arubaChangeRange)window.__arubaChangeRange(3);" style="background: #00b0ff; color: #050b14; border: none; border-radius: 4px; padding: 2px 8px; font-size: 10px; font-weight: 800; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 0 8px rgba(0, 176, 255, 0.6);">3h</button>
+<button id="btn-range-6" type="button" onclick="if(window.__arubaChangeRange)window.__arubaChangeRange(6);" style="background: transparent; color: #94a3b8; border: none; border-radius: 4px; padding: 2px 8px; font-size: 10px; font-weight: 700; cursor: pointer; transition: all 0.2s ease;">6h</button>
+<button id="btn-range-12" type="button" onclick="if(window.__arubaChangeRange)window.__arubaChangeRange(12);" style="background: transparent; color: #94a3b8; border: none; border-radius: 4px; padding: 2px 8px; font-size: 10px; font-weight: 700; cursor: pointer; transition: all 0.2s ease;">12h</button>
+<button id="btn-range-24" type="button" onclick="if(window.__arubaChangeRange)window.__arubaChangeRange(24);" style="background: transparent; color: #94a3b8; border: none; border-radius: 4px; padding: 2px 8px; font-size: 10px; font-weight: 700; cursor: pointer; transition: all 0.2s ease;">24h</button>
+</div>
+<span id="canvas-hint-label" style="font-size: 9px; color: #64748b; font-family: monospace;">&#10022; passe o mouse</span>
+</div>
+</div>
+<!-- Floating Interactive Tooltip HUD -->
+<div id="canvas-tooltip" style="display: none; position: absolute; top: 10px; left: 50%; transform: translateX(-50%); background: rgba(11, 16, 26, 0.96); border: 1px solid #00b0ff; border-radius: 6px; padding: 4px 12px; font-size: 11px; color: #f8fafc; pointer-events: none; z-index: 1000; box-shadow: 0 4px 20px rgba(0,0,0,0.9); backdrop-filter: blur(8px); align-items: center; gap: 12px; white-space: nowrap; width: max-content; flex-shrink: 0;">
+<span id="tt-time" style="color: #94a3b8; font-family: monospace; font-size: 10px; border-right: 1px solid #334155; padding-right: 8px; white-space: nowrap; flex-shrink: 0;">--:--:--</span>
+<span style="color: #00b0ff; font-weight: 700; display: flex; align-items: center; gap: 4px; white-space: nowrap; flex-shrink: 0;">
+<span style="width: 6px; height: 6px; border-radius: 50%; background: #00b0ff; display: inline-block; flex-shrink: 0;"></span>
+In: <span id="tt-in" style="white-space: nowrap;">0 Kb/s</span>
+</span>
+<span style="color: #00e676; font-weight: 700; display: flex; align-items: center; gap: 4px; white-space: nowrap; flex-shrink: 0;">
+<span style="width: 6px; height: 6px; border-radius: 50%; background: #00e676; display: inline-block; flex-shrink: 0;"></span>
+Out: <span id="tt-out" style="white-space: nowrap;">0 Kb/s</span>
+</span>
+<span style="color: #ffffff; font-weight: 700; border-left: 1px solid #334155; padding-left: 8px; white-space: nowrap; flex-shrink: 0;">
+Total: <span id="tt-total" style="white-space: nowrap;">0 Kb/s</span>
+</span>
+</div>
+<canvas id="port-chart-canvas" width="600" height="200" style="width: 100%; height: clamp(170px, 18vw, 260px); min-height: 170px; max-height: 260px; display: block; cursor: crosshair;"></canvas>
+<div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px; font-size: 10.5px;">
+<div style="display: flex; gap: 18px;">
+<span id="legend-in" style="color: #00b0ff; display: flex; align-items: center; gap: 6px; cursor: pointer; user-select: none; font-weight: 600; transition: all 0.2s ease;" title="Clique para alternar exibi&ccedil;&atilde;o de Entrada">
+<span style="width: 12px; height: 3px; border-radius: 1px; background: #00b0ff; display: inline-block;"></span> Entrada (Inbound)
+</span>
+<span id="legend-out" style="color: #00e676; display: flex; align-items: center; gap: 6px; cursor: pointer; user-select: none; font-weight: 600; transition: all 0.2s ease;" title="Clique para alternar exibi&ccedil;&atilde;o de Sa&iacute;da">
+<span style="width: 12px; height: 3px; border-radius: 1px; background: #00e676; display: inline-block;"></span> Sa&iacute;da (Outbound)
+</span>
+</div>
+<span id="canvas-hover-val" style="color: #38bdf8; font-family: monospace; font-size: 10px; font-weight: 600;"></span>
+</div>
+</div>
+</div> <!-- End Selected Port Panel -->
+<!-- Real Events Timeline Panel -->
+<div style="background: #121620; border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 8px; padding: 18px 22px;">
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+<div style="font-size: 10.5px; font-weight: 700; letter-spacing: 0.8px; color: #8b949e; text-transform: uppercase;">EVENTOS DE PORTA &bull; BAMEX SW01</div>
+<div style="font-size: 10.5px; font-weight: 700; color: #64748b; text-transform: uppercase;">ZABBIX EVENT.GET</div>
+</div>
+<div id="event-list-container" style="display: flex; flex-direction: column; gap: 8px;">
+<div style="display: flex; align-items: center; justify-content: space-between; font-size: 12px; color: #e2e8f0; background: #0d121c; padding: 7px 11px; border-radius: 4px; border-left: 3px solid #00e676;">
+<div style="display: flex; align-items: center; gap: 8px;">
+<span style="color: #8b949e; font-family: monospace; min-width: 58px; font-size: 11px;">01:25:08</span>
+<span style="width: 7px; height: 7px; border-radius: 50%; background: #00e676; box-shadow: 0 0 6px #00e676; display: inline-block;"></span>
+<span style="font-weight: 500;">Interface 1(): Link down</span>
+</div>
+<span style="background: rgba(0, 230, 118, 0.12); color: #00e676; font-size: 9.5px; font-weight: 700; padding: 2px 6px; border-radius: 3px; font-family: monospace;">RESOLVIDO</span>
+</div>
+<div style="display: flex; align-items: center; justify-content: space-between; font-size: 12px; color: #e2e8f0; background: #0d121c; padding: 7px 11px; border-radius: 4px; border-left: 3px solid #f59e0b;">
+<div style="display: flex; align-items: center; gap: 8px;">
+<span style="color: #8b949e; font-family: monospace; min-width: 58px; font-size: 11px;">01:22:07</span>
+<span style="width: 7px; height: 7px; border-radius: 50%; background: #f59e0b; box-shadow: 0 0 6px #f59e0b; display: inline-block;"></span>
+<span style="font-weight: 500;">Interface 1(): Link down</span>
+</div>
+<span style="background: rgba(239, 68, 68, 0.12); color: #ef4444; font-size: 9.5px; font-weight: 700; padding: 2px 6px; border-radius: 3px; font-family: monospace;">PROBLEMA</span>
+</div>
+<div style="display: flex; align-items: center; justify-content: space-between; font-size: 12px; color: #e2e8f0; background: #0d121c; padding: 7px 11px; border-radius: 4px; border-left: 3px solid #00e676;">
+<div style="display: flex; align-items: center; gap: 8px;">
+<span style="color: #8b949e; font-family: monospace; min-width: 58px; font-size: 11px;">01:21:08</span>
+<span style="width: 7px; height: 7px; border-radius: 50%; background: #00e676; box-shadow: 0 0 6px #00e676; display: inline-block;"></span>
+<span style="font-weight: 500;">Interface 1(): Link down</span>
+</div>
+<span style="background: rgba(0, 230, 118, 0.12); color: #00e676; font-size: 9.5px; font-weight: 700; padding: 2px 6px; border-radius: 3px; font-family: monospace;">RESOLVIDO</span>
+</div>
+<div style="display: flex; align-items: center; justify-content: space-between; font-size: 12px; color: #e2e8f0; background: #0d121c; padding: 7px 11px; border-radius: 4px; border-left: 3px solid #f59e0b;">
+<div style="display: flex; align-items: center; gap: 8px;">
+<span style="color: #8b949e; font-family: monospace; min-width: 58px; font-size: 11px;">00:26:07</span>
+<span style="width: 7px; height: 7px; border-radius: 50%; background: #f59e0b; box-shadow: 0 0 6px #f59e0b; display: inline-block;"></span>
+<span style="font-weight: 500;">Interface 1(): Link down</span>
+</div>
+<span style="background: rgba(239, 68, 68, 0.12); color: #ef4444; font-size: 9.5px; font-weight: 700; padding: 2px 6px; border-radius: 3px; font-family: monospace;">PROBLEMA</span>
+</div>
+<div style="display: flex; align-items: center; justify-content: space-between; font-size: 12px; color: #e2e8f0; background: #0d121c; padding: 7px 11px; border-radius: 4px; border-left: 3px solid #00e676;">
+<div style="display: flex; align-items: center; gap: 8px;">
+<span style="color: #8b949e; font-family: monospace; min-width: 58px; font-size: 11px;">00:22:08</span>
+<span style="width: 7px; height: 7px; border-radius: 50%; background: #00e676; box-shadow: 0 0 6px #00e676; display: inline-block;"></span>
+<span style="font-weight: 500;">Interface 1(): Link down</span>
+</div>
+<span style="background: rgba(0, 230, 118, 0.12); color: #00e676; font-size: 9.5px; font-weight: 700; padding: 2px 6px; border-radius: 3px; font-family: monospace;">RESOLVIDO</span>
+</div>
+<div style="display: flex; align-items: center; justify-content: space-between; font-size: 12px; color: #e2e8f0; background: #0d121c; padding: 7px 11px; border-radius: 4px; border-left: 3px solid #f59e0b;">
+<div style="display: flex; align-items: center; gap: 8px;">
+<span style="color: #8b949e; font-family: monospace; min-width: 58px; font-size: 11px;">00:21:07</span>
+<span style="width: 7px; height: 7px; border-radius: 50%; background: #f59e0b; box-shadow: 0 0 6px #f59e0b; display: inline-block;"></span>
+<span style="font-weight: 500;">Interface 1(): Link down</span>
+</div>
+<span style="background: rgba(239, 68, 68, 0.12); color: #ef4444; font-size: 9.5px; font-weight: 700; padding: 2px 6px; border-radius: 3px; font-family: monospace;">PROBLEMA</span>
+</div>
+<div style="display: flex; align-items: center; justify-content: space-between; font-size: 12px; color: #e2e8f0; background: #0d121c; padding: 7px 11px; border-radius: 4px; border-left: 3px solid #00e676;">
+<div style="display: flex; align-items: center; gap: 8px;">
+<span style="color: #8b949e; font-family: monospace; min-width: 58px; font-size: 11px;">23:51:07</span>
+<span style="width: 7px; height: 7px; border-radius: 50%; background: #00e676; box-shadow: 0 0 6px #00e676; display: inline-block;"></span>
+<span style="font-weight: 500;">Interface 1(): Link down</span>
+</div>
+<span style="background: rgba(0, 230, 118, 0.12); color: #00e676; font-size: 9.5px; font-weight: 700; padding: 2px 6px; border-radius: 3px; font-family: monospace;">RESOLVIDO</span>
+</div>
+</div>
+</div> <!-- End Right Events Panel -->
+</div> <!-- End Bottom Grid -->
+</div>
