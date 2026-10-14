@@ -1,3 +1,11 @@
+param(
+    [string]$TargetHostId,
+    [string]$TargetDashboardUid,
+    [string]$TargetDashboardTitle,
+    [string]$TargetSwitchShortName,
+    [string]$TargetSwitchIp
+)
+
 Add-Type -AssemblyName System.Drawing
 Add-Type -AssemblyName System.Web.Extensions
 Add-Type -AssemblyName System.Net.Http
@@ -23,11 +31,13 @@ if (-not $zabbixUrl) { $zabbixUrl = "http://10.0.0.26/api_jsonrpc.php" }
 $token = [Environment]::GetEnvironmentVariable("ZABBIX_TOKEN")
 if (-not $token) { $token = "SEU_ZABBIX_TOKEN" }
 
-$hostId = [Environment]::GetEnvironmentVariable("ZABBIX_HOST_ID")
+$hostId = if ($TargetHostId) { $TargetHostId } else { [Environment]::GetEnvironmentVariable("ZABBIX_HOST_ID") }
 if (-not $hostId) { $hostId = "10682" }
 
-$switchIp = [Environment]::GetEnvironmentVariable("SWITCH_IP")
+$switchIp = if ($TargetSwitchIp) { $TargetSwitchIp } else { [Environment]::GetEnvironmentVariable("SWITCH_IP") }
 if (-not $switchIp) { $switchIp = "10.0.0.1" }
+
+$switchShortName = if ($TargetSwitchShortName) { $TargetSwitchShortName } else { "SW01" }
 
 $client = New-Object System.Net.Http.HttpClient
 $client.DefaultRequestHeaders.Add("Authorization", "Bearer $token")
@@ -53,7 +63,7 @@ try {
         $interfaces = @($hostData[0]["interfaces"])
         $firstIf = $interfaces | Where-Object { $_["main"] -eq 1 -or $_["type"] -eq 2 } | Select-Object -First 1
         if (-not $firstIf) { $firstIf = $interfaces[0] }
-        if ($firstIf -and $firstIf["ip"]) {
+        if ($firstIf -and $firstIf["ip"] -and -not $TargetSwitchIp) {
             $switchIp = $firstIf["ip"]
             Write-Output "Successfully retrieved real Switch IP from Zabbix interface: $switchIp"
         }
@@ -101,7 +111,7 @@ $sysContact = ($items | Where-Object { $_["key_"] -like "system.contact*" }).las
 if (-not $sysContact) { $sysContact = "Bamex" }
 
 $sysName = ($items | Where-Object { $_["key_"] -eq "system.name" }).lastvalue
-if (-not $sysName) { $sysName = "SW01" }
+if (-not $sysName) { $sysName = $switchShortName }
 
 $sysObjectId = ($items | Where-Object { $_["key_"] -like "system.objectid*" }).lastvalue
 if (-not $sysObjectId) { $sysObjectId = "SNMPv2-SMI::enterprises.11.2.3.7.11.196" }
@@ -333,7 +343,7 @@ $null = $sb.AppendLine(@"
       <span style="width: 7px; height: 7px; border-radius: 50%; background-color: #00e676; box-shadow: 0 0 8px #00e676; display: inline-block; margin-right: 6px;"></span>
       BAMEX &bull; RACK CPD &bull; COLETA SNMP VIA ZABBIX
     </div>
-    <h1 style="font-size: 28px; font-weight: 800; margin: 0 0 6px 0; color: #ffffff; letter-spacing: -0.5px;">SW01-BAMEX &bull; Aruba Instant On 1930 24G 4SFP+</h1>
+    <h1 style="font-size: 28px; font-weight: 800; margin: 0 0 6px 0; color: #ffffff; letter-spacing: -0.5px;">$switchShortName-BAMEX &bull; Aruba Instant On 1930 24G 4SFP+</h1>
     <div style="font-size: 12px; color: #8b949e; display: flex; align-items: center; gap: 8px;">
       <span id="header-switch-ip">24x GbE RJ45 + 4x SFP+ 10G &bull; L2+ Managed &bull; JL682A &bull; IP: $switchIp</span>
       <span style="background: rgba(0, 230, 118, 0.12); color: #00e676; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px; border: 1px solid rgba(0, 230, 118, 0.25);">PRODUCAO LIVE</span>
@@ -844,7 +854,7 @@ $topTalkersInitialHtml
     <!-- Real Events Timeline Panel -->
     <div style="background: #121620; border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 8px; padding: 12px 16px; flex: 1; display: flex; flex-direction: column; min-height: 0;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-shrink: 0;">
-        <div style="font-size: 10.5px; font-weight: 700; letter-spacing: 0.8px; color: #8b949e; text-transform: uppercase;">EVENTOS DE PORTA &bull; BAMEX SW01</div>
+        <div style="font-size: 10.5px; font-weight: 700; letter-spacing: 0.8px; color: #8b949e; text-transform: uppercase;">EVENTOS DE PORTA &bull; BAMEX $switchShortName</div>
         <div style="font-size: 10px; font-weight: 700; color: #64748b; text-transform: uppercase;">ZABBIX EVENT.GET</div>
       </div>
       <div id="event-list-container" style="display: flex; flex-direction: column; gap: 6px; flex: 1;">
@@ -871,7 +881,9 @@ foreach ($l in $lines) {
 }
 $htmlClean = $cleanLines -join "`n"
 
-[System.IO.File]::WriteAllText("$pwd\grafana\dashboards\aruba_interactive_twin.html", $htmlClean, [System.Text.Encoding]::UTF8)
+if (-not $TargetDashboardUid -or $TargetDashboardUid -eq "alpt2p5") {
+    [System.IO.File]::WriteAllText("$pwd\grafana\dashboards\aruba_interactive_twin.html", $htmlClean, [System.Text.Encoding]::UTF8)
+}
 
 # ========================================================
 # 3. CLIENT-SIDE JAVASCRIPT FOR INTERACTIVITY & ZABBIX SYNC
@@ -2116,7 +2128,7 @@ $jsCodeTemplate = @'
           }
           if (powerWrap) {
             powerWrap.title = isPingUp
-              ? ('Power: ON | Switch operacional e respondendo ao Ping (' + '$switchIp' + ')')
+              ? ('Power: ON | Switch operacional e respondendo ao Ping (' + '__SWITCH_IP_PLACEHOLDER__' + ')')
               : 'Power: CR\u00cdTICO | Sem resposta de Ping no Zabbix';
           }
 
@@ -2299,6 +2311,7 @@ $jsCode = $jsCode.Replace("__ZABBIX_URL_PLACEHOLDER__", $zabbixUrl)
 $jsCode = $jsCode.Replace("__ZABBIX_TOKEN_PLACEHOLDER__", $token)
 $jsCode = $jsCode.Replace("__ZABBIX_HOSTID_PLACEHOLDER__", $hostId)
 $jsCode = $jsCode.Replace("__INITIAL_ALERT_PORTS_PLACEHOLDER__", $initialAlertPortsJson)
+$jsCode = $jsCode.Replace("__SWITCH_IP_PLACEHOLDER__", $switchIp)
 [System.IO.File]::WriteAllText("$pwd\scratch\aruba_interactive.js", $jsCode, [System.Text.Encoding]::UTF8)
 
 # Write local test preview HTML
@@ -2459,8 +2472,10 @@ if (-not $user) { $user = "admin" }
 $pass = [Environment]::GetEnvironmentVariable("GRAFANA_PASSWORD")
 if (-not $pass) { $pass = "admin" }
 
-$dashboardUid = [Environment]::GetEnvironmentVariable("GRAFANA_DASHBOARD_UID")
+$dashboardUid = if ($TargetDashboardUid) { $TargetDashboardUid } else { [Environment]::GetEnvironmentVariable("GRAFANA_DASHBOARD_UID") }
 if (-not $dashboardUid) { $dashboardUid = "alpt2p5" }
+
+$dashboardTitle = if ($TargetDashboardTitle) { $TargetDashboardTitle } else { "POC - Switch Aruba Instant On 1930" }
 
 $pair = "${user}:${pass}"
 $base64 = [Convert]::ToBase64String([System.Text.Encoding]::ASCII.GetBytes($pair))
@@ -2468,10 +2483,24 @@ $base64 = [Convert]::ToBase64String([System.Text.Encoding]::ASCII.GetBytes($pair
 $gClient = New-Object System.Net.Http.HttpClient
 $gClient.DefaultRequestHeaders.Authorization = New-Object System.Net.Http.Headers.AuthenticationHeaderValue("Basic", $base64)
 
-$getRes = $gClient.GetStringAsync("$grafanaUrl/api/dashboards/uid/$dashboardUid").Result
-$dashObj = $serializer.DeserializeObject($getRes)
-$dash = $dashObj["dashboard"]
-$dash["title"] = "POC - Switch Aruba Instant On 1930"
+# Fetch base template dashboard
+$baseGetRes = $gClient.GetStringAsync("$grafanaUrl/api/dashboards/uid/alpt2p5").Result
+$baseDashObj = $serializer.DeserializeObject($baseGetRes)
+$dash = $baseDashObj["dashboard"]
+
+# Check if target dashboard exists in Grafana to preserve its internal ID
+try {
+    $existingRes = $gClient.GetStringAsync("$grafanaUrl/api/dashboards/uid/$dashboardUid").Result
+    $existingObj = $serializer.DeserializeObject($existingRes)
+    $dash["id"] = $existingObj["dashboard"]["id"]
+    $dash["version"] = $existingObj["dashboard"]["version"]
+} catch {
+    $dash["id"] = $null
+    $dash["version"] = 1
+}
+
+$dash["uid"] = $dashboardUid
+$dash["title"] = $dashboardTitle
 
 $panel = @{
     id = 1

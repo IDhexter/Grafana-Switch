@@ -15,12 +15,20 @@ Implantar, automatizar e manter uma infraestrutura completa de observabilidade, 
   - Credenciais e segredos isolados em variáveis de ambiente, nunca versionados em repositório.
 
 ## Estado Atual do Projeto
-- **Fase:** Produção / POC Avançada de Gêmeo Digital (Digital Twin) de Ativos de Rede (v55).
+- **Fase:** Produção / Gêmeos Digitais Multi-Switch em Massa (v56).
 - **Ambientes Conectados (Ativos):**
-  - **Zabbix API:** `http://10.0.0.26/api_jsonrpc.php` (Host ID do Switch mapeado via `.env`, IP de gerência descoberto dinamicamente via `host.get`).
-  - **Grafana:** `http://10.0.0.25:3000` (Dashboard UID: `alpt2p5`).
+  - **Zabbix API:** `http://10.10.1.26/api_jsonrpc.php` (Proxy 1, SNMP Community `vegasnmp`).
+  - **Switches Monitorados:**
+    - `[BAMEX] - SW01` (Host ID: `10682`, IP: `10.50.0.2`): Dashboard Grafana `alpt2p5`
+    - `[BAMEX] - SW02` (Host ID: `10683`, IP: `10.50.0.3`): Dashboard Grafana `bamex-sw02`
+    - `[BAMEX] - SW03` (Host ID: `11125`, IP: `10.50.0.4`): Dashboard Grafana `bamex-sw03`
+    - `[BAMEX] - SW04` (Host ID: `11126`, IP: `10.50.0.5`): Dashboard Grafana `bamex-sw04`
+  - **Grafana:** `http://10.10.1.25:3000` (Pasta `POC ALEX`, Folder ID: 136).
   - **Repositório GitHub:** `https://github.com/IDhexter/Grafana-Switch` (branch `main`).
 - **O que está 100% funcionando:**
+  - **Script de Automação e Deploy Multi-Switch Parametrizado (`scripts/build_aruba_interactive_twin.ps1`):**
+    - Permite gerar e publicar dashboards individuais para qualquer switch da rede informando apenas `-TargetHostId`, `-TargetDashboardUid`, `-TargetDashboardTitle`, `-TargetSwitchShortName`, `-TargetSwitchIp`.
+    - Clone automático de template base (`alpt2p5`), preservação de UID, sincronização de nome e IP em tempo real.
   - **Gêmeo Digital do Switch Aruba Instant On 1930 24G 4SFP+ (JL682A)**:
     - Layout generoso e espaçado (portas RJ45 de 50x60px, SFP+ 10G em 2x2, bancos modulares 1-12 e 13-24).
     - **4 LEDs de Diagnóstico do Chassi conectados à telemetria:**

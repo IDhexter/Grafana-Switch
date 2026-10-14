@@ -28,7 +28,12 @@
 - [x] Item 3: Drag-to-Zoom interativo no gráfico Canvas com brush selection, botão flutuante `[ ↺ RESET ZOOM ]` e atalho de duplo clique.
 - [x] Alinhamento vertical perfeito do grid inferior: card esquerdo (gráfico Canvas) e cards direitos (Top 3 + Alertas) nivelados na mesma linha reta com zero espaço desperdiçado (versão 54).
 - [x] Correção do botão `[ ↺ RESET ZOOM ]` com bind direto de eventos de DOM (`onclick`, `onmousedown`, `ontouchend`) contornando a sanitização do Grafana e preservação de zoom ativo durante o polling periódico de telemetria (versão 55).
-- [x] Deploy bem-sucedido no Grafana (v55, status 200 OK) e exportação sanitizada para o repositório.
+- [x] Parametrização modular do script `scripts/build_aruba_interactive_twin.ps1` com suporte a `-TargetHostId`, `-TargetDashboardUid`, `-TargetDashboardTitle`, `-TargetSwitchShortName`, `-TargetSwitchIp`.
+- [x] Criação e deploy no Grafana de +3 dashboards para os switches da rede Bamex:
+  - `[BAMEX] - SW02` (IP: `10.50.0.3`, Host ID: `10683`, UID: `bamex-sw02`)
+  - `[BAMEX] - SW03` (IP: `10.50.0.4`, Host ID: `11125`, UID: `bamex-sw03`)
+  - `[BAMEX] - SW04` (IP: `10.50.0.5`, Host ID: `11126`, UID: `bamex-sw04`)
+- [x] Exportação e sanitização de dados no repositório local e atualização da memória do projeto.
 
 ## 🔜 Backlog Imediato (Próximos Passos)
 - [ ] Criar estrutura base de pastas do repositório (`docker/`, `zabbix/`, `grafana/`, `scripts/`, `.gitignore`).
