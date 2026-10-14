@@ -46,16 +46,28 @@ $tempProfile = "$env:TEMP\chrome_direct_shot"
 if (Test-Path $tempProfile) { Remove-Item -Recurse -Force $tempProfile -ErrorAction SilentlyContinue }
 
 $proc = Start-Process -FilePath $chrome -ArgumentList "--headless=new", "--remote-debugging-port=$port", "--user-data-dir=`"$tempProfile`"", "--disable-gpu", "about:blank" -PassThru
-Start-Sleep -Seconds 2
+$serializer = New-Object System.Web.Script.Serialization.JavaScriptSerializer
+$serializer.MaxJsonLength = 100000000
+
+$pages = $null
+for ($i = 0; $i -lt 15; $i++) {
+    Start-Sleep -Milliseconds 600
+    try {
+        $cdpList = (New-Object System.Net.Http.HttpClient).GetStringAsync("http://127.0.0.1:$port/json").Result
+        $pages = $serializer.DeserializeObject($cdpList)
+        if ($pages -and $pages.Count -gt 0) { break }
+    } catch {}
+}
+
+if (-not $pages -or $pages.Count -eq 0) {
+    Write-Error "Chrome CDP did not initialize in time."
+    exit 1
+}
+
+$wsUrl = $pages[0]["webSocketDebuggerUrl"]
+Write-Output "Connected to CDP: $wsUrl"
 
 try {
-    $cdpList = (New-Object System.Net.Http.HttpClient).GetStringAsync("http://localhost:$port/json").Result
-    $serializer = New-Object System.Web.Script.Serialization.JavaScriptSerializer
-    $serializer.MaxJsonLength = 100000000
-    $pages = $serializer.DeserializeObject($cdpList)
-    $wsUrl = $pages[0]["webSocketDebuggerUrl"]
-    Write-Output "Connected to CDP: $wsUrl"
-
     $ws = New-Object System.Net.WebSockets.ClientWebSocket
     $wsCts = New-Object System.Threading.CancellationTokenSource(10000)
     $ws.ConnectAsync((New-Object System.Uri($wsUrl)), $wsCts.Token).Wait()

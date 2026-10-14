@@ -35,6 +35,10 @@
   - Limitar a alocação de memória no container da stack para no máximo 3GB a 4GB, garantindo folga para os demais serviços no host Proxmox.
 
 ## Padrões de Código e Convenções
+- **Integridade de Telemetria em Produção (Zero Dados Mockados):**
+  - NUNCA inventar ou fabricar nomes amigáveis, aliases ou descrições de portas em ambiente de produção.
+  - Se o dispositivo não possuir descrição configurada na MIB SNMP (`ifAlias`), adotar estritamente a identidade física de hardware (`Porta X`, `GigabitEthernetX`, `1GbE RJ45`, `SFP+ 10G`).
+  - Toda captura de alias deve ser 100% dinâmica via regex a partir dos itens reais do Zabbix (`Interface (\d+)\(([^)]*)\)`).
 - **Nomenclatura:**
   - Arquivos e diretórios: `kebab-case` (ex: `docker-compose.yml`, `deploy.sh`, `zabbix-server.conf`).
   - Variáveis de ambiente: `UPPER_SNAKE_CASE` (ex: `POSTGRES_PASSWORD`, `ZBX_SERVER_HOST`).

@@ -21,6 +21,13 @@
 - [x] Interatividade de clique em portas com cursor azul neon, atualização instantânea de KPIs, velocidade (com suporte a degradado 10M/100M em âmbar) e osciloscópio HTML5 Canvas.
 - [x] Resolução do quirk de escape de Markdown do Business Text e tratamento de erros do ciclo de vida React.
 - [x] Criação do script de automação e deploy `scripts/build_aruba_interactive_twin.ps1`.
+- [x] Escala dinâmica e adaptativa de volume de tráfego de rede (bps, Kb/s, Mb/s, Gb/s) para KPIs, detalhes de portas, hover tooltips e régua do gráfico Canvas.
+- [x] Geração de backups de segurança da versão v51 (`*.v51.backup.*`) antes da evolução do painel.
+- [x] Item 1: Remoção de dados mockados e adoção de nomenclatura 100% autêntica via Zabbix SNMP (`Interface (\d+)\(([^)]*)\)` com fallback estrito para hardware real `GigabitEthernetX` / `1GbE RJ45` / `SFP+ 10G`).
+- [x] Item 2: Widget compacto Top Talkers ajustado estritamente para **Top 3** consumidores com ranking de medalhas (1º, 2º, 3º).
+- [x] Item 3: Drag-to-Zoom interativo no gráfico Canvas com brush selection, botão flutuante `[ ↺ RESET ZOOM ]` e atalho de duplo clique.
+- [x] Alinhamento vertical perfeito do grid inferior: card esquerdo (gráfico Canvas) e cards direitos (Top 3 + Alertas) nivelados na mesma linha reta com zero espaço desperdiçado (versão 54).
+- [x] Deploy bem-sucedido no Grafana (v54, status 200 OK) e exportação sanitizada para o repositório.
 
 ## 🔜 Backlog Imediato (Próximos Passos)
 - [ ] Criar estrutura base de pastas do repositório (`docker/`, `zabbix/`, `grafana/`, `scripts/`, `.gitignore`).

@@ -124,6 +124,7 @@ for ($p = 1; $p -le 28; $p++) {
     $ports["$p"] = @{
         Port = $p
         Name = if ($isSfp) { "SFP+ $p" } else { "GigabitEthernet$p" }
+        Alias = ""
         Type = if ($isSfp) { "SFP+ 10G" } else { "1GbE RJ45" }
         OperStatus = 2 # 1=UP, 2=DOWN
         Speed = 0
@@ -142,12 +143,16 @@ foreach ($it in $items) {
     $name = $it["name"]
     $id = $it["itemid"]
 
-    if ($name -match 'Interface (\d+)\(\)') {
+    if ($name -match 'Interface (\d+)\(([^)]*)\)') {
         $pNum = [string]$matches[1]
+        $extractedAlias = [string]$matches[2].Trim()
         if ($key -match '\.(\d+)\]') {
             if ([int64]$matches[1] -ge 100000) { continue }
         }
         if ($ports.ContainsKey($pNum)) {
+            if ($extractedAlias.Length -gt 0) {
+                $ports[$pNum].Alias = $extractedAlias
+            }
             if ($key.StartsWith("net.if.status[")) { $ports[$pNum].OperStatus = [int]$val }
             elseif ($key.StartsWith("net.if.speed[")) { $ports[$pNum].Speed = [int64]$val }
             elseif ($key.StartsWith("net.if.in[")) { 
@@ -164,6 +169,28 @@ foreach ($it in $items) {
     }
 }
 
+function Format-Bps ($bps) {
+    $b = [double]$bps
+    if ($b -ge 1000000000) {
+        $v = $b / 1000000000.0
+        $fmt = if ($v -ge 100) { "{0:N1} Gb/s" } else { "{0:N2} Gb/s" }
+        return [string]::Format([System.Globalization.CultureInfo]::InvariantCulture, $fmt, $v)
+    }
+    if ($b -ge 1000000) {
+        $v = $b / 1000000.0
+        $fmt = if ($v -ge 100) { "{0:N1} Mb/s" } else { "{0:N2} Mb/s" }
+        return [string]::Format([System.Globalization.CultureInfo]::InvariantCulture, $fmt, $v)
+    }
+    if ($b -ge 1000) {
+        $v = $b / 1000.0
+        return [string]::Format([System.Globalization.CultureInfo]::InvariantCulture, "{0:N1} Kb/s", $v)
+    }
+    if ($b -gt 0) {
+        return "$([Math]::Round($b)) bps"
+    }
+    return "0 bps"
+}
+
 $activeCount = 0
 $degradedCount = 0
 $totalTrafficBps = 0
@@ -177,16 +204,16 @@ for ($p = 1; $p -le 28; $p++) {
     $totalTrafficBps += ($pt.InBps + $pt.OutBps)
 }
 
-$totalTrafficFmt = "$([Math]::Round($totalTrafficBps / 1000.0, 1)) Kb/s"
+$totalTrafficFmt = Format-Bps $totalTrafficBps
 Write-Output "Active Ports: $activeCount / 28 | Degraded Links: $degradedCount | Total Traffic: $totalTrafficFmt"
 
 # Convert ports hash to JSON for client-side JavaScript
 $portsJson = $serializer.Serialize($ports)
 
-# Render initial Events HTML
+# Render initial Events HTML (Top 5 events for perfect height balance)
 $eventsSb = New-Object System.Text.StringBuilder
 if ($rawEvents -and $rawEvents.Count -gt 0) {
-    foreach ($ev in $rawEvents) {
+    foreach ($ev in ($rawEvents | Select-Object -First 5)) {
         $dt = [DateTimeOffset]::FromUnixTimeSeconds([int64]$ev["clock"]).ToLocalTime().ToString("HH:mm:ss")
         $isResolved = ([int]$ev["value"] -eq 0)
         $dotColor = if ($isResolved) { "#00e676" } elseif ([int]$ev["severity"] -ge 4) { "#ef4444" } else { "#f59e0b" }
@@ -197,13 +224,13 @@ if ($rawEvents -and $rawEvents.Count -gt 0) {
         $eventName = $ev["name"] -replace "<", "&lt;" -replace ">", "&gt;"
         
         $null = $eventsSb.AppendLine(@"
-      <div style="display: flex; align-items: center; justify-content: space-between; font-size: 12px; color: #e2e8f0; background: #0d121c; padding: 7px 11px; border-radius: 4px; border-left: 3px solid $dotColor;">
+      <div style="display: flex; align-items: center; justify-content: space-between; font-size: 11.5px; color: #e2e8f0; background: #0d121c; padding: 6px 10px; border-radius: 4px; border-left: 3px solid $dotColor;">
         <div style="display: flex; align-items: center; gap: 8px;">
-          <span style="color: #8b949e; font-family: monospace; min-width: 58px; font-size: 11px;">$dt</span>
-          <span style="width: 7px; height: 7px; border-radius: 50%; background: $dotColor; $shadow display: inline-block;"></span>
+          <span style="color: #8b949e; font-family: monospace; min-width: 54px; font-size: 10.5px;">$dt</span>
+          <span style="width: 6px; height: 6px; border-radius: 50%; background: $dotColor; $shadow display: inline-block;"></span>
           <span style="font-weight: 500;">$eventName</span>
         </div>
-        <span style="background: $badgeBg; color: $badgeColor; font-size: 9.5px; font-weight: 700; padding: 2px 6px; border-radius: 3px; font-family: monospace;">$badgeText</span>
+        <span style="background: $badgeBg; color: $badgeColor; font-size: 9px; font-weight: 700; padding: 2px 5px; border-radius: 3px; font-family: monospace;">$badgeText</span>
       </div>
 "@)
     }
@@ -213,6 +240,83 @@ if ($rawEvents -and $rawEvents.Count -gt 0) {
 "@)
 }
 $eventsHtml = $eventsSb.ToString()
+
+# Initial Selected Port (Port 24) Formatted Values
+$initP = $ports["24"]
+$initInFmt = if ($initP) { Format-Bps $initP.InBps } else { "0 bps" }
+$initOutFmt = if ($initP) { Format-Bps $initP.OutBps } else { "0 bps" }
+$initSpeedStr = if ($initP -and $initP.OperStatus -eq 1) {
+    if ($initP.Speed -ge 10000000000) { "10 Gb/s" }
+    elseif ($initP.Speed -ge 1000000000) { "1 Gb/s" }
+    elseif ($initP.Speed -ge 100000000) { "100 Mb/s" }
+    elseif ($initP.Speed -ge 10000000) { "10 Mb/s" }
+    else { "--" }
+} else { "--" }
+$initUtilStr = if ($initP -and $initP.OperStatus -eq 1 -and $initP.Speed -gt 0) {
+    [string]::Format([System.Globalization.CultureInfo]::InvariantCulture, "{0:N2}%", ((($initP.InBps + $initP.OutBps) / [double]$initP.Speed) * 100))
+} else { "0,00%" }
+$initErrorsStr = if ($initP -and $initP.InErrors -ne $null) { "$($initP.InErrors)" } else { "0" }
+$initSub = if ($initP -and $initP.Alias) { $initP.Alias } elseif ($initP) { $initP.Type } else { "1GbE RJ45" }
+
+# Generate initial Top Talkers HTML (Top 3 active consumers)
+$topActiveList = New-Object System.Collections.ArrayList
+for ($p = 1; $p -le 28; $p++) {
+    $pt = $ports["$p"]
+    if ($pt.OperStatus -eq 1) {
+        $tot = $pt.InBps + $pt.OutBps
+        $null = $topActiveList.Add(@{
+            Port = $p
+            Name = $pt.Name
+            Alias = $pt.Alias
+            InBps = $pt.InBps
+            OutBps = $pt.OutBps
+            Total = $tot
+        })
+    }
+}
+
+$topSorted = $topActiveList | Sort-Object -Property Total -Descending
+$topMaxTraffic = if ($topSorted.Count -gt 0 -and $topSorted[0].Total -gt 0) { $topSorted[0].Total } else { 1 }
+
+$topTalkersSb = New-Object System.Text.StringBuilder
+$medals = @(
+    @{ Badge = "1&ordm;"; Color = "#ffd700"; Bg = "rgba(255, 215, 0, 0.15)" },
+    @{ Badge = "2&ordm;"; Color = "#c0c0c0"; Bg = "rgba(192, 192, 192, 0.15)" },
+    @{ Badge = "3&ordm;"; Color = "#cd7f32"; Bg = "rgba(205, 127, 50, 0.15)" }
+)
+
+$tIdx = 0
+foreach ($item in ($topSorted | Select-Object -First 3)) {
+    $m = if ($tIdx -lt $medals.Count) { $medals[$tIdx] } else { $medals[2] }
+    $pct = [Math]::Max(5, [Math]::Min(100, [Math]::Round(($item.Total / [double]$topMaxTraffic) * 100)))
+    $totFmt = Format-Bps $item.Total
+    $inFmt = Format-Bps $item.InBps
+    $outFmt = Format-Bps $item.OutBps
+    $isSelected = ($item.Port -eq 24)
+    $borderStyle = if ($isSelected) { "border: 1px solid #00b0ff; box-shadow: 0 0 8px rgba(0, 176, 255, 0.3);" } else { "border: 1px solid #1e293b;" }
+    $subLabel = if ($item.Alias) { $item.Alias } else { $item.Name }
+    
+    $null = $topTalkersSb.AppendLine(@"
+      <div class="sw-top-talker" data-tt-port="$($item.Port)" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort($($item.Port));" style="background: #0d121c; border-radius: 4px; padding: 6px 10px; cursor: pointer; $borderStyle transition: all 0.2s ease;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 3px;">
+          <div style="display: flex; align-items: center; gap: 7px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+            <span style="font-size: 9px; font-weight: 800; color: $($m.Color); background: $($m.Bg); padding: 1px 5px; border-radius: 3px; font-family: monospace;">$($m.Badge)</span>
+            <span style="font-size: 11px; font-weight: 700; color: #ffffff;">Porta $($item.Port)</span>
+            <span style="font-size: 10px; color: #8b949e; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">$subLabel</span>
+          </div>
+          <div style="font-size: 11px; font-weight: 800; color: #38bdf8; font-family: monospace; white-space: nowrap; margin-left: 8px;">$totFmt</div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <div style="flex: 1; height: 3px; background: #1c2230; border-radius: 2px; overflow: hidden;">
+            <div style="width: $pct%; height: 100%; background: #00b0ff; border-radius: 2px;"></div>
+          </div>
+          <span style="font-size: 8.5px; color: #64748b; font-family: monospace; white-space: nowrap;">In: $inFmt &bull; Out: $outFmt</span>
+        </div>
+      </div>
+"@)
+    $tIdx++
+}
+$topTalkersInitialHtml = $topTalkersSb.ToString()
 
 # ========================================================
 # 2. BUILD HTML STRUCTURE
@@ -331,7 +435,10 @@ foreach ($col in 0..5) {
     $ledShadow = if ($hasAlert) { "box-shadow: 0 0 8px #ef4444;" } elseif ($isUp) { "box-shadow: 0 0 5px $ledColor;" } else { "" }
     $ledPulseClass = if ($hasAlert) { " sw-port-fault-pulse" } else { "" }
     $statusDesc = if ($hasAlert) { "DOWN (ALARME)" } elseif ($isUp) { if ($pt.Speed -lt 1000000000) { "UP (DEGRADADO)" } else { "UP" } } else { "DOWN" }
-    $titleText = "Porta $pNum | $($pt.Name)&#10;Status: $statusDesc&#10;Velocidade: $(if (-not $isUp) { '--' } elseif ($pt.Speed -ge 1000000000) { '1 Gb/s' } elseif ($pt.Speed -ge 100000000) { '100 Mb/s' } elseif ($pt.Speed -ge 10000000) { '10 Mb/s' } else { '--' })&#10;Entrada: $([Math]::Round($pt.InBps/1000.0, 1)) Kb/s&#10;Saida: $([Math]::Round($pt.OutBps/1000.0, 1)) Kb/s"
+    $inFmt = Format-Bps $pt.InBps
+    $outFmt = Format-Bps $pt.OutBps
+    $titleLabel = if ($pt.Alias -and $pt.Alias.Length -gt 0) { "Porta $pNum | $($pt.Alias)" } else { "Porta $pNum | $($pt.Name)" }
+    $titleText = "$titleLabel&#10;Status: $statusDesc&#10;Velocidade: $(if (-not $isUp) { '--' } elseif ($pt.Speed -ge 1000000000) { '1 Gb/s' } elseif ($pt.Speed -ge 100000000) { '100 Mb/s' } elseif ($pt.Speed -ge 10000000) { '10 Mb/s' } else { '--' })&#10;Entrada: $inFmt&#10;Saida: $outFmt"
     $selectedClass = if ($pNum -eq 24) { " sw-selected" } else { "" }
     $borderStyle = if ($pNum -eq 24) { "2px solid #00b0ff" } elseif ($hasAlert) { "1px solid rgba(239, 68, 68, 0.6)" } else { "1px solid #263346" }
     $boxShadowStyle = if ($pNum -eq 24) { "0 0 14px rgba(0, 176, 255, 0.9)" } else { "none" }
@@ -363,7 +470,10 @@ foreach ($col in 0..5) {
     $ledShadow = if ($hasAlert) { "box-shadow: 0 0 8px #ef4444;" } elseif ($isUp) { "box-shadow: 0 0 5px $ledColor;" } else { "" }
     $ledPulseClass = if ($hasAlert) { " sw-port-fault-pulse" } else { "" }
     $statusDesc = if ($hasAlert) { "DOWN (ALARME)" } elseif ($isUp) { if ($pt.Speed -lt 1000000000) { "UP (DEGRADADO)" } else { "UP" } } else { "DOWN" }
-    $titleText = "Porta $pNum | $($pt.Name)&#10;Status: $statusDesc&#10;Velocidade: $(if (-not $isUp) { '--' } elseif ($pt.Speed -ge 1000000000) { '1 Gb/s' } elseif ($pt.Speed -ge 100000000) { '100 Mb/s' } elseif ($pt.Speed -ge 10000000) { '10 Mb/s' } else { '--' })&#10;Entrada: $([Math]::Round($pt.InBps/1000.0, 1)) Kb/s&#10;Saida: $([Math]::Round($pt.OutBps/1000.0, 1)) Kb/s"
+    $inFmt = Format-Bps $pt.InBps
+    $outFmt = Format-Bps $pt.OutBps
+    $titleLabel = if ($pt.Alias -and $pt.Alias.Length -gt 0) { "Porta $pNum | $($pt.Alias)" } else { "Porta $pNum | $($pt.Name)" }
+    $titleText = "$titleLabel&#10;Status: $statusDesc&#10;Velocidade: $(if (-not $isUp) { '--' } elseif ($pt.Speed -ge 1000000000) { '1 Gb/s' } elseif ($pt.Speed -ge 100000000) { '100 Mb/s' } elseif ($pt.Speed -ge 10000000) { '10 Mb/s' } else { '--' })&#10;Entrada: $inFmt&#10;Saida: $outFmt"
     $selectedClass = if ($pNum -eq 24) { " sw-selected" } else { "" }
     $borderStyle = if ($pNum -eq 24) { "2px solid #00b0ff" } elseif ($hasAlert) { "1px solid rgba(239, 68, 68, 0.6)" } else { "1px solid #263346" }
     $boxShadowStyle = if ($pNum -eq 24) { "0 0 14px rgba(0, 176, 255, 0.9)" } else { "none" }
@@ -403,7 +513,10 @@ foreach ($col in 6..11) {
     $ledShadow = if ($hasAlert) { "box-shadow: 0 0 8px #ef4444;" } elseif ($isUp) { "box-shadow: 0 0 5px $ledColor;" } else { "" }
     $ledPulseClass = if ($hasAlert) { " sw-port-fault-pulse" } else { "" }
     $statusDesc = if ($hasAlert) { "DOWN (ALARME)" } elseif ($isUp) { if ($pt.Speed -lt 1000000000) { "UP (DEGRADADO)" } else { "UP" } } else { "DOWN" }
-    $titleText = "Porta $pNum | $($pt.Name)&#10;Status: $statusDesc&#10;Velocidade: $(if (-not $isUp) { '--' } elseif ($pt.Speed -ge 1000000000) { '1 Gb/s' } elseif ($pt.Speed -ge 100000000) { '100 Mb/s' } elseif ($pt.Speed -ge 10000000) { '10 Mb/s' } else { '--' })&#10;Entrada: $([Math]::Round($pt.InBps/1000.0, 1)) Kb/s&#10;Saida: $([Math]::Round($pt.OutBps/1000.0, 1)) Kb/s"
+    $inFmt = Format-Bps $pt.InBps
+    $outFmt = Format-Bps $pt.OutBps
+    $titleLabel = if ($pt.Alias -and $pt.Alias.Length -gt 0) { "Porta $pNum | $($pt.Alias)" } else { "Porta $pNum | $($pt.Name)" }
+    $titleText = "$titleLabel&#10;Status: $statusDesc&#10;Velocidade: $(if (-not $isUp) { '--' } elseif ($pt.Speed -ge 1000000000) { '1 Gb/s' } elseif ($pt.Speed -ge 100000000) { '100 Mb/s' } elseif ($pt.Speed -ge 10000000) { '10 Mb/s' } else { '--' })&#10;Entrada: $inFmt&#10;Saida: $outFmt"
     $selectedClass = if ($pNum -eq 24) { " sw-selected" } else { "" }
     $borderStyle = if ($pNum -eq 24) { "2px solid #00b0ff" } elseif ($hasAlert) { "1px solid rgba(239, 68, 68, 0.6)" } else { "1px solid #263346" }
     $boxShadowStyle = if ($pNum -eq 24) { "0 0 14px rgba(0, 176, 255, 0.9)" } else { "none" }
@@ -435,7 +548,10 @@ foreach ($col in 6..11) {
     $ledShadow = if ($hasAlert) { "box-shadow: 0 0 8px #ef4444;" } elseif ($isUp) { "box-shadow: 0 0 5px $ledColor;" } else { "" }
     $ledPulseClass = if ($hasAlert) { " sw-port-fault-pulse" } else { "" }
     $statusDesc = if ($hasAlert) { "DOWN (ALARME)" } elseif ($isUp) { if ($pt.Speed -lt 1000000000) { "UP (DEGRADADO)" } else { "UP" } } else { "DOWN" }
-    $titleText = "Porta $pNum | $($pt.Name)&#10;Status: $statusDesc&#10;Velocidade: $(if (-not $isUp) { '--' } elseif ($pt.Speed -ge 1000000000) { '1 Gb/s' } elseif ($pt.Speed -ge 100000000) { '100 Mb/s' } elseif ($pt.Speed -ge 10000000) { '10 Mb/s' } else { '--' })&#10;Entrada: $([Math]::Round($pt.InBps/1000.0, 1)) Kb/s&#10;Saida: $([Math]::Round($pt.OutBps/1000.0, 1)) Kb/s"
+    $inFmt = Format-Bps $pt.InBps
+    $outFmt = Format-Bps $pt.OutBps
+    $titleLabel = if ($pt.Alias -and $pt.Alias.Length -gt 0) { "Porta $pNum | $($pt.Alias)" } else { "Porta $pNum | $($pt.Name)" }
+    $titleText = "$titleLabel&#10;Status: $statusDesc&#10;Velocidade: $(if (-not $isUp) { '--' } elseif ($pt.Speed -ge 1000000000) { '1 Gb/s' } elseif ($pt.Speed -ge 100000000) { '100 Mb/s' } elseif ($pt.Speed -ge 10000000) { '10 Mb/s' } else { '--' })&#10;Entrada: $inFmt&#10;Saida: $outFmt"
     $selectedClass = if ($pNum -eq 24) { " sw-selected" } else { "" }
     $borderStyle = if ($pNum -eq 24) { "2px solid #00b0ff" } elseif ($hasAlert) { "1px solid rgba(239, 68, 68, 0.6)" } else { "1px solid #263346" }
     $boxShadowStyle = if ($pNum -eq 24) { "0 0 14px rgba(0, 176, 255, 0.9)" } else { "none" }
@@ -478,8 +594,10 @@ foreach ($s in @(25, 27)) {
     $sBorder = if ($isUp) { "1px solid #00b0ff" } elseif ($hasAlert) { "1px solid rgba(239, 68, 68, 0.6)" } else { "1px solid #283344" }
     $sBg = if ($isUp) { "#142132" } else { "#101622" }
     $sBar = if ($isUp) { "#00b0ff" } else { "#2d3748" }
-    $statusDesc = if ($hasAlert) { "DOWN (ALARME)" } elseif ($isUp) { "UP" } else { "DOWN" }
-    $titleText = "SFP+ $s | SFP+ 10G&#10;Status: $statusDesc&#10;Velocidade: $(if ($isUp) { '10 Gb/s' } else { '--' })&#10;Entrada: 0 Kb/s&#10;Saida: 0 Kb/s"
+    $sInFmt = Format-Bps $spt.InBps
+    $sOutFmt = Format-Bps $spt.OutBps
+    $sTitleLabel = if ($spt.Alias -and $spt.Alias.Length -gt 0) { "SFP+ $s | $($spt.Alias)" } else { "SFP+ $s | SFP+ 10G" }
+    $titleText = "$sTitleLabel&#10;Status: $statusDesc&#10;Velocidade: $(if ($isUp) { '10 Gb/s' } else { '--' })&#10;Entrada: $sInFmt&#10;Saida: $sOutFmt"
 
     $null = $sb.AppendLine(@"
         <div class="sw-port" data-port="$s" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort($s);" title="$titleText" style="width: 72px; height: 44px; background: $sBg; border: $sBorder; border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 7px; position: relative; cursor: pointer; box-sizing: border-box;">
@@ -509,8 +627,10 @@ foreach ($s in @(26, 28)) {
     $sBorder = if ($isUp) { "1px solid #00b0ff" } elseif ($hasAlert) { "1px solid rgba(239, 68, 68, 0.6)" } else { "1px solid #283344" }
     $sBg = if ($isUp) { "#142132" } else { "#101622" }
     $sBar = if ($isUp) { "#00b0ff" } else { "#2d3748" }
-    $statusDesc = if ($hasAlert) { "DOWN (ALARME)" } elseif ($isUp) { "UP" } else { "DOWN" }
-    $titleText = "SFP+ $s | SFP+ 10G&#10;Status: $statusDesc&#10;Velocidade: $(if ($isUp) { '10 Gb/s' } else { '--' })&#10;Entrada: 0 Kb/s&#10;Saida: 0 Kb/s"
+    $sInFmt = Format-Bps $spt.InBps
+    $sOutFmt = Format-Bps $spt.OutBps
+    $sTitleLabel = if ($spt.Alias -and $spt.Alias.Length -gt 0) { "SFP+ $s | $($spt.Alias)" } else { "SFP+ $s | SFP+ 10G" }
+    $titleText = "$sTitleLabel&#10;Status: $statusDesc&#10;Velocidade: $(if ($isUp) { '10 Gb/s' } else { '--' })&#10;Entrada: $sInFmt&#10;Saida: $sOutFmt"
 
     $null = $sb.AppendLine(@"
         <div class="sw-port" data-port="$s" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort($s);" title="$titleText" style="width: 72px; height: 44px; background: $sBg; border: $sBorder; border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 7px; position: relative; cursor: pointer; box-sizing: border-box;">
@@ -614,48 +734,48 @@ $null = $sb.AppendLine(@"
 </div>
 
 <!-- BOTTOM GRID: SELECTED PORT DETAIL + EVENTS -->
-<div style="display: grid; grid-template-columns: 1.6fr 1.1fr; gap: 18px;">
+<div style="display: grid; grid-template-columns: 1.6fr 1.1fr; gap: 18px; align-items: stretch;">
 
   <!-- Selected Port Detail Panel -->
-  <div style="background: #121620; border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 8px; padding: 18px 22px;">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+  <div style="background: #121620; border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 8px; padding: 16px 20px; display: flex; flex-direction: column;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
       <div style="font-size: 10.5px; font-weight: 700; letter-spacing: 0.8px; color: #8b949e; text-transform: uppercase;">DETALHE DA PORTA SELECIONADA</div>
       <div id="sel-port-type" style="font-size: 11px; font-weight: 700; color: #ff8300; letter-spacing: 0.5px;">ARUBA 1GBE RJ45</div>
     </div>
 
-    <div style="display: flex; align-items: baseline; gap: 10px; margin-bottom: 16px;">
-      <h2 id="sel-port-title" style="font-size: 26px; font-weight: 800; color: #ffffff; margin: 0; letter-spacing: -0.5px;">Porta 24</h2>
-      <span id="sel-port-name" style="font-size: 13px; color: #8b949e; font-weight: 500;">GigabitEthernet24 &bull; Uplink LAN</span>
+    <div style="display: flex; align-items: baseline; gap: 10px; margin-bottom: 14px;">
+      <h2 id="sel-port-title" style="font-size: 25px; font-weight: 800; color: #ffffff; margin: 0; letter-spacing: -0.5px;">Porta 24</h2>
+      <span id="sel-port-name" style="font-size: 13px; color: #8b949e; font-weight: 500;">$($initP.Name) &bull; $initSub</span>
       <span id="sel-port-status" style="background: rgba(0, 230, 118, 0.15); color: #00e676; font-size: 10.5px; font-weight: 800; padding: 2px 8px; border-radius: 4px; border: 1px solid rgba(0, 230, 118, 0.3);">UP</span>
     </div>
 
     <!-- 5 Stats Cards -->
-    <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 16px;">
+    <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 14px;">
       <div>
-        <div style="font-size: 9.5px; font-weight: 700; color: #8b949e; text-transform: uppercase; margin-bottom: 4px;">VELOCIDADE</div>
-        <div id="sel-port-speed" style="font-size: 17px; font-weight: 800; color: #ffffff;">1 Gb/s</div>
+        <div style="font-size: 9px; font-weight: 700; color: #8b949e; text-transform: uppercase; margin-bottom: 3px;">VELOCIDADE</div>
+        <div id="sel-port-speed" style="font-size: 16px; font-weight: 800; color: #ffffff;">$initSpeedStr</div>
       </div>
       <div>
-        <div style="font-size: 9.5px; font-weight: 700; color: #8b949e; text-transform: uppercase; margin-bottom: 4px;">ENTRADA</div>
-        <div id="sel-port-in" style="font-size: 17px; font-weight: 800; color: #ffffff;">25.8 Kb/s</div>
+        <div style="font-size: 9px; font-weight: 700; color: #8b949e; text-transform: uppercase; margin-bottom: 3px;">ENTRADA</div>
+        <div id="sel-port-in" style="font-size: 16px; font-weight: 800; color: #ffffff;">$initInFmt</div>
       </div>
       <div>
-        <div style="font-size: 9.5px; font-weight: 700; color: #8b949e; text-transform: uppercase; margin-bottom: 4px;">SA&Iacute;DA</div>
-        <div id="sel-port-out" style="font-size: 17px; font-weight: 800; color: #ffffff;">7.8 Kb/s</div>
+        <div style="font-size: 9px; font-weight: 700; color: #8b949e; text-transform: uppercase; margin-bottom: 3px;">SA&Iacute;DA</div>
+        <div id="sel-port-out" style="font-size: 16px; font-weight: 800; color: #ffffff;">$initOutFmt</div>
       </div>
       <div>
-        <div style="font-size: 9.5px; font-weight: 700; color: #8b949e; text-transform: uppercase; margin-bottom: 4px;">UTILIZA&Ccedil;&Atilde;O</div>
-        <div id="sel-port-util" style="font-size: 17px; font-weight: 800; color: #ffffff;">0,01%</div>
+        <div style="font-size: 9px; font-weight: 700; color: #8b949e; text-transform: uppercase; margin-bottom: 3px;">UTILIZA&Ccedil;&Atilde;O</div>
+        <div id="sel-port-util" style="font-size: 16px; font-weight: 800; color: #ffffff;">$initUtilStr</div>
       </div>
       <div>
-        <div style="font-size: 9.5px; font-weight: 700; color: #8b949e; text-transform: uppercase; margin-bottom: 4px;">ERROS RX</div>
-        <div id="sel-port-errors" style="font-size: 17px; font-weight: 800; color: #ffffff;">0</div>
+        <div style="font-size: 9px; font-weight: 700; color: #8b949e; text-transform: uppercase; margin-bottom: 3px;">ERROS RX</div>
+        <div id="sel-port-errors" style="font-size: 16px; font-weight: 800; color: #ffffff;">$initErrorsStr</div>
       </div>
     </div>
 
     <!-- Real Historical Traffic Canvas -->
-    <div id="chart-card-container" style="background: #090c12; border: 1px solid #1a2230; border-radius: 6px; padding: 12px 14px; position: relative;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+    <div id="chart-card-container" style="background: #090c12; border: 1px solid #1a2230; border-radius: 6px; padding: 10px 14px; position: relative; flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
         <div style="display: flex; align-items: center; gap: 8px;">
           <span style="font-size: 10px; font-weight: 800; letter-spacing: 0.6px; color: #94a3b8; text-transform: uppercase;">HIST&Oacute;RICO DE TR&Aacute;FEGO (SNMP)</span>
           <span id="canvas-max-label" style="font-size: 9.5px; color: #38bdf8; font-family: monospace; font-weight: 700; background: rgba(0, 176, 255, 0.1); padding: 1px 6px; border-radius: 3px; border: 1px solid rgba(0, 176, 255, 0.2);">Hist&oacute;rico Real Zabbix</span>
@@ -668,7 +788,8 @@ $null = $sb.AppendLine(@"
             <button id="btn-range-12" type="button" onclick="if(window.__arubaChangeRange)window.__arubaChangeRange(12);" style="background: transparent; color: #94a3b8; border: none; border-radius: 4px; padding: 2px 8px; font-size: 10px; font-weight: 700; cursor: pointer; transition: all 0.2s ease;">12h</button>
             <button id="btn-range-24" type="button" onclick="if(window.__arubaChangeRange)window.__arubaChangeRange(24);" style="background: transparent; color: #94a3b8; border: none; border-radius: 4px; padding: 2px 8px; font-size: 10px; font-weight: 700; cursor: pointer; transition: all 0.2s ease;">24h</button>
           </div>
-          <span id="canvas-hint-label" style="font-size: 9px; color: #64748b; font-family: monospace;">&#10022; passe o mouse</span>
+          <button id="btn-reset-zoom" type="button" onclick="if(window.__arubaResetZoom)window.__arubaResetZoom();" style="display: none; background: rgba(0, 176, 255, 0.15); color: #38bdf8; border: 1px solid #00b0ff; border-radius: 4px; padding: 2px 8px; font-size: 10px; font-weight: 700; cursor: pointer; transition: all 0.2s ease;">&#x21bb; RESET ZOOM</button>
+          <span id="canvas-hint-label" style="font-size: 9px; color: #64748b; font-family: monospace;">&#10022; arraste para zoom &bull; duplo clique reset</span>
         </div>
       </div>
 
@@ -677,20 +798,20 @@ $null = $sb.AppendLine(@"
         <span id="tt-time" style="color: #94a3b8; font-family: monospace; font-size: 10px; border-right: 1px solid #334155; padding-right: 8px; white-space: nowrap; flex-shrink: 0;">--:--:--</span>
         <span style="color: #00b0ff; font-weight: 700; display: flex; align-items: center; gap: 4px; white-space: nowrap; flex-shrink: 0;">
           <span style="width: 6px; height: 6px; border-radius: 50%; background: #00b0ff; display: inline-block; flex-shrink: 0;"></span>
-          In: <span id="tt-in" style="white-space: nowrap;">0 Kb/s</span>
+          In: <span id="tt-in" style="white-space: nowrap;">0 bps</span>
         </span>
         <span style="color: #00e676; font-weight: 700; display: flex; align-items: center; gap: 4px; white-space: nowrap; flex-shrink: 0;">
           <span style="width: 6px; height: 6px; border-radius: 50%; background: #00e676; display: inline-block; flex-shrink: 0;"></span>
-          Out: <span id="tt-out" style="white-space: nowrap;">0 Kb/s</span>
+          Out: <span id="tt-out" style="white-space: nowrap;">0 bps</span>
         </span>
         <span style="color: #ffffff; font-weight: 700; border-left: 1px solid #334155; padding-left: 8px; white-space: nowrap; flex-shrink: 0;">
-          Total: <span id="tt-total" style="white-space: nowrap;">0 Kb/s</span>
+          Total: <span id="tt-total" style="white-space: nowrap;">0 bps</span>
         </span>
       </div>
 
-      <canvas id="port-chart-canvas" width="600" height="200" style="width: 100%; height: clamp(170px, 18vw, 260px); min-height: 170px; max-height: 260px; display: block; cursor: crosshair;"></canvas>
+      <canvas id="port-chart-canvas" width="600" height="200" style="width: 100%; height: 200px; min-height: 180px; flex: 1; display: block; cursor: crosshair;"></canvas>
       
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px; font-size: 10.5px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px; font-size: 10.5px;">
         <div style="display: flex; gap: 18px;">
           <span id="legend-in" style="color: #00b0ff; display: flex; align-items: center; gap: 6px; cursor: pointer; user-select: none; font-weight: 600; transition: all 0.2s ease;" title="Clique para alternar exibi&ccedil;&atilde;o de Entrada">
             <span style="width: 12px; height: 3px; border-radius: 1px; background: #00b0ff; display: inline-block;"></span> Entrada (Inbound)
@@ -705,16 +826,32 @@ $null = $sb.AppendLine(@"
 
   </div> <!-- End Selected Port Panel -->
 
-  <!-- Real Events Timeline Panel -->
-  <div style="background: #121620; border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 8px; padding: 18px 22px;">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
-      <div style="font-size: 10.5px; font-weight: 700; letter-spacing: 0.8px; color: #8b949e; text-transform: uppercase;">EVENTOS DE PORTA &bull; BAMEX SW01</div>
-      <div style="font-size: 10.5px; font-weight: 700; color: #64748b; text-transform: uppercase;">ZABBIX EVENT.GET</div>
+  <!-- Right Column: Top Talkers + Real Events -->
+  <div style="display: flex; flex-direction: column; gap: 12px; height: 100%;">
+    <!-- Top Talkers Widget -->
+    <div style="background: #121620; border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 8px; padding: 12px 16px; flex-shrink: 0;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+        <div style="font-size: 10.5px; font-weight: 700; letter-spacing: 0.8px; color: #8b949e; text-transform: uppercase; display: flex; align-items: center; gap: 6px;">
+          <span style="color: #ffd700;">&#9733;</span> TOP CONSUMIDORES DE TR&Aacute;FEGO
+        </div>
+        <div style="font-size: 9.5px; font-weight: 700; color: #38bdf8; font-family: monospace; background: rgba(0, 176, 255, 0.1); padding: 1px 6px; border-radius: 3px; border: 1px solid rgba(0, 176, 255, 0.2);">TOP 3 AO VIVO</div>
+      </div>
+      <div id="top-talkers-container" style="display: flex; flex-direction: column; gap: 6px;">
+$topTalkersInitialHtml
+      </div>
     </div>
-    <div id="event-list-container" style="display: flex; flex-direction: column; gap: 8px;">
+
+    <!-- Real Events Timeline Panel -->
+    <div style="background: #121620; border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 8px; padding: 12px 16px; flex: 1; display: flex; flex-direction: column; min-height: 0;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-shrink: 0;">
+        <div style="font-size: 10.5px; font-weight: 700; letter-spacing: 0.8px; color: #8b949e; text-transform: uppercase;">EVENTOS DE PORTA &bull; BAMEX SW01</div>
+        <div style="font-size: 10px; font-weight: 700; color: #64748b; text-transform: uppercase;">ZABBIX EVENT.GET</div>
+      </div>
+      <div id="event-list-container" style="display: flex; flex-direction: column; gap: 6px; flex: 1;">
 $eventsHtml
+      </div>
     </div>
-  </div> <!-- End Right Events Panel -->
+  </div> <!-- End Right Column -->
 
 </div> <!-- End Bottom Grid -->
 
@@ -754,6 +891,10 @@ $jsCodeTemplate = @'
         const hrs = parseInt(val) || 3;
         selectedTimeRangeHours = hrs;
         window.__arubaSelectedTimeRange = hrs;
+
+        if (window.__arubaResetZoom) {
+          window.__arubaResetZoom();
+        }
 
         // Visual highlight for active range button
         [3, 6, 12, 24].forEach(h => {
@@ -808,6 +949,23 @@ $jsCodeTemplate = @'
         const el = getEl(id);
         if (el) el.innerHTML = html;
       } catch (e) {}
+    }
+
+    function formatTrafficBps(bps) {
+      const b = parseFloat(bps) || 0;
+      if (b >= 1000000000) {
+        const v = b / 1000000000.0;
+        return (v >= 100 ? v.toFixed(1) : v.toFixed(2)) + ' Gb/s';
+      }
+      if (b >= 1000000) {
+        const v = b / 1000000.0;
+        return (v >= 100 ? v.toFixed(1) : v.toFixed(2)) + ' Mb/s';
+      }
+      if (b >= 1000) {
+        return (b / 1000.0).toFixed(1) + ' Kb/s';
+      }
+      if (b > 0) return Math.round(b) + ' bps';
+      return '0 bps';
     }
 
     // Interactive Unit Locator button function + Asset Drawer
@@ -896,12 +1054,35 @@ $jsCodeTemplate = @'
     const chartState = {
       inPts: [],
       outPts: [],
+      fullInPts: [],
+      fullOutPts: [],
       currentInBps: 0,
       currentOutBps: 0,
       showIn: true,
       showOut: true,
       hoveredIdx: null,
-      isInteractivityBound: false
+      isInteractivityBound: false,
+      isZoomed: false,
+      isDragging: false,
+      dragStartX: null,
+      dragCurrentX: null
+    };
+
+    window.__arubaResetZoom = function() {
+      try {
+        chartState.isZoomed = false;
+        chartState.isDragging = false;
+        chartState.dragStartX = null;
+        chartState.dragCurrentX = null;
+        chartState.inPts = (chartState.fullInPts && chartState.fullInPts.length) ? [...chartState.fullInPts] : [];
+        chartState.outPts = (chartState.fullOutPts && chartState.fullOutPts.length) ? [...chartState.fullOutPts] : [];
+        const btn = getEl('btn-reset-zoom');
+        if (btn) btn.style.display = 'none';
+        safeSetText('canvas-hint-label', '\u2726 arraste para zoom \u2022 duplo clique reset');
+        renderCanvas();
+      } catch (e) {
+        console.warn('resetZoom error:', e);
+      }
     };
 
     function renderCanvas() {
@@ -944,10 +1125,7 @@ $jsCodeTemplate = @'
         let maxVal = Math.max(...allVals, 0);
 
         function fmtBps(b) {
-          if (b >= 1000000000) return (b / 1000000000.0).toFixed(1) + ' Gb/s';
-          if (b >= 1000000) return (b / 1000000.0).toFixed(1) + ' Mb/s';
-          if (b >= 1000) return (b / 1000.0).toFixed(1) + ' Kb/s';
-          return Math.round(b) + ' bps';
+          return formatTrafficBps(b);
         }
 
         if (maxVal === 0) {
@@ -1134,6 +1312,21 @@ $jsCodeTemplate = @'
             ctx.stroke();
           }
         }
+
+        // Drag Box Zoom Selection Overlay
+        if (chartState.isDragging && chartState.dragStartX != null && chartState.dragCurrentX != null) {
+          const x1 = Math.max(padLeft, Math.min(chartState.dragStartX, chartState.dragCurrentX));
+          const x2 = Math.min(w - padRight, Math.max(chartState.dragStartX, chartState.dragCurrentX));
+          const boxW = Math.max(0, x2 - x1);
+
+          ctx.fillStyle = 'rgba(0, 176, 255, 0.22)';
+          ctx.fillRect(x1, padTop, boxW, plotH);
+          ctx.strokeStyle = '#00b0ff';
+          ctx.lineWidth = 1.5;
+          ctx.setLineDash([4, 2]);
+          ctx.strokeRect(x1, padTop, boxW, plotH);
+          ctx.setLineDash([]);
+        }
       } catch (err) {
         console.warn('renderCanvas error:', err);
       }
@@ -1162,6 +1355,24 @@ $jsCodeTemplate = @'
         }
       }
 
+      canvas.onmousedown = function(e) {
+        try {
+          if (e.button !== 0) return;
+          const count = Math.max(chartState.inPts.length, chartState.outPts.length);
+          if (count < 3) return;
+          const rect = canvas.getBoundingClientRect();
+          const clientX = (e.clientX - rect.left) * (canvas.width / rect.width);
+          const padLeft = 62;
+          const padRight = 14;
+          if (clientX >= padLeft && clientX <= canvas.width - padRight) {
+            chartState.isDragging = true;
+            chartState.dragStartX = clientX;
+            chartState.dragCurrentX = clientX;
+            if (tooltip) tooltip.style.display = 'none';
+          }
+        } catch (e) {}
+      };
+
       canvas.onmousemove = function(e) {
         try {
           const count = Math.max(chartState.inPts.length, chartState.outPts.length);
@@ -1172,6 +1383,13 @@ $jsCodeTemplate = @'
           const padLeft = 62;
           const padRight = 14;
           const plotW = canvas.width - padLeft - padRight;
+
+          if (chartState.isDragging) {
+            chartState.dragCurrentX = Math.max(padLeft, Math.min(canvas.width - padRight, clientX));
+            if (tooltip) tooltip.style.display = 'none';
+            renderCanvas();
+            return;
+          }
 
           let bestIdx = 0;
           let minDiff = Infinity;
@@ -1207,9 +1425,7 @@ $jsCodeTemplate = @'
           }
 
           function fmt(bps) {
-            if (bps >= 1000000000) return (bps / 1000000000.0).toFixed(2) + ' Gb/s';
-            if (bps >= 1000000) return (bps / 1000000.0).toFixed(2) + ' Mb/s';
-            return (bps / 1000.0).toFixed(1) + ' Kb/s';
+            return formatTrafficBps(bps);
           }
 
           safeSetText('tt-time', timeStr);
@@ -1246,7 +1462,60 @@ $jsCodeTemplate = @'
         }
       };
 
+      canvas.onmouseup = function(e) {
+        try {
+          if (!chartState.isDragging) return;
+          chartState.isDragging = false;
+          const startX = chartState.dragStartX;
+          const endX = chartState.dragCurrentX;
+          chartState.dragStartX = null;
+          chartState.dragCurrentX = null;
+
+          const padLeft = 62;
+          const padRight = 14;
+          const plotW = canvas.width - padLeft - padRight;
+          const count = Math.max(chartState.inPts.length, chartState.outPts.length);
+
+          if (count >= 4 && Math.abs(endX - startX) > 18) {
+            const minX = Math.max(padLeft, Math.min(startX, endX));
+            const maxX = Math.min(canvas.width - padRight, Math.max(startX, endX));
+
+            const pctStart = (minX - padLeft) / plotW;
+            const pctEnd = (maxX - padLeft) / plotW;
+
+            let idxStart = Math.max(0, Math.floor(pctStart * (count - 1)));
+            let idxEnd = Math.min(count - 1, Math.ceil(pctEnd * (count - 1)));
+
+            if (idxEnd - idxStart >= 3) {
+              chartState.isZoomed = true;
+              chartState.inPts = chartState.inPts.slice(idxStart, idxEnd + 1);
+              chartState.outPts = chartState.outPts.slice(idxStart, idxEnd + 1);
+              const btn = getEl('btn-reset-zoom');
+              if (btn) btn.style.display = 'inline-block';
+              safeSetText('canvas-hint-label', 'Zoom: ' + chartState.inPts.length + ' pts \u2022 duplo clique p/ reset');
+              chartState.hoveredIdx = null;
+              if (tooltip) tooltip.style.display = 'none';
+              renderCanvas();
+              return;
+            }
+          }
+          renderCanvas();
+        } catch (e) {
+          chartState.isDragging = false;
+          renderCanvas();
+        }
+      };
+
+      canvas.ondblclick = function(e) {
+        if (window.__arubaResetZoom) window.__arubaResetZoom();
+      };
+
       canvas.onmouseleave = function() {
+        if (chartState.isDragging) {
+          chartState.isDragging = false;
+          chartState.dragStartX = null;
+          chartState.dragCurrentX = null;
+        }
         chartState.hoveredIdx = null;
         if (tooltip) tooltip.style.display = 'none';
         if (hoverVal) hoverVal.innerText = '';
@@ -1275,10 +1544,16 @@ $jsCodeTemplate = @'
     }
 
     function drawRealChart(inPts, outPts, currentInBps, currentOutBps) {
-      chartState.inPts = inPts || [];
-      chartState.outPts = outPts || [];
+      chartState.fullInPts = inPts || [];
+      chartState.fullOutPts = outPts || [];
+      chartState.inPts = [...chartState.fullInPts];
+      chartState.outPts = [...chartState.fullOutPts];
       chartState.currentInBps = currentInBps || 0;
       chartState.currentOutBps = currentOutBps || 0;
+      chartState.isZoomed = false;
+      const btn = getEl('btn-reset-zoom');
+      if (btn) btn.style.display = 'none';
+      safeSetText('canvas-hint-label', '\u2726 arraste para zoom \u2022 duplo clique reset');
       initChartInteractivity();
       renderCanvas();
     }
@@ -1362,6 +1637,73 @@ $jsCodeTemplate = @'
       }
     }
 
+    function updateTopTalkers() {
+      try {
+        const topContainer = getEl('top-talkers-container');
+        if (!topContainer) return;
+
+        const list = [];
+        for (let p = 1; p <= 28; p++) {
+          const pt = ports[p];
+          if (pt && pt.OperStatus === 1) {
+            const tot = (pt.InBps || 0) + (pt.OutBps || 0);
+            const alias = (pt && pt.Alias) ? pt.Alias : (pt.Name || ('Porta ' + p));
+            list.push({
+              port: p,
+              name: pt.Name,
+              alias: alias,
+              inBps: pt.InBps || 0,
+              outBps: pt.OutBps || 0,
+              total: tot
+            });
+          }
+        }
+
+        list.sort((a, b) => b.total - a.total);
+        const top3 = list.slice(0, 3);
+        const maxTraffic = (top3.length > 0 && top3[0].total > 0) ? top3[0].total : 1;
+
+        const medals = [
+          { badge: '1\u00ba', color: '#ffd700', bg: 'rgba(255, 215, 0, 0.15)' },
+          { badge: '2\u00ba', color: '#c0c0c0', bg: 'rgba(192, 192, 192, 0.15)' },
+          { badge: '3\u00ba', color: '#cd7f32', bg: 'rgba(205, 127, 50, 0.15)' }
+        ];
+
+        let html = '';
+        top3.forEach((item, idx) => {
+          const m = medals[idx] || medals[2];
+          const pct = Math.max(5, Math.min(100, Math.round((item.total / maxTraffic) * 100)));
+          const isSelected = (item.port === selectedPortNum);
+          const borderStyle = isSelected
+            ? 'border: 1px solid #00b0ff; box-shadow: 0 0 8px rgba(0, 176, 255, 0.3);'
+            : 'border: 1px solid #1e293b;';
+
+          html += `
+            <div class="sw-top-talker" data-tt-port="${item.port}" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(${item.port});" style="background: #0d121c; border-radius: 4px; padding: 6px 10px; cursor: pointer; ${borderStyle} transition: all 0.2s ease;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 3px;">
+                <div style="display: flex; align-items: center; gap: 7px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                  <span style="font-size: 9px; font-weight: 800; color: ${m.color}; background: ${m.bg}; padding: 1px 5px; border-radius: 3px; font-family: monospace;">${m.badge}</span>
+                  <span style="font-size: 11px; font-weight: 700; color: #ffffff;">Porta ${item.port}</span>
+                  <span style="font-size: 10px; color: #8b949e; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${item.alias}</span>
+                </div>
+                <div style="font-size: 11px; font-weight: 800; color: #38bdf8; font-family: monospace; white-space: nowrap; margin-left: 8px;">${formatTrafficBps(item.total)}</div>
+              </div>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <div style="flex: 1; height: 3px; background: #1c2230; border-radius: 2px; overflow: hidden;">
+                  <div style="width: ${pct}%; height: 100%; background: #00b0ff; border-radius: 2px;"></div>
+                </div>
+                <span style="font-size: 8.5px; color: #64748b; font-family: monospace; white-space: nowrap;">In: ${formatTrafficBps(item.inBps)} &bull; Out: ${formatTrafficBps(item.outBps)}</span>
+              </div>
+            </div>
+          `;
+        });
+
+        topContainer.innerHTML = html;
+      } catch (e) {
+        console.warn('updateTopTalkers error:', e);
+      }
+    }
+
     function selectPort(pNum) {
       try {
         selectedPortNum = pNum;
@@ -1393,11 +1735,29 @@ $jsCodeTemplate = @'
           }
         } catch (e) {}
 
+        // Highlight active Top Talker
+        try {
+          const allTts = document.querySelectorAll('.sw-top-talker');
+          if (allTts && allTts.length) {
+            allTts.forEach(el => {
+              const pId = parseInt(el.getAttribute('data-tt-port') || '0', 10);
+              if (pId === pNum) {
+                el.style.border = '1px solid #00b0ff';
+                el.style.boxShadow = '0 0 8px rgba(0, 176, 255, 0.4)';
+              } else {
+                el.style.border = '1px solid #1e293b';
+                el.style.boxShadow = 'none';
+              }
+            });
+          }
+        } catch (e) {}
+
         // Update Detail Panel
         const isSfp = (pNum >= 25);
         safeSetText('sel-port-type', isSfp ? 'ARUBA SFP+ 10G' : 'ARUBA 1GBE RJ45');
         safeSetText('sel-port-title', isSfp ? `Porta ${pNum} (SFP+)` : `Porta ${pNum}`);
-        safeSetHtml('sel-port-name', `${p.Name || ('Porta ' + pNum)} &bull; ${p.Type || ''}`);
+        const pSub = p.Alias ? p.Alias : (p.Type || (isSfp ? 'SFP+ 10G' : '1GbE RJ45'));
+        safeSetHtml('sel-port-name', `${p.Name || ('Porta ' + pNum)} &bull; ${pSub}`);
 
         const badge = getEl('sel-port-status');
         if (badge) {
@@ -1436,10 +1796,8 @@ $jsCodeTemplate = @'
         else if (p.Speed >= 10000000) speedStr = '10 Mb/s';
         safeSetText('sel-port-speed', speedStr);
 
-        const inKb = ((p.InBps || 0) / 1000.0).toFixed(1);
-        const outKb = ((p.OutBps || 0) / 1000.0).toFixed(1);
-        safeSetText('sel-port-in', `${inKb} Kb/s`);
-        safeSetText('sel-port-out', `${outKb} Kb/s`);
+        safeSetText('sel-port-in', formatTrafficBps(p.InBps));
+        safeSetText('sel-port-out', formatTrafficBps(p.OutBps));
 
         let util = '0,00%';
         if (p.Speed > 0 && p.OperStatus === 1) {
@@ -1538,7 +1896,7 @@ $jsCodeTemplate = @'
               method: 'event.get',
               params: {
                 hostids: ['__ZABBIX_HOSTID_PLACEHOLDER__'],
-                limit: 7,
+                limit: 5,
                 sortfield: 'clock',
                 sortorder: 'DESC',
                 output: ['eventid', 'clock', 'value', 'name', 'severity']
@@ -1659,13 +2017,13 @@ $jsCodeTemplate = @'
               const safeName = (ev.name || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
               return `
-                <div style="display: flex; align-items: center; justify-content: space-between; font-size: 12px; color: #e2e8f0; background: #0d121c; padding: 7px 11px; border-radius: 4px; border-left: 3px solid ${dotColor};">
+                <div style="display: flex; align-items: center; justify-content: space-between; font-size: 11.5px; color: #e2e8f0; background: #0d121c; padding: 5px 9px; border-radius: 4px; border-left: 3px solid ${dotColor};">
                   <div style="display: flex; align-items: center; gap: 8px;">
-                    <span style="color: #8b949e; font-family: monospace; min-width: 58px; font-size: 11px;">${dt}</span>
-                    <span style="width: 7px; height: 7px; border-radius: 50%; background: ${dotColor}; ${shadow} display: inline-block;"></span>
+                    <span style="color: #8b949e; font-family: monospace; min-width: 54px; font-size: 10.5px;">${dt}</span>
+                    <span style="width: 6px; height: 6px; border-radius: 50%; background: ${dotColor}; ${shadow} display: inline-block;"></span>
                     <span style="font-weight: 500;">${safeName}</span>
                   </div>
-                  <span style="background: ${badgeBg}; color: ${badgeColor}; font-size: 9.5px; font-weight: 700; padding: 2px 6px; border-radius: 3px; font-family: monospace;">${badgeText}</span>
+                  <span style="background: ${badgeBg}; color: ${badgeColor}; font-size: 9px; font-weight: 700; padding: 2px 5px; border-radius: 3px; font-family: monospace;">${badgeText}</span>
                 </div>
               `;
             }).join('');
@@ -1689,11 +2047,15 @@ $jsCodeTemplate = @'
                 pingStatus = parseInt(it.lastvalue);
               }
 
-              const m = it.name.match(/Interface (\d+)\(\)/);
+              const m = it.name.match(/Interface (\d+)\(([^)]*)\)/);
               if (m) {
-                const pNum = parseInt(m[1]);
+                const pNum = parseInt(m[1], 10);
+                const liveAlias = (m[2] || '').trim();
                 if (k.match(/\.(\d+)\]/) && parseInt(RegExp.$1) >= 100000) return;
                 if (ports[pNum]) {
+                  if (liveAlias.length > 0) {
+                    ports[pNum].Alias = liveAlias;
+                  }
                   if (k.startsWith('net.if.status[')) ports[pNum].OperStatus = v;
                   else if (k.startsWith('net.if.speed[')) ports[pNum].Speed = v;
                   else if (k.startsWith('net.if.in[')) {
@@ -1767,6 +2129,11 @@ $jsCodeTemplate = @'
                 if (hasAlert) {
                   pEl.style.border = (p === selectedPortNum) ? '2px solid #00b0ff' : '1px solid rgba(239, 68, 68, 0.6)';
                 }
+                const statusDesc = hasAlert ? 'DOWN (ALARME)' : (isUp ? (pt.Speed < 1000000000 && pt.Speed > 0 ? 'UP (DEGRADADO)' : 'UP') : 'DOWN');
+                const speedText = (!isUp ? '--' : (pt.Speed >= 10000000000 ? '10 Gb/s' : (pt.Speed >= 1000000000 ? '1 Gb/s' : (pt.Speed >= 100000000 ? '100 Mb/s' : (pt.Speed >= 10000000 ? '10 Mb/s' : '--')))));
+                const pSub = pt.Alias ? pt.Alias : (p >= 25 ? 'SFP+ 10G' : pt.Name);
+                const portLabel = (p >= 25) ? `SFP+ ${p} | ${pSub}` : `Porta ${p} | ${pSub}`;
+                pEl.title = `${portLabel}\nStatus: ${statusDesc}\nVelocidade: ${speedText}\nEntrada: ${formatTrafficBps(pt.InBps)}\nSaida: ${formatTrafficBps(pt.OutBps)}`;
               }
             } catch (e) {}
           }
@@ -1774,9 +2141,12 @@ $jsCodeTemplate = @'
           // Update KPIs safely
           safeSetText('kpi-active-ports', activeTotal + '');
           safeSetText('kpi-degraded-ports', degradedTotal + '');
-          safeSetText('kpi-total-traffic', (trafficTotal / 1000.0).toFixed(1) + ' Kb/s');
+          safeSetText('kpi-total-traffic', formatTrafficBps(trafficTotal));
           const kBar = getEl('kpi-active-bar');
           if (kBar && kBar.style) kBar.style.width = Math.round((activeTotal / 28.0) * 100) + '%';
+
+          // Update Top Talkers live
+          updateTopTalkers();
 
           // Refresh selected port view & historical traffic
           selectPort(selectedPortNum);
@@ -1846,6 +2216,7 @@ $jsCodeTemplate = @'
     bindPortEvents();
     bindRangeButtons();
     bindDrawerControls();
+    updateTopTalkers();
     selectPort(24);
 
     // Defer a secondary binding & selection to ensure React DOM has completed rendering
@@ -1853,6 +2224,7 @@ $jsCodeTemplate = @'
       bindPortEvents();
       bindRangeButtons();
       bindDrawerControls();
+      updateTopTalkers();
       selectPort(selectedPortNum);
     }, 150);
 
@@ -1929,6 +2301,16 @@ body { background: #0c0f17; margin: 0; padding: 12px; }
   color: #ffffff !important;
   border-color: #64748b !important;
 }
+.sw-top-talker:hover {
+  border-color: #00b0ff !important;
+  background: #141c2b !important;
+  transform: translateX(2px);
+}
+#btn-reset-zoom:hover {
+  background: #00b0ff !important;
+  color: #050b14 !important;
+  box-shadow: 0 0 10px rgba(0, 176, 255, 0.6) !important;
+}
 </style>
 </head>
 <body>
@@ -1995,6 +2377,16 @@ $cssStyles = @"
   background: #334155 !important;
   color: #ffffff !important;
   border-color: #64748b !important;
+}
+.sw-top-talker:hover {
+  border-color: #00b0ff !important;
+  background: #141c2b !important;
+  transform: translateX(2px);
+}
+#btn-reset-zoom:hover {
+  background: #00b0ff !important;
+  color: #050b14 !important;
+  box-shadow: 0 0 10px rgba(0, 176, 255, 0.6) !important;
 }
 "@
 
