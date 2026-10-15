@@ -481,6 +481,59 @@ $null = $sb.AppendLine(@"
   <div style="flex: 1; margin: 0 16px; background: #080c14; border: 1.5px solid #1c2636; border-radius: 8px; padding: 12px 24px; box-shadow: inset 0 3px 12px rgba(0,0,0,0.9); display: flex; align-items: center; justify-content: space-around;">
 "@)
 
+function Get-Rj45PortHtml($pNum, $pt, $hasAlert, $selectedPortNum) {
+    $isUp = ($pt.OperStatus -eq 1)
+    $normSpd = $pt.Speed
+    if ($normSpd -gt 0 -and $normSpd -lt 100000) { $normSpd = $normSpd * 1000000 }
+    $isDegraded = ($isUp -and $normSpd -lt 1000000000)
+    
+    $ledColor = if ($hasAlert) { "#ef4444" } elseif (-not $isUp) { "#27303f" } elseif ($isDegraded) { "#f59e0b" } else { "#00e676" }
+    $ledShadow = if ($hasAlert) { "box-shadow: 0 0 8px #ef4444;" } elseif ($isUp) { "box-shadow: 0 0 6px $ledColor;" } else { "" }
+    $ledPulseClass = if ($hasAlert) { " sw-port-fault-pulse" } else { "" }
+    $actClass = if ($isUp -and -not $hasAlert) { " sw-led-act" } else { "" }
+    $statusDesc = if ($hasAlert) { "DOWN (ALARME)" } elseif ($isUp) { if ($isDegraded) { "UP (DEGRADADO)" } else { "UP" } } else { "DOWN" }
+    $inFmt = Format-Bps $pt.InBps
+    $outFmt = Format-Bps $pt.OutBps
+    $titleLabel = if ($pt.Alias -and $pt.Alias.Length -gt 0) { "Porta $pNum | $($pt.Alias)" } else { "Porta $pNum | $($pt.Name)" }
+    $speedLabel = if (-not $isUp) { '--' } elseif ($normSpd -ge 10000000000) { '10 Gb/s' } elseif ($normSpd -ge 1000000000) { '1 Gb/s' } elseif ($normSpd -ge 100000000) { '100 Mb/s' } elseif ($normSpd -ge 10000000) { '10 Mb/s' } else { '--' }
+    $titleText = "$titleLabel&#10;Status: $statusDesc&#10;Velocidade: $speedLabel&#10;Entrada: $inFmt&#10;Saida: $outFmt"
+    $selectedClass = if ($pNum -eq 24) { " sw-selected" } else { "" }
+    $borderStyle = if ($pNum -eq 24) { "2px solid #00b0ff" } elseif ($hasAlert) { "1px solid rgba(239, 68, 68, 0.6)" } else { "1px solid #263346" }
+    $boxShadowStyle = if ($pNum -eq 24) { "0 0 14px rgba(0, 176, 255, 0.9)" } else { "none" }
+
+    return @"
+          <div class="sw-port$selectedClass" data-port="$pNum" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort($pNum);" title="$titleText" style="width: 50px; height: 62px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: $borderStyle; box-shadow: $boxShadowStyle; box-sizing: border-box;">
+            <div style="width: 100%; display: flex; justify-content: space-between; padding: 0 3px;">
+              <span class="sw-led-1$ledPulseClass" style="width: 6px; height: 4px; border-radius: 1px; background-color: $ledColor; $ledShadow display: inline-block;"></span>
+              <span class="sw-led-2$ledPulseClass$actClass" style="width: 6px; height: 4px; border-radius: 1px; background-color: $ledColor; opacity: 0.85; $ledShadow display: inline-block;"></span>
+            </div>
+            <!-- Authentic Shielded RJ45 Jack Receptacle -->
+            <div class="sw-rj45-jack" style="width: 36px; height: 30px; background: linear-gradient(180deg, #1c2433 0%, #101622 100%); border: 1.5px solid #2b384e; border-radius: 3px; position: relative; box-shadow: inset 0 1px 2px rgba(255,255,255,0.12), 0 2px 5px rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; box-sizing: border-box;">
+              <!-- Metallic Ground Shield Tabs -->
+              <div style="position: absolute; top: -1px; left: 6px; width: 4px; height: 1.5px; background: #475569; border-radius: 0 0 1px 1px;"></div>
+              <div style="position: absolute; top: -1px; right: 6px; width: 4px; height: 1.5px; background: #475569; border-radius: 0 0 1px 1px;"></div>
+              <!-- Inner Cavity with Stepped Silhouette -->
+              <div style="width: 28px; height: 23px; background: #030508; border-radius: 2px; position: relative; overflow: hidden; border: 1px solid #151d2a; box-shadow: inset 0 2px 6px rgba(0,0,0,0.95); display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 1px 0 0 0; box-sizing: border-box;">
+                <!-- 8 Gold Pins (8P8C) -->
+                <div style="width: 22px; height: 5px; display: flex; justify-content: space-between; align-items: flex-start; padding: 0 1px;">
+                  <span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span>
+                  <span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span>
+                </div>
+                <!-- Stepped Shoulders & Central Clip Retention Slot -->
+                <div style="width: 100%; display: flex; align-items: flex-end; justify-content: space-between;">
+                  <div style="width: 6px; height: 10px; background: #0d1420; border-top: 1px solid #1e293b; border-right: 1px solid #1e293b; border-radius: 1px 2px 0 0;"></div>
+                  <div style="width: 12px; height: 7px; background: #070b12; border-top: 1px solid #222f44; border-left: 1px solid #182232; border-right: 1px solid #182232; border-radius: 1px 1px 0 0; display: flex; justify-content: center; align-items: center;">
+                    <div style="width: 6px; height: 2px; background: #162030; border-radius: 1px;"></div>
+                  </div>
+                  <div style="width: 6px; height: 10px; background: #0d1420; border-top: 1px solid #1e293b; border-left: 1px solid #1e293b; border-radius: 2px 1px 0 0;"></div>
+                </div>
+              </div>
+            </div>
+            <div style="font-size: 10.5px; font-weight: 800; color: #8b949e; line-height: 1; font-family: monospace; margin-bottom: 1px;">$pNum</div>
+          </div>
+"@
+}
+
 # Bank 1: Ports 1 - 12 (6 columns)
 $null = $sb.AppendLine(@"
       <div style="display: flex; flex-direction: column; gap: 6px;">
@@ -489,34 +542,7 @@ $null = $sb.AppendLine(@"
 "@)
 foreach ($col in 0..5) {
     $pNum = ($col * 2) + 1
-    $pt = $ports["$pNum"]
-    $isUp = ($pt.OperStatus -eq 1)
-    $hasAlert = ($probPorts.ContainsKey($pNum) -and $probPorts[$pNum])
-    $ledColor = if ($hasAlert) { "#ef4444" } elseif (-not $isUp) { "#27303f" } elseif ($pt.Speed -lt 1000000000) { "#f59e0b" } else { "#00e676" }
-    $ledShadow = if ($hasAlert) { "box-shadow: 0 0 8px #ef4444;" } elseif ($isUp) { "box-shadow: 0 0 5px $ledColor;" } else { "" }
-    $ledPulseClass = if ($hasAlert) { " sw-port-fault-pulse" } else { "" }
-    $statusDesc = if ($hasAlert) { "DOWN (ALARME)" } elseif ($isUp) { if ($pt.Speed -lt 1000000000) { "UP (DEGRADADO)" } else { "UP" } } else { "DOWN" }
-    $inFmt = Format-Bps $pt.InBps
-    $outFmt = Format-Bps $pt.OutBps
-    $titleLabel = if ($pt.Alias -and $pt.Alias.Length -gt 0) { "Porta $pNum | $($pt.Alias)" } else { "Porta $pNum | $($pt.Name)" }
-    $titleText = "$titleLabel&#10;Status: $statusDesc&#10;Velocidade: $(if (-not $isUp) { '--' } elseif ($pt.Speed -ge 1000000000) { '1 Gb/s' } elseif ($pt.Speed -ge 100000000) { '100 Mb/s' } elseif ($pt.Speed -ge 10000000) { '10 Mb/s' } else { '--' })&#10;Entrada: $inFmt&#10;Saida: $outFmt"
-    $selectedClass = if ($pNum -eq 24) { " sw-selected" } else { "" }
-    $borderStyle = if ($pNum -eq 24) { "2px solid #00b0ff" } elseif ($hasAlert) { "1px solid rgba(239, 68, 68, 0.6)" } else { "1px solid #263346" }
-    $boxShadowStyle = if ($pNum -eq 24) { "0 0 14px rgba(0, 176, 255, 0.9)" } else { "none" }
-
-    $null = $sb.AppendLine(@"
-          <div class="sw-port$selectedClass" data-port="$pNum" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort($pNum);" title="$titleText" style="width: 50px; height: 60px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: $borderStyle; box-shadow: $boxShadowStyle; box-sizing: border-box;">
-            <div style="width: 100%; display: flex; justify-content: space-between; padding: 0 3px;">
-              <span class="sw-led-1$ledPulseClass" style="width: 6px; height: 4px; border-radius: 1px; background-color: $ledColor; $ledShadow display: inline-block;"></span>
-              <span class="sw-led-2$ledPulseClass" style="width: 6px; height: 4px; border-radius: 1px; background-color: $ledColor; opacity: 0.85; $ledShadow display: inline-block;"></span>
-            </div>
-            <div style="width: 34px; height: 28px; background: #05070a; border: 1.5px solid #1a2332; border-radius: 2px; position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: space-between;">
-              <div style="width: 24px; height: 4px; background: repeating-linear-gradient(90deg, #d4af37 0px, #d4af37 1px, transparent 1px, transparent 2.5px); opacity: 0.85; margin-top: 1px;"></div>
-              <div style="width: 14px; height: 6px; background: #0d1420; border-top: 1px solid #192332; border-left: 1px solid #192332; border-right: 1px solid #192332; border-radius: 1px 1px 0 0;"></div>
-            </div>
-            <div style="font-size: 10.5px; font-weight: 800; color: #8b949e; line-height: 1; font-family: monospace; margin-bottom: 1px;">$pNum</div>
-          </div>
-"@)
+    $null = $sb.AppendLine((Get-Rj45PortHtml -pNum $pNum -pt $ports["$pNum"] -hasAlert ($probPorts.ContainsKey($pNum) -and $probPorts[$pNum]) -selectedPortNum 24))
 }
 $null = $sb.AppendLine(@"
         </div>
@@ -524,34 +550,7 @@ $null = $sb.AppendLine(@"
 "@)
 foreach ($col in 0..5) {
     $pNum = ($col * 2) + 2
-    $pt = $ports["$pNum"]
-    $isUp = ($pt.OperStatus -eq 1)
-    $hasAlert = ($probPorts.ContainsKey($pNum) -and $probPorts[$pNum])
-    $ledColor = if ($hasAlert) { "#ef4444" } elseif (-not $isUp) { "#27303f" } elseif ($pt.Speed -lt 1000000000) { "#f59e0b" } else { "#00e676" }
-    $ledShadow = if ($hasAlert) { "box-shadow: 0 0 8px #ef4444;" } elseif ($isUp) { "box-shadow: 0 0 5px $ledColor;" } else { "" }
-    $ledPulseClass = if ($hasAlert) { " sw-port-fault-pulse" } else { "" }
-    $statusDesc = if ($hasAlert) { "DOWN (ALARME)" } elseif ($isUp) { if ($pt.Speed -lt 1000000000) { "UP (DEGRADADO)" } else { "UP" } } else { "DOWN" }
-    $inFmt = Format-Bps $pt.InBps
-    $outFmt = Format-Bps $pt.OutBps
-    $titleLabel = if ($pt.Alias -and $pt.Alias.Length -gt 0) { "Porta $pNum | $($pt.Alias)" } else { "Porta $pNum | $($pt.Name)" }
-    $titleText = "$titleLabel&#10;Status: $statusDesc&#10;Velocidade: $(if (-not $isUp) { '--' } elseif ($pt.Speed -ge 1000000000) { '1 Gb/s' } elseif ($pt.Speed -ge 100000000) { '100 Mb/s' } elseif ($pt.Speed -ge 10000000) { '10 Mb/s' } else { '--' })&#10;Entrada: $inFmt&#10;Saida: $outFmt"
-    $selectedClass = if ($pNum -eq 24) { " sw-selected" } else { "" }
-    $borderStyle = if ($pNum -eq 24) { "2px solid #00b0ff" } elseif ($hasAlert) { "1px solid rgba(239, 68, 68, 0.6)" } else { "1px solid #263346" }
-    $boxShadowStyle = if ($pNum -eq 24) { "0 0 14px rgba(0, 176, 255, 0.9)" } else { "none" }
-
-    $null = $sb.AppendLine(@"
-          <div class="sw-port$selectedClass" data-port="$pNum" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort($pNum);" title="$titleText" style="width: 50px; height: 60px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: $borderStyle; box-shadow: $boxShadowStyle; box-sizing: border-box;">
-            <div style="width: 100%; display: flex; justify-content: space-between; padding: 0 3px;">
-              <span class="sw-led-1$ledPulseClass" style="width: 6px; height: 4px; border-radius: 1px; background-color: $ledColor; $ledShadow display: inline-block;"></span>
-              <span class="sw-led-2$ledPulseClass" style="width: 6px; height: 4px; border-radius: 1px; background-color: $ledColor; opacity: 0.85; $ledShadow display: inline-block;"></span>
-            </div>
-            <div style="width: 34px; height: 28px; background: #05070a; border: 1.5px solid #1a2332; border-radius: 2px; position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: space-between;">
-              <div style="width: 24px; height: 4px; background: repeating-linear-gradient(90deg, #d4af37 0px, #d4af37 1px, transparent 1px, transparent 2.5px); opacity: 0.85; margin-top: 1px;"></div>
-              <div style="width: 14px; height: 6px; background: #0d1420; border-top: 1px solid #192332; border-left: 1px solid #192332; border-right: 1px solid #192332; border-radius: 1px 1px 0 0;"></div>
-            </div>
-            <div style="font-size: 10.5px; font-weight: 800; color: #8b949e; line-height: 1; font-family: monospace; margin-bottom: 1px;">$pNum</div>
-          </div>
-"@)
+    $null = $sb.AppendLine((Get-Rj45PortHtml -pNum $pNum -pt $ports["$pNum"] -hasAlert ($probPorts.ContainsKey($pNum) -and $probPorts[$pNum]) -selectedPortNum 24))
 }
 $null = $sb.AppendLine(@"
         </div>
@@ -567,34 +566,7 @@ $null = $sb.AppendLine(@"
 "@)
 foreach ($col in 6..11) {
     $pNum = ($col * 2) + 1
-    $pt = $ports["$pNum"]
-    $isUp = ($pt.OperStatus -eq 1)
-    $hasAlert = ($probPorts.ContainsKey($pNum) -and $probPorts[$pNum])
-    $ledColor = if ($hasAlert) { "#ef4444" } elseif (-not $isUp) { "#27303f" } elseif ($pt.Speed -lt 1000000000) { "#f59e0b" } else { "#00e676" }
-    $ledShadow = if ($hasAlert) { "box-shadow: 0 0 8px #ef4444;" } elseif ($isUp) { "box-shadow: 0 0 5px $ledColor;" } else { "" }
-    $ledPulseClass = if ($hasAlert) { " sw-port-fault-pulse" } else { "" }
-    $statusDesc = if ($hasAlert) { "DOWN (ALARME)" } elseif ($isUp) { if ($pt.Speed -lt 1000000000) { "UP (DEGRADADO)" } else { "UP" } } else { "DOWN" }
-    $inFmt = Format-Bps $pt.InBps
-    $outFmt = Format-Bps $pt.OutBps
-    $titleLabel = if ($pt.Alias -and $pt.Alias.Length -gt 0) { "Porta $pNum | $($pt.Alias)" } else { "Porta $pNum | $($pt.Name)" }
-    $titleText = "$titleLabel&#10;Status: $statusDesc&#10;Velocidade: $(if (-not $isUp) { '--' } elseif ($pt.Speed -ge 1000000000) { '1 Gb/s' } elseif ($pt.Speed -ge 100000000) { '100 Mb/s' } elseif ($pt.Speed -ge 10000000) { '10 Mb/s' } else { '--' })&#10;Entrada: $inFmt&#10;Saida: $outFmt"
-    $selectedClass = if ($pNum -eq 24) { " sw-selected" } else { "" }
-    $borderStyle = if ($pNum -eq 24) { "2px solid #00b0ff" } elseif ($hasAlert) { "1px solid rgba(239, 68, 68, 0.6)" } else { "1px solid #263346" }
-    $boxShadowStyle = if ($pNum -eq 24) { "0 0 14px rgba(0, 176, 255, 0.9)" } else { "none" }
-
-    $null = $sb.AppendLine(@"
-          <div class="sw-port$selectedClass" data-port="$pNum" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort($pNum);" title="$titleText" style="width: 50px; height: 60px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: $borderStyle; box-shadow: $boxShadowStyle; box-sizing: border-box;">
-            <div style="width: 100%; display: flex; justify-content: space-between; padding: 0 3px;">
-              <span class="sw-led-1$ledPulseClass" style="width: 6px; height: 4px; border-radius: 1px; background-color: $ledColor; $ledShadow display: inline-block;"></span>
-              <span class="sw-led-2$ledPulseClass" style="width: 6px; height: 4px; border-radius: 1px; background-color: $ledColor; opacity: 0.85; $ledShadow display: inline-block;"></span>
-            </div>
-            <div style="width: 34px; height: 28px; background: #05070a; border: 1.5px solid #1a2332; border-radius: 2px; position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: space-between;">
-              <div style="width: 24px; height: 4px; background: repeating-linear-gradient(90deg, #d4af37 0px, #d4af37 1px, transparent 1px, transparent 2.5px); opacity: 0.85; margin-top: 1px;"></div>
-              <div style="width: 14px; height: 6px; background: #0d1420; border-top: 1px solid #192332; border-left: 1px solid #192332; border-right: 1px solid #192332; border-radius: 1px 1px 0 0;"></div>
-            </div>
-            <div style="font-size: 10.5px; font-weight: 800; color: #8b949e; line-height: 1; font-family: monospace; margin-bottom: 1px;">$pNum</div>
-          </div>
-"@)
+    $null = $sb.AppendLine((Get-Rj45PortHtml -pNum $pNum -pt $ports["$pNum"] -hasAlert ($probPorts.ContainsKey($pNum) -and $probPorts[$pNum]) -selectedPortNum 24))
 }
 $null = $sb.AppendLine(@"
         </div>
@@ -602,34 +574,7 @@ $null = $sb.AppendLine(@"
 "@)
 foreach ($col in 6..11) {
     $pNum = ($col * 2) + 2
-    $pt = $ports["$pNum"]
-    $isUp = ($pt.OperStatus -eq 1)
-    $hasAlert = ($probPorts.ContainsKey($pNum) -and $probPorts[$pNum])
-    $ledColor = if ($hasAlert) { "#ef4444" } elseif (-not $isUp) { "#27303f" } elseif ($pt.Speed -lt 1000000000) { "#f59e0b" } else { "#00e676" }
-    $ledShadow = if ($hasAlert) { "box-shadow: 0 0 8px #ef4444;" } elseif ($isUp) { "box-shadow: 0 0 5px $ledColor;" } else { "" }
-    $ledPulseClass = if ($hasAlert) { " sw-port-fault-pulse" } else { "" }
-    $statusDesc = if ($hasAlert) { "DOWN (ALARME)" } elseif ($isUp) { if ($pt.Speed -lt 1000000000) { "UP (DEGRADADO)" } else { "UP" } } else { "DOWN" }
-    $inFmt = Format-Bps $pt.InBps
-    $outFmt = Format-Bps $pt.OutBps
-    $titleLabel = if ($pt.Alias -and $pt.Alias.Length -gt 0) { "Porta $pNum | $($pt.Alias)" } else { "Porta $pNum | $($pt.Name)" }
-    $titleText = "$titleLabel&#10;Status: $statusDesc&#10;Velocidade: $(if (-not $isUp) { '--' } elseif ($pt.Speed -ge 1000000000) { '1 Gb/s' } elseif ($pt.Speed -ge 100000000) { '100 Mb/s' } elseif ($pt.Speed -ge 10000000) { '10 Mb/s' } else { '--' })&#10;Entrada: $inFmt&#10;Saida: $outFmt"
-    $selectedClass = if ($pNum -eq 24) { " sw-selected" } else { "" }
-    $borderStyle = if ($pNum -eq 24) { "2px solid #00b0ff" } elseif ($hasAlert) { "1px solid rgba(239, 68, 68, 0.6)" } else { "1px solid #263346" }
-    $boxShadowStyle = if ($pNum -eq 24) { "0 0 14px rgba(0, 176, 255, 0.9)" } else { "none" }
-
-    $null = $sb.AppendLine(@"
-          <div class="sw-port$selectedClass" data-port="$pNum" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort($pNum);" title="$titleText" style="width: 50px; height: 60px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: $borderStyle; box-shadow: $boxShadowStyle; box-sizing: border-box;">
-            <div style="width: 100%; display: flex; justify-content: space-between; padding: 0 3px;">
-              <span class="sw-led-1$ledPulseClass" style="width: 6px; height: 4px; border-radius: 1px; background-color: $ledColor; $ledShadow display: inline-block;"></span>
-              <span class="sw-led-2$ledPulseClass" style="width: 6px; height: 4px; border-radius: 1px; background-color: $ledColor; opacity: 0.85; $ledShadow display: inline-block;"></span>
-            </div>
-            <div style="width: 34px; height: 28px; background: #05070a; border: 1.5px solid #1a2332; border-radius: 2px; position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: space-between;">
-              <div style="width: 24px; height: 4px; background: repeating-linear-gradient(90deg, #d4af37 0px, #d4af37 1px, transparent 1px, transparent 2.5px); opacity: 0.85; margin-top: 1px;"></div>
-              <div style="width: 14px; height: 6px; background: #0d1420; border-top: 1px solid #192332; border-left: 1px solid #192332; border-right: 1px solid #192332; border-radius: 1px 1px 0 0;"></div>
-            </div>
-            <div style="font-size: 10.5px; font-weight: 800; color: #8b949e; line-height: 1; font-family: monospace; margin-bottom: 1px;">$pNum</div>
-          </div>
-"@)
+    $null = $sb.AppendLine((Get-Rj45PortHtml -pNum $pNum -pt $ports["$pNum"] -hasAlert ($probPorts.ContainsKey($pNum) -and $probPorts[$pNum]) -selectedPortNum 24))
 }
 $null = $sb.AppendLine(@"
         </div>
@@ -652,6 +597,7 @@ foreach ($s in @(25, 27)) {
     $sLed = if ($hasAlert) { "#ef4444" } elseif ($isUp) { "#00e676" } else { "#27303f" }
     $sLedShadow = if ($hasAlert) { "box-shadow: 0 0 8px #ef4444;" } elseif ($isUp) { "box-shadow: 0 0 5px #00e676;" } else { "" }
     $sLedPulseClass = if ($hasAlert) { " sw-port-fault-pulse" } else { "" }
+    $sActClass = if ($isUp -and -not $hasAlert) { " sw-led-act" } else { "" }
     $sBorder = if ($isUp) { "1px solid #00b0ff" } elseif ($hasAlert) { "1px solid rgba(239, 68, 68, 0.6)" } else { "1px solid #283344" }
     $sBg = if ($isUp) { "#142132" } else { "#101622" }
     $sBar = if ($isUp) { "#00b0ff" } else { "#2d3748" }
@@ -663,7 +609,7 @@ foreach ($s in @(25, 27)) {
     $null = $sb.AppendLine(@"
         <div class="sw-port" data-port="$s" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort($s);" title="$titleText" style="width: 72px; height: 44px; background: $sBg; border: $sBorder; border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 7px; position: relative; cursor: pointer; box-sizing: border-box;">
           <div style="width: 100%; display: flex; justify-content: space-between; align-items: center;">
-            <span class="sw-led-1$sLedPulseClass" style="width: 6px; height: 4px; border-radius: 1px; background: $sLed; $sLedShadow display: inline-block;"></span>
+            <span class="sw-led-1$sLedPulseClass$sActClass" style="width: 6px; height: 4px; border-radius: 1px; background: $sLed; $sLedShadow display: inline-block;"></span>
             <span style="font-size: 8px; font-weight: 700; color: #64748b; letter-spacing: 0.5px;">10G</span>
           </div>
           <div style="width: 48px; height: 10px; border-radius: 2px; background: $sBar; border: 1px solid rgba(0,0,0,0.5);"></div>
@@ -685,6 +631,7 @@ foreach ($s in @(26, 28)) {
     $sLed = if ($hasAlert) { "#ef4444" } elseif ($isUp) { "#00e676" } else { "#27303f" }
     $sLedShadow = if ($hasAlert) { "box-shadow: 0 0 8px #ef4444;" } elseif ($isUp) { "box-shadow: 0 0 5px #00e676;" } else { "" }
     $sLedPulseClass = if ($hasAlert) { " sw-port-fault-pulse" } else { "" }
+    $sActClass = if ($isUp -and -not $hasAlert) { " sw-led-act" } else { "" }
     $sBorder = if ($isUp) { "1px solid #00b0ff" } elseif ($hasAlert) { "1px solid rgba(239, 68, 68, 0.6)" } else { "1px solid #283344" }
     $sBg = if ($isUp) { "#142132" } else { "#101622" }
     $sBar = if ($isUp) { "#00b0ff" } else { "#2d3748" }
@@ -696,7 +643,7 @@ foreach ($s in @(26, 28)) {
     $null = $sb.AppendLine(@"
         <div class="sw-port" data-port="$s" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort($s);" title="$titleText" style="width: 72px; height: 44px; background: $sBg; border: $sBorder; border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 7px; position: relative; cursor: pointer; box-sizing: border-box;">
           <div style="width: 100%; display: flex; justify-content: space-between; align-items: center;">
-            <span class="sw-led-1$sLedPulseClass" style="width: 6px; height: 4px; border-radius: 1px; background: $sLed; $sLedShadow display: inline-block;"></span>
+            <span class="sw-led-1$sLedPulseClass$sActClass" style="width: 6px; height: 4px; border-radius: 1px; background: $sLed; $sLedShadow display: inline-block;"></span>
             <span style="font-size: 8px; font-weight: 700; color: #64748b; letter-spacing: 0.5px;">10G</span>
           </div>
           <div style="width: 48px; height: 10px; border-radius: 2px; background: $sBar; border: 1px solid rgba(0,0,0,0.5);"></div>
@@ -2354,15 +2301,41 @@ $jsCodeTemplate = @'
 
               const pEl = container.querySelector(`.sw-port[data-port="${p}"]`);
               if (pEl) {
-                pEl.querySelectorAll('.sw-led-1, .sw-led-2').forEach(led => {
-                  led.style.backgroundColor = ledColor;
-                  led.style.boxShadow = ledShadow;
+                const led1 = pEl.querySelector('.sw-led-1');
+                const led2 = pEl.querySelector('.sw-led-2');
+                if (led1 && led2) {
+                  led1.style.backgroundColor = ledColor;
+                  led1.style.boxShadow = ledShadow;
+                  led2.style.backgroundColor = ledColor;
+                  led2.style.boxShadow = ledShadow;
+
                   if (hasAlert) {
-                    led.classList.add('sw-port-fault-pulse');
+                    led1.classList.add('sw-port-fault-pulse');
+                    led2.classList.add('sw-port-fault-pulse');
+                    led2.classList.remove('sw-led-act');
+                  } else if (isUp) {
+                    led1.classList.remove('sw-port-fault-pulse');
+                    led2.classList.remove('sw-port-fault-pulse');
+                    led2.classList.add('sw-led-act');
                   } else {
-                    led.classList.remove('sw-port-fault-pulse');
+                    led1.classList.remove('sw-port-fault-pulse');
+                    led2.classList.remove('sw-port-fault-pulse');
+                    led2.classList.remove('sw-led-act');
                   }
-                });
+                } else if (led1) {
+                  led1.style.backgroundColor = ledColor;
+                  led1.style.boxShadow = ledShadow;
+                  if (hasAlert) {
+                    led1.classList.add('sw-port-fault-pulse');
+                    led1.classList.remove('sw-led-act');
+                  } else if (isUp) {
+                    led1.classList.remove('sw-port-fault-pulse');
+                    led1.classList.add('sw-led-act');
+                  } else {
+                    led1.classList.remove('sw-port-fault-pulse');
+                    led1.classList.remove('sw-led-act');
+                  }
+                }
                 if (hasAlert) {
                   pEl.style.border = (p === selectedPortNum) ? '2px solid #00b0ff' : '1px solid rgba(239, 68, 68, 0.6)';
                 }
@@ -2639,6 +2612,35 @@ $cssStyles = @"
 .sw-port-fault-pulse {
   animation: swPortFaultPulse 1.2s infinite ease-in-out !important;
 }
+/* Authentic RJ45 Jack Contact Pins */
+.sw-pin {
+  width: 1px !important;
+  height: 4.5px !important;
+  background: linear-gradient(180deg, #ffd700 0%, #b8860b 100%) !important;
+  display: inline-block !important;
+  box-shadow: 0 0 1px rgba(255, 215, 0, 0.7) !important;
+  border-radius: 0.5px !important;
+}
+/* Authentic Network Activity LED Flicker (Modelo 1 - Indústria) */
+@keyframes swActFlicker {
+  0% { opacity: 1; filter: drop-shadow(0 0 4px currentColor); }
+  10% { opacity: 0.15; filter: none; }
+  22% { opacity: 0.95; filter: drop-shadow(0 0 3px currentColor); }
+  34% { opacity: 0.2; filter: none; }
+  46% { opacity: 1; filter: drop-shadow(0 0 5px currentColor); }
+  62% { opacity: 0.3; filter: none; }
+  78% { opacity: 0.95; filter: drop-shadow(0 0 4px currentColor); }
+  90% { opacity: 0.2; filter: none; }
+  100% { opacity: 1; filter: drop-shadow(0 0 4px currentColor); }
+}
+.sw-led-act {
+  animation: swActFlicker 0.45s infinite cubic-bezier(0.4, 0, 0.6, 1) !important;
+}
+/* Organic unsynchronized cadence across ports */
+.sw-port:nth-child(2n) .sw-led-act { animation-duration: 0.38s !important; animation-delay: -0.14s !important; }
+.sw-port:nth-child(3n) .sw-led-act { animation-duration: 0.52s !important; animation-delay: -0.27s !important; }
+.sw-port:nth-child(5n) .sw-led-act { animation-duration: 0.42s !important; animation-delay: -0.09s !important; }
+.sw-port:nth-child(7n) .sw-led-act { animation-duration: 0.48s !important; animation-delay: -0.35s !important; }
 #btn-close-drawer:hover {
   background: #334155 !important;
   color: #ffffff !important;

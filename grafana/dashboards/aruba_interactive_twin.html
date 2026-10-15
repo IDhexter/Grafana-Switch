@@ -14,8 +14,8 @@ BAMEX &bull; RACK CPD &bull; COLETA SNMP VIA ZABBIX
 </div>
 </div>
 <div style="text-align: right;">
-<div id="live-clock" style="font-size: 24px; font-weight: 700; font-family: monospace; color: #ffffff; letter-spacing: 1px;">09:58:20</div>
-<div style="font-size: 11px; color: #8b949e; margin-top: 4px;">SNMPv2 &bull; Intervalo 15 s &bull; <span id="header-uptime">Uptime 10d 24h 37m</span></div>
+<div id="live-clock" style="font-size: 24px; font-weight: 700; font-family: monospace; color: #ffffff; letter-spacing: 1px;">10:17:29</div>
+<div style="font-size: 11px; color: #8b949e; margin-top: 4px;">SNMPv2 &bull; Intervalo 15 s &bull; <span id="header-uptime">Uptime 10d 24h 56m</span></div>
 </div>
 </div>
 <!-- KPI CARDS ROW -->
@@ -40,7 +40,7 @@ BAMEX &bull; RACK CPD &bull; COLETA SNMP VIA ZABBIX
 <div style="flex: 1; border-right: 1px solid rgba(255, 255, 255, 0.08); padding-left: 16px; padding-right: 16px;">
 <div style="font-size: 10.5px; font-weight: 700; letter-spacing: 0.8px; color: #8b949e; text-transform: uppercase; margin-bottom: 6px;">TR&Aacute;FEGO TOTAL</div>
 <div id="kpi-total-traffic" style="font-size: 26px; font-weight: 800; color: #ffffff; display: flex; align-items: baseline;">
-6.57 Mb/s
+7.55 Mb/s
 </div>
 </div>
 <div style="flex: 1; padding-left: 16px;">
@@ -89,137 +89,353 @@ BAMEX &bull; RACK CPD &bull; COLETA SNMP VIA ZABBIX
 <div style="display: flex; flex-direction: column; gap: 6px;">
 <div style="font-size: 9px; font-weight: 700; color: #64748b; letter-spacing: 1px; text-align: center; text-transform: uppercase;">PORTAS 1 &ndash; 12 &bull; 10/100/1000M</div>
 <div style="display: flex; gap: 18px;">
-<div class="sw-port" data-port="1" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(1);" title="Porta 1 | GigabitEthernet1&#10;Status: UP&#10;Velocidade: 1 Gb/s&#10;Entrada: 54.2 Kb/s&#10;Saida: 325.2 Kb/s" style="width: 50px; height: 60px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
+<div class="sw-port" data-port="1" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(1);" title="Porta 1 | GigabitEthernet1&#10;Status: UP&#10;Velocidade: 1 Gb/s&#10;Entrada: 73.8 Kb/s&#10;Saida: 600.9 Kb/s" style="width: 50px; height: 62px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
 <div style="width: 100%; display: flex; justify-content: space-between; padding: 0 3px;">
-<span class="sw-led-1" style="width: 6px; height: 4px; border-radius: 1px; background-color: #00e676; box-shadow: 0 0 5px #00e676; display: inline-block;"></span>
-<span class="sw-led-2" style="width: 6px; height: 4px; border-radius: 1px; background-color: #00e676; opacity: 0.85; box-shadow: 0 0 5px #00e676; display: inline-block;"></span>
+<span class="sw-led-1" style="width: 6px; height: 4px; border-radius: 1px; background-color: #00e676; box-shadow: 0 0 6px #00e676; display: inline-block;"></span>
+<span class="sw-led-2 sw-led-act" style="width: 6px; height: 4px; border-radius: 1px; background-color: #00e676; opacity: 0.85; box-shadow: 0 0 6px #00e676; display: inline-block;"></span>
 </div>
-<div style="width: 34px; height: 28px; background: #05070a; border: 1.5px solid #1a2332; border-radius: 2px; position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: space-between;">
-<div style="width: 24px; height: 4px; background: repeating-linear-gradient(90deg, #d4af37 0px, #d4af37 1px, transparent 1px, transparent 2.5px); opacity: 0.85; margin-top: 1px;"></div>
-<div style="width: 14px; height: 6px; background: #0d1420; border-top: 1px solid #192332; border-left: 1px solid #192332; border-right: 1px solid #192332; border-radius: 1px 1px 0 0;"></div>
+<!-- Authentic Shielded RJ45 Jack Receptacle -->
+<div class="sw-rj45-jack" style="width: 36px; height: 30px; background: linear-gradient(180deg, #1c2433 0%, #101622 100%); border: 1.5px solid #2b384e; border-radius: 3px; position: relative; box-shadow: inset 0 1px 2px rgba(255,255,255,0.12), 0 2px 5px rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; box-sizing: border-box;">
+<!-- Metallic Ground Shield Tabs -->
+<div style="position: absolute; top: -1px; left: 6px; width: 4px; height: 1.5px; background: #475569; border-radius: 0 0 1px 1px;"></div>
+<div style="position: absolute; top: -1px; right: 6px; width: 4px; height: 1.5px; background: #475569; border-radius: 0 0 1px 1px;"></div>
+<!-- Inner Cavity with Stepped Silhouette -->
+<div style="width: 28px; height: 23px; background: #030508; border-radius: 2px; position: relative; overflow: hidden; border: 1px solid #151d2a; box-shadow: inset 0 2px 6px rgba(0,0,0,0.95); display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 1px 0 0 0; box-sizing: border-box;">
+<!-- 8 Gold Pins (8P8C) -->
+<div style="width: 22px; height: 5px; display: flex; justify-content: space-between; align-items: flex-start; padding: 0 1px;">
+<span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span>
+<span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span>
+</div>
+<!-- Stepped Shoulders & Central Clip Retention Slot -->
+<div style="width: 100%; display: flex; align-items: flex-end; justify-content: space-between;">
+<div style="width: 6px; height: 10px; background: #0d1420; border-top: 1px solid #1e293b; border-right: 1px solid #1e293b; border-radius: 1px 2px 0 0;"></div>
+<div style="width: 12px; height: 7px; background: #070b12; border-top: 1px solid #222f44; border-left: 1px solid #182232; border-right: 1px solid #182232; border-radius: 1px 1px 0 0; display: flex; justify-content: center; align-items: center;">
+<div style="width: 6px; height: 2px; background: #162030; border-radius: 1px;"></div>
+</div>
+<div style="width: 6px; height: 10px; background: #0d1420; border-top: 1px solid #1e293b; border-left: 1px solid #1e293b; border-radius: 2px 1px 0 0;"></div>
+</div>
+</div>
 </div>
 <div style="font-size: 10.5px; font-weight: 800; color: #8b949e; line-height: 1; font-family: monospace; margin-bottom: 1px;">1</div>
 </div>
-<div class="sw-port" data-port="3" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(3);" title="Porta 3 | GigabitEthernet3&#10;Status: UP&#10;Velocidade: 1 Gb/s&#10;Entrada: 50.2 Kb/s&#10;Saida: 145.7 Kb/s" style="width: 50px; height: 60px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
+<div class="sw-port" data-port="3" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(3);" title="Porta 3 | GigabitEthernet3&#10;Status: UP&#10;Velocidade: 1 Gb/s&#10;Entrada: 21.8 Kb/s&#10;Saida: 155.4 Kb/s" style="width: 50px; height: 62px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
 <div style="width: 100%; display: flex; justify-content: space-between; padding: 0 3px;">
-<span class="sw-led-1" style="width: 6px; height: 4px; border-radius: 1px; background-color: #00e676; box-shadow: 0 0 5px #00e676; display: inline-block;"></span>
-<span class="sw-led-2" style="width: 6px; height: 4px; border-radius: 1px; background-color: #00e676; opacity: 0.85; box-shadow: 0 0 5px #00e676; display: inline-block;"></span>
+<span class="sw-led-1" style="width: 6px; height: 4px; border-radius: 1px; background-color: #00e676; box-shadow: 0 0 6px #00e676; display: inline-block;"></span>
+<span class="sw-led-2 sw-led-act" style="width: 6px; height: 4px; border-radius: 1px; background-color: #00e676; opacity: 0.85; box-shadow: 0 0 6px #00e676; display: inline-block;"></span>
 </div>
-<div style="width: 34px; height: 28px; background: #05070a; border: 1.5px solid #1a2332; border-radius: 2px; position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: space-between;">
-<div style="width: 24px; height: 4px; background: repeating-linear-gradient(90deg, #d4af37 0px, #d4af37 1px, transparent 1px, transparent 2.5px); opacity: 0.85; margin-top: 1px;"></div>
-<div style="width: 14px; height: 6px; background: #0d1420; border-top: 1px solid #192332; border-left: 1px solid #192332; border-right: 1px solid #192332; border-radius: 1px 1px 0 0;"></div>
+<!-- Authentic Shielded RJ45 Jack Receptacle -->
+<div class="sw-rj45-jack" style="width: 36px; height: 30px; background: linear-gradient(180deg, #1c2433 0%, #101622 100%); border: 1.5px solid #2b384e; border-radius: 3px; position: relative; box-shadow: inset 0 1px 2px rgba(255,255,255,0.12), 0 2px 5px rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; box-sizing: border-box;">
+<!-- Metallic Ground Shield Tabs -->
+<div style="position: absolute; top: -1px; left: 6px; width: 4px; height: 1.5px; background: #475569; border-radius: 0 0 1px 1px;"></div>
+<div style="position: absolute; top: -1px; right: 6px; width: 4px; height: 1.5px; background: #475569; border-radius: 0 0 1px 1px;"></div>
+<!-- Inner Cavity with Stepped Silhouette -->
+<div style="width: 28px; height: 23px; background: #030508; border-radius: 2px; position: relative; overflow: hidden; border: 1px solid #151d2a; box-shadow: inset 0 2px 6px rgba(0,0,0,0.95); display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 1px 0 0 0; box-sizing: border-box;">
+<!-- 8 Gold Pins (8P8C) -->
+<div style="width: 22px; height: 5px; display: flex; justify-content: space-between; align-items: flex-start; padding: 0 1px;">
+<span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span>
+<span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span>
+</div>
+<!-- Stepped Shoulders & Central Clip Retention Slot -->
+<div style="width: 100%; display: flex; align-items: flex-end; justify-content: space-between;">
+<div style="width: 6px; height: 10px; background: #0d1420; border-top: 1px solid #1e293b; border-right: 1px solid #1e293b; border-radius: 1px 2px 0 0;"></div>
+<div style="width: 12px; height: 7px; background: #070b12; border-top: 1px solid #222f44; border-left: 1px solid #182232; border-right: 1px solid #182232; border-radius: 1px 1px 0 0; display: flex; justify-content: center; align-items: center;">
+<div style="width: 6px; height: 2px; background: #162030; border-radius: 1px;"></div>
+</div>
+<div style="width: 6px; height: 10px; background: #0d1420; border-top: 1px solid #1e293b; border-left: 1px solid #1e293b; border-radius: 2px 1px 0 0;"></div>
+</div>
+</div>
 </div>
 <div style="font-size: 10.5px; font-weight: 800; color: #8b949e; line-height: 1; font-family: monospace; margin-bottom: 1px;">3</div>
 </div>
-<div class="sw-port" data-port="5" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(5);" title="Porta 5 | GigabitEthernet5&#10;Status: DOWN&#10;Velocidade: --&#10;Entrada: 0 bps&#10;Saida: 0 bps" style="width: 50px; height: 60px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
+<div class="sw-port" data-port="5" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(5);" title="Porta 5 | GigabitEthernet5&#10;Status: DOWN&#10;Velocidade: --&#10;Entrada: 0 bps&#10;Saida: 0 bps" style="width: 50px; height: 62px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
 <div style="width: 100%; display: flex; justify-content: space-between; padding: 0 3px;">
 <span class="sw-led-1" style="width: 6px; height: 4px; border-radius: 1px; background-color: #27303f;  display: inline-block;"></span>
 <span class="sw-led-2" style="width: 6px; height: 4px; border-radius: 1px; background-color: #27303f; opacity: 0.85;  display: inline-block;"></span>
 </div>
-<div style="width: 34px; height: 28px; background: #05070a; border: 1.5px solid #1a2332; border-radius: 2px; position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: space-between;">
-<div style="width: 24px; height: 4px; background: repeating-linear-gradient(90deg, #d4af37 0px, #d4af37 1px, transparent 1px, transparent 2.5px); opacity: 0.85; margin-top: 1px;"></div>
-<div style="width: 14px; height: 6px; background: #0d1420; border-top: 1px solid #192332; border-left: 1px solid #192332; border-right: 1px solid #192332; border-radius: 1px 1px 0 0;"></div>
+<!-- Authentic Shielded RJ45 Jack Receptacle -->
+<div class="sw-rj45-jack" style="width: 36px; height: 30px; background: linear-gradient(180deg, #1c2433 0%, #101622 100%); border: 1.5px solid #2b384e; border-radius: 3px; position: relative; box-shadow: inset 0 1px 2px rgba(255,255,255,0.12), 0 2px 5px rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; box-sizing: border-box;">
+<!-- Metallic Ground Shield Tabs -->
+<div style="position: absolute; top: -1px; left: 6px; width: 4px; height: 1.5px; background: #475569; border-radius: 0 0 1px 1px;"></div>
+<div style="position: absolute; top: -1px; right: 6px; width: 4px; height: 1.5px; background: #475569; border-radius: 0 0 1px 1px;"></div>
+<!-- Inner Cavity with Stepped Silhouette -->
+<div style="width: 28px; height: 23px; background: #030508; border-radius: 2px; position: relative; overflow: hidden; border: 1px solid #151d2a; box-shadow: inset 0 2px 6px rgba(0,0,0,0.95); display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 1px 0 0 0; box-sizing: border-box;">
+<!-- 8 Gold Pins (8P8C) -->
+<div style="width: 22px; height: 5px; display: flex; justify-content: space-between; align-items: flex-start; padding: 0 1px;">
+<span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span>
+<span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span>
+</div>
+<!-- Stepped Shoulders & Central Clip Retention Slot -->
+<div style="width: 100%; display: flex; align-items: flex-end; justify-content: space-between;">
+<div style="width: 6px; height: 10px; background: #0d1420; border-top: 1px solid #1e293b; border-right: 1px solid #1e293b; border-radius: 1px 2px 0 0;"></div>
+<div style="width: 12px; height: 7px; background: #070b12; border-top: 1px solid #222f44; border-left: 1px solid #182232; border-right: 1px solid #182232; border-radius: 1px 1px 0 0; display: flex; justify-content: center; align-items: center;">
+<div style="width: 6px; height: 2px; background: #162030; border-radius: 1px;"></div>
+</div>
+<div style="width: 6px; height: 10px; background: #0d1420; border-top: 1px solid #1e293b; border-left: 1px solid #1e293b; border-radius: 2px 1px 0 0;"></div>
+</div>
+</div>
 </div>
 <div style="font-size: 10.5px; font-weight: 800; color: #8b949e; line-height: 1; font-family: monospace; margin-bottom: 1px;">5</div>
 </div>
-<div class="sw-port" data-port="7" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(7);" title="Porta 7 | GigabitEthernet7&#10;Status: UP&#10;Velocidade: 1 Gb/s&#10;Entrada: 58.3 Kb/s&#10;Saida: 166.8 Kb/s" style="width: 50px; height: 60px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
+<div class="sw-port" data-port="7" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(7);" title="Porta 7 | GigabitEthernet7&#10;Status: UP&#10;Velocidade: 1 Gb/s&#10;Entrada: 75.9 Kb/s&#10;Saida: 192.9 Kb/s" style="width: 50px; height: 62px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
 <div style="width: 100%; display: flex; justify-content: space-between; padding: 0 3px;">
-<span class="sw-led-1" style="width: 6px; height: 4px; border-radius: 1px; background-color: #00e676; box-shadow: 0 0 5px #00e676; display: inline-block;"></span>
-<span class="sw-led-2" style="width: 6px; height: 4px; border-radius: 1px; background-color: #00e676; opacity: 0.85; box-shadow: 0 0 5px #00e676; display: inline-block;"></span>
+<span class="sw-led-1" style="width: 6px; height: 4px; border-radius: 1px; background-color: #00e676; box-shadow: 0 0 6px #00e676; display: inline-block;"></span>
+<span class="sw-led-2 sw-led-act" style="width: 6px; height: 4px; border-radius: 1px; background-color: #00e676; opacity: 0.85; box-shadow: 0 0 6px #00e676; display: inline-block;"></span>
 </div>
-<div style="width: 34px; height: 28px; background: #05070a; border: 1.5px solid #1a2332; border-radius: 2px; position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: space-between;">
-<div style="width: 24px; height: 4px; background: repeating-linear-gradient(90deg, #d4af37 0px, #d4af37 1px, transparent 1px, transparent 2.5px); opacity: 0.85; margin-top: 1px;"></div>
-<div style="width: 14px; height: 6px; background: #0d1420; border-top: 1px solid #192332; border-left: 1px solid #192332; border-right: 1px solid #192332; border-radius: 1px 1px 0 0;"></div>
+<!-- Authentic Shielded RJ45 Jack Receptacle -->
+<div class="sw-rj45-jack" style="width: 36px; height: 30px; background: linear-gradient(180deg, #1c2433 0%, #101622 100%); border: 1.5px solid #2b384e; border-radius: 3px; position: relative; box-shadow: inset 0 1px 2px rgba(255,255,255,0.12), 0 2px 5px rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; box-sizing: border-box;">
+<!-- Metallic Ground Shield Tabs -->
+<div style="position: absolute; top: -1px; left: 6px; width: 4px; height: 1.5px; background: #475569; border-radius: 0 0 1px 1px;"></div>
+<div style="position: absolute; top: -1px; right: 6px; width: 4px; height: 1.5px; background: #475569; border-radius: 0 0 1px 1px;"></div>
+<!-- Inner Cavity with Stepped Silhouette -->
+<div style="width: 28px; height: 23px; background: #030508; border-radius: 2px; position: relative; overflow: hidden; border: 1px solid #151d2a; box-shadow: inset 0 2px 6px rgba(0,0,0,0.95); display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 1px 0 0 0; box-sizing: border-box;">
+<!-- 8 Gold Pins (8P8C) -->
+<div style="width: 22px; height: 5px; display: flex; justify-content: space-between; align-items: flex-start; padding: 0 1px;">
+<span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span>
+<span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span>
+</div>
+<!-- Stepped Shoulders & Central Clip Retention Slot -->
+<div style="width: 100%; display: flex; align-items: flex-end; justify-content: space-between;">
+<div style="width: 6px; height: 10px; background: #0d1420; border-top: 1px solid #1e293b; border-right: 1px solid #1e293b; border-radius: 1px 2px 0 0;"></div>
+<div style="width: 12px; height: 7px; background: #070b12; border-top: 1px solid #222f44; border-left: 1px solid #182232; border-right: 1px solid #182232; border-radius: 1px 1px 0 0; display: flex; justify-content: center; align-items: center;">
+<div style="width: 6px; height: 2px; background: #162030; border-radius: 1px;"></div>
+</div>
+<div style="width: 6px; height: 10px; background: #0d1420; border-top: 1px solid #1e293b; border-left: 1px solid #1e293b; border-radius: 2px 1px 0 0;"></div>
+</div>
+</div>
 </div>
 <div style="font-size: 10.5px; font-weight: 800; color: #8b949e; line-height: 1; font-family: monospace; margin-bottom: 1px;">7</div>
 </div>
-<div class="sw-port" data-port="9" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(9);" title="Porta 9 | GigabitEthernet9&#10;Status: UP&#10;Velocidade: 1 Gb/s&#10;Entrada: 35.5 Kb/s&#10;Saida: 292.1 Kb/s" style="width: 50px; height: 60px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
+<div class="sw-port" data-port="9" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(9);" title="Porta 9 | GigabitEthernet9&#10;Status: UP&#10;Velocidade: 1 Gb/s&#10;Entrada: 19.4 Kb/s&#10;Saida: 97.8 Kb/s" style="width: 50px; height: 62px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
 <div style="width: 100%; display: flex; justify-content: space-between; padding: 0 3px;">
-<span class="sw-led-1" style="width: 6px; height: 4px; border-radius: 1px; background-color: #00e676; box-shadow: 0 0 5px #00e676; display: inline-block;"></span>
-<span class="sw-led-2" style="width: 6px; height: 4px; border-radius: 1px; background-color: #00e676; opacity: 0.85; box-shadow: 0 0 5px #00e676; display: inline-block;"></span>
+<span class="sw-led-1" style="width: 6px; height: 4px; border-radius: 1px; background-color: #00e676; box-shadow: 0 0 6px #00e676; display: inline-block;"></span>
+<span class="sw-led-2 sw-led-act" style="width: 6px; height: 4px; border-radius: 1px; background-color: #00e676; opacity: 0.85; box-shadow: 0 0 6px #00e676; display: inline-block;"></span>
 </div>
-<div style="width: 34px; height: 28px; background: #05070a; border: 1.5px solid #1a2332; border-radius: 2px; position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: space-between;">
-<div style="width: 24px; height: 4px; background: repeating-linear-gradient(90deg, #d4af37 0px, #d4af37 1px, transparent 1px, transparent 2.5px); opacity: 0.85; margin-top: 1px;"></div>
-<div style="width: 14px; height: 6px; background: #0d1420; border-top: 1px solid #192332; border-left: 1px solid #192332; border-right: 1px solid #192332; border-radius: 1px 1px 0 0;"></div>
+<!-- Authentic Shielded RJ45 Jack Receptacle -->
+<div class="sw-rj45-jack" style="width: 36px; height: 30px; background: linear-gradient(180deg, #1c2433 0%, #101622 100%); border: 1.5px solid #2b384e; border-radius: 3px; position: relative; box-shadow: inset 0 1px 2px rgba(255,255,255,0.12), 0 2px 5px rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; box-sizing: border-box;">
+<!-- Metallic Ground Shield Tabs -->
+<div style="position: absolute; top: -1px; left: 6px; width: 4px; height: 1.5px; background: #475569; border-radius: 0 0 1px 1px;"></div>
+<div style="position: absolute; top: -1px; right: 6px; width: 4px; height: 1.5px; background: #475569; border-radius: 0 0 1px 1px;"></div>
+<!-- Inner Cavity with Stepped Silhouette -->
+<div style="width: 28px; height: 23px; background: #030508; border-radius: 2px; position: relative; overflow: hidden; border: 1px solid #151d2a; box-shadow: inset 0 2px 6px rgba(0,0,0,0.95); display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 1px 0 0 0; box-sizing: border-box;">
+<!-- 8 Gold Pins (8P8C) -->
+<div style="width: 22px; height: 5px; display: flex; justify-content: space-between; align-items: flex-start; padding: 0 1px;">
+<span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span>
+<span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span>
+</div>
+<!-- Stepped Shoulders & Central Clip Retention Slot -->
+<div style="width: 100%; display: flex; align-items: flex-end; justify-content: space-between;">
+<div style="width: 6px; height: 10px; background: #0d1420; border-top: 1px solid #1e293b; border-right: 1px solid #1e293b; border-radius: 1px 2px 0 0;"></div>
+<div style="width: 12px; height: 7px; background: #070b12; border-top: 1px solid #222f44; border-left: 1px solid #182232; border-right: 1px solid #182232; border-radius: 1px 1px 0 0; display: flex; justify-content: center; align-items: center;">
+<div style="width: 6px; height: 2px; background: #162030; border-radius: 1px;"></div>
+</div>
+<div style="width: 6px; height: 10px; background: #0d1420; border-top: 1px solid #1e293b; border-left: 1px solid #1e293b; border-radius: 2px 1px 0 0;"></div>
+</div>
+</div>
 </div>
 <div style="font-size: 10.5px; font-weight: 800; color: #8b949e; line-height: 1; font-family: monospace; margin-bottom: 1px;">9</div>
 </div>
-<div class="sw-port" data-port="11" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(11);" title="Porta 11 | GigabitEthernet11&#10;Status: DOWN&#10;Velocidade: --&#10;Entrada: 0 bps&#10;Saida: 0 bps" style="width: 50px; height: 60px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
+<div class="sw-port" data-port="11" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(11);" title="Porta 11 | GigabitEthernet11&#10;Status: DOWN&#10;Velocidade: --&#10;Entrada: 0 bps&#10;Saida: 0 bps" style="width: 50px; height: 62px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
 <div style="width: 100%; display: flex; justify-content: space-between; padding: 0 3px;">
 <span class="sw-led-1" style="width: 6px; height: 4px; border-radius: 1px; background-color: #27303f;  display: inline-block;"></span>
 <span class="sw-led-2" style="width: 6px; height: 4px; border-radius: 1px; background-color: #27303f; opacity: 0.85;  display: inline-block;"></span>
 </div>
-<div style="width: 34px; height: 28px; background: #05070a; border: 1.5px solid #1a2332; border-radius: 2px; position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: space-between;">
-<div style="width: 24px; height: 4px; background: repeating-linear-gradient(90deg, #d4af37 0px, #d4af37 1px, transparent 1px, transparent 2.5px); opacity: 0.85; margin-top: 1px;"></div>
-<div style="width: 14px; height: 6px; background: #0d1420; border-top: 1px solid #192332; border-left: 1px solid #192332; border-right: 1px solid #192332; border-radius: 1px 1px 0 0;"></div>
+<!-- Authentic Shielded RJ45 Jack Receptacle -->
+<div class="sw-rj45-jack" style="width: 36px; height: 30px; background: linear-gradient(180deg, #1c2433 0%, #101622 100%); border: 1.5px solid #2b384e; border-radius: 3px; position: relative; box-shadow: inset 0 1px 2px rgba(255,255,255,0.12), 0 2px 5px rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; box-sizing: border-box;">
+<!-- Metallic Ground Shield Tabs -->
+<div style="position: absolute; top: -1px; left: 6px; width: 4px; height: 1.5px; background: #475569; border-radius: 0 0 1px 1px;"></div>
+<div style="position: absolute; top: -1px; right: 6px; width: 4px; height: 1.5px; background: #475569; border-radius: 0 0 1px 1px;"></div>
+<!-- Inner Cavity with Stepped Silhouette -->
+<div style="width: 28px; height: 23px; background: #030508; border-radius: 2px; position: relative; overflow: hidden; border: 1px solid #151d2a; box-shadow: inset 0 2px 6px rgba(0,0,0,0.95); display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 1px 0 0 0; box-sizing: border-box;">
+<!-- 8 Gold Pins (8P8C) -->
+<div style="width: 22px; height: 5px; display: flex; justify-content: space-between; align-items: flex-start; padding: 0 1px;">
+<span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span>
+<span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span>
+</div>
+<!-- Stepped Shoulders & Central Clip Retention Slot -->
+<div style="width: 100%; display: flex; align-items: flex-end; justify-content: space-between;">
+<div style="width: 6px; height: 10px; background: #0d1420; border-top: 1px solid #1e293b; border-right: 1px solid #1e293b; border-radius: 1px 2px 0 0;"></div>
+<div style="width: 12px; height: 7px; background: #070b12; border-top: 1px solid #222f44; border-left: 1px solid #182232; border-right: 1px solid #182232; border-radius: 1px 1px 0 0; display: flex; justify-content: center; align-items: center;">
+<div style="width: 6px; height: 2px; background: #162030; border-radius: 1px;"></div>
+</div>
+<div style="width: 6px; height: 10px; background: #0d1420; border-top: 1px solid #1e293b; border-left: 1px solid #1e293b; border-radius: 2px 1px 0 0;"></div>
+</div>
+</div>
 </div>
 <div style="font-size: 10.5px; font-weight: 800; color: #8b949e; line-height: 1; font-family: monospace; margin-bottom: 1px;">11</div>
 </div>
 </div>
 <div style="display: flex; gap: 18px;">
-<div class="sw-port" data-port="2" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(2);" title="Porta 2 | GigabitEthernet2&#10;Status: UP&#10;Velocidade: 1 Gb/s&#10;Entrada: 120.7 Kb/s&#10;Saida: 258.7 Kb/s" style="width: 50px; height: 60px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
+<div class="sw-port" data-port="2" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(2);" title="Porta 2 | GigabitEthernet2&#10;Status: UP&#10;Velocidade: 1 Gb/s&#10;Entrada: 123.5 Kb/s&#10;Saida: 177.8 Kb/s" style="width: 50px; height: 62px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
 <div style="width: 100%; display: flex; justify-content: space-between; padding: 0 3px;">
-<span class="sw-led-1" style="width: 6px; height: 4px; border-radius: 1px; background-color: #00e676; box-shadow: 0 0 5px #00e676; display: inline-block;"></span>
-<span class="sw-led-2" style="width: 6px; height: 4px; border-radius: 1px; background-color: #00e676; opacity: 0.85; box-shadow: 0 0 5px #00e676; display: inline-block;"></span>
+<span class="sw-led-1" style="width: 6px; height: 4px; border-radius: 1px; background-color: #00e676; box-shadow: 0 0 6px #00e676; display: inline-block;"></span>
+<span class="sw-led-2 sw-led-act" style="width: 6px; height: 4px; border-radius: 1px; background-color: #00e676; opacity: 0.85; box-shadow: 0 0 6px #00e676; display: inline-block;"></span>
 </div>
-<div style="width: 34px; height: 28px; background: #05070a; border: 1.5px solid #1a2332; border-radius: 2px; position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: space-between;">
-<div style="width: 24px; height: 4px; background: repeating-linear-gradient(90deg, #d4af37 0px, #d4af37 1px, transparent 1px, transparent 2.5px); opacity: 0.85; margin-top: 1px;"></div>
-<div style="width: 14px; height: 6px; background: #0d1420; border-top: 1px solid #192332; border-left: 1px solid #192332; border-right: 1px solid #192332; border-radius: 1px 1px 0 0;"></div>
+<!-- Authentic Shielded RJ45 Jack Receptacle -->
+<div class="sw-rj45-jack" style="width: 36px; height: 30px; background: linear-gradient(180deg, #1c2433 0%, #101622 100%); border: 1.5px solid #2b384e; border-radius: 3px; position: relative; box-shadow: inset 0 1px 2px rgba(255,255,255,0.12), 0 2px 5px rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; box-sizing: border-box;">
+<!-- Metallic Ground Shield Tabs -->
+<div style="position: absolute; top: -1px; left: 6px; width: 4px; height: 1.5px; background: #475569; border-radius: 0 0 1px 1px;"></div>
+<div style="position: absolute; top: -1px; right: 6px; width: 4px; height: 1.5px; background: #475569; border-radius: 0 0 1px 1px;"></div>
+<!-- Inner Cavity with Stepped Silhouette -->
+<div style="width: 28px; height: 23px; background: #030508; border-radius: 2px; position: relative; overflow: hidden; border: 1px solid #151d2a; box-shadow: inset 0 2px 6px rgba(0,0,0,0.95); display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 1px 0 0 0; box-sizing: border-box;">
+<!-- 8 Gold Pins (8P8C) -->
+<div style="width: 22px; height: 5px; display: flex; justify-content: space-between; align-items: flex-start; padding: 0 1px;">
+<span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span>
+<span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span>
+</div>
+<!-- Stepped Shoulders & Central Clip Retention Slot -->
+<div style="width: 100%; display: flex; align-items: flex-end; justify-content: space-between;">
+<div style="width: 6px; height: 10px; background: #0d1420; border-top: 1px solid #1e293b; border-right: 1px solid #1e293b; border-radius: 1px 2px 0 0;"></div>
+<div style="width: 12px; height: 7px; background: #070b12; border-top: 1px solid #222f44; border-left: 1px solid #182232; border-right: 1px solid #182232; border-radius: 1px 1px 0 0; display: flex; justify-content: center; align-items: center;">
+<div style="width: 6px; height: 2px; background: #162030; border-radius: 1px;"></div>
+</div>
+<div style="width: 6px; height: 10px; background: #0d1420; border-top: 1px solid #1e293b; border-left: 1px solid #1e293b; border-radius: 2px 1px 0 0;"></div>
+</div>
+</div>
 </div>
 <div style="font-size: 10.5px; font-weight: 800; color: #8b949e; line-height: 1; font-family: monospace; margin-bottom: 1px;">2</div>
 </div>
-<div class="sw-port" data-port="4" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(4);" title="Porta 4 | GigabitEthernet4&#10;Status: DOWN&#10;Velocidade: --&#10;Entrada: 0 bps&#10;Saida: 0 bps" style="width: 50px; height: 60px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
+<div class="sw-port" data-port="4" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(4);" title="Porta 4 | GigabitEthernet4&#10;Status: DOWN&#10;Velocidade: --&#10;Entrada: 0 bps&#10;Saida: 0 bps" style="width: 50px; height: 62px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
 <div style="width: 100%; display: flex; justify-content: space-between; padding: 0 3px;">
 <span class="sw-led-1" style="width: 6px; height: 4px; border-radius: 1px; background-color: #27303f;  display: inline-block;"></span>
 <span class="sw-led-2" style="width: 6px; height: 4px; border-radius: 1px; background-color: #27303f; opacity: 0.85;  display: inline-block;"></span>
 </div>
-<div style="width: 34px; height: 28px; background: #05070a; border: 1.5px solid #1a2332; border-radius: 2px; position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: space-between;">
-<div style="width: 24px; height: 4px; background: repeating-linear-gradient(90deg, #d4af37 0px, #d4af37 1px, transparent 1px, transparent 2.5px); opacity: 0.85; margin-top: 1px;"></div>
-<div style="width: 14px; height: 6px; background: #0d1420; border-top: 1px solid #192332; border-left: 1px solid #192332; border-right: 1px solid #192332; border-radius: 1px 1px 0 0;"></div>
+<!-- Authentic Shielded RJ45 Jack Receptacle -->
+<div class="sw-rj45-jack" style="width: 36px; height: 30px; background: linear-gradient(180deg, #1c2433 0%, #101622 100%); border: 1.5px solid #2b384e; border-radius: 3px; position: relative; box-shadow: inset 0 1px 2px rgba(255,255,255,0.12), 0 2px 5px rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; box-sizing: border-box;">
+<!-- Metallic Ground Shield Tabs -->
+<div style="position: absolute; top: -1px; left: 6px; width: 4px; height: 1.5px; background: #475569; border-radius: 0 0 1px 1px;"></div>
+<div style="position: absolute; top: -1px; right: 6px; width: 4px; height: 1.5px; background: #475569; border-radius: 0 0 1px 1px;"></div>
+<!-- Inner Cavity with Stepped Silhouette -->
+<div style="width: 28px; height: 23px; background: #030508; border-radius: 2px; position: relative; overflow: hidden; border: 1px solid #151d2a; box-shadow: inset 0 2px 6px rgba(0,0,0,0.95); display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 1px 0 0 0; box-sizing: border-box;">
+<!-- 8 Gold Pins (8P8C) -->
+<div style="width: 22px; height: 5px; display: flex; justify-content: space-between; align-items: flex-start; padding: 0 1px;">
+<span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span>
+<span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span>
+</div>
+<!-- Stepped Shoulders & Central Clip Retention Slot -->
+<div style="width: 100%; display: flex; align-items: flex-end; justify-content: space-between;">
+<div style="width: 6px; height: 10px; background: #0d1420; border-top: 1px solid #1e293b; border-right: 1px solid #1e293b; border-radius: 1px 2px 0 0;"></div>
+<div style="width: 12px; height: 7px; background: #070b12; border-top: 1px solid #222f44; border-left: 1px solid #182232; border-right: 1px solid #182232; border-radius: 1px 1px 0 0; display: flex; justify-content: center; align-items: center;">
+<div style="width: 6px; height: 2px; background: #162030; border-radius: 1px;"></div>
+</div>
+<div style="width: 6px; height: 10px; background: #0d1420; border-top: 1px solid #1e293b; border-left: 1px solid #1e293b; border-radius: 2px 1px 0 0;"></div>
+</div>
+</div>
 </div>
 <div style="font-size: 10.5px; font-weight: 800; color: #8b949e; line-height: 1; font-family: monospace; margin-bottom: 1px;">4</div>
 </div>
-<div class="sw-port" data-port="6" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(6);" title="Porta 6 | GigabitEthernet6&#10;Status: DOWN&#10;Velocidade: --&#10;Entrada: 0 bps&#10;Saida: 0 bps" style="width: 50px; height: 60px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
+<div class="sw-port" data-port="6" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(6);" title="Porta 6 | GigabitEthernet6&#10;Status: DOWN&#10;Velocidade: --&#10;Entrada: 0 bps&#10;Saida: 0 bps" style="width: 50px; height: 62px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
 <div style="width: 100%; display: flex; justify-content: space-between; padding: 0 3px;">
 <span class="sw-led-1" style="width: 6px; height: 4px; border-radius: 1px; background-color: #27303f;  display: inline-block;"></span>
 <span class="sw-led-2" style="width: 6px; height: 4px; border-radius: 1px; background-color: #27303f; opacity: 0.85;  display: inline-block;"></span>
 </div>
-<div style="width: 34px; height: 28px; background: #05070a; border: 1.5px solid #1a2332; border-radius: 2px; position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: space-between;">
-<div style="width: 24px; height: 4px; background: repeating-linear-gradient(90deg, #d4af37 0px, #d4af37 1px, transparent 1px, transparent 2.5px); opacity: 0.85; margin-top: 1px;"></div>
-<div style="width: 14px; height: 6px; background: #0d1420; border-top: 1px solid #192332; border-left: 1px solid #192332; border-right: 1px solid #192332; border-radius: 1px 1px 0 0;"></div>
+<!-- Authentic Shielded RJ45 Jack Receptacle -->
+<div class="sw-rj45-jack" style="width: 36px; height: 30px; background: linear-gradient(180deg, #1c2433 0%, #101622 100%); border: 1.5px solid #2b384e; border-radius: 3px; position: relative; box-shadow: inset 0 1px 2px rgba(255,255,255,0.12), 0 2px 5px rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; box-sizing: border-box;">
+<!-- Metallic Ground Shield Tabs -->
+<div style="position: absolute; top: -1px; left: 6px; width: 4px; height: 1.5px; background: #475569; border-radius: 0 0 1px 1px;"></div>
+<div style="position: absolute; top: -1px; right: 6px; width: 4px; height: 1.5px; background: #475569; border-radius: 0 0 1px 1px;"></div>
+<!-- Inner Cavity with Stepped Silhouette -->
+<div style="width: 28px; height: 23px; background: #030508; border-radius: 2px; position: relative; overflow: hidden; border: 1px solid #151d2a; box-shadow: inset 0 2px 6px rgba(0,0,0,0.95); display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 1px 0 0 0; box-sizing: border-box;">
+<!-- 8 Gold Pins (8P8C) -->
+<div style="width: 22px; height: 5px; display: flex; justify-content: space-between; align-items: flex-start; padding: 0 1px;">
+<span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span>
+<span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span>
+</div>
+<!-- Stepped Shoulders & Central Clip Retention Slot -->
+<div style="width: 100%; display: flex; align-items: flex-end; justify-content: space-between;">
+<div style="width: 6px; height: 10px; background: #0d1420; border-top: 1px solid #1e293b; border-right: 1px solid #1e293b; border-radius: 1px 2px 0 0;"></div>
+<div style="width: 12px; height: 7px; background: #070b12; border-top: 1px solid #222f44; border-left: 1px solid #182232; border-right: 1px solid #182232; border-radius: 1px 1px 0 0; display: flex; justify-content: center; align-items: center;">
+<div style="width: 6px; height: 2px; background: #162030; border-radius: 1px;"></div>
+</div>
+<div style="width: 6px; height: 10px; background: #0d1420; border-top: 1px solid #1e293b; border-left: 1px solid #1e293b; border-radius: 2px 1px 0 0;"></div>
+</div>
+</div>
 </div>
 <div style="font-size: 10.5px; font-weight: 800; color: #8b949e; line-height: 1; font-family: monospace; margin-bottom: 1px;">6</div>
 </div>
-<div class="sw-port" data-port="8" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(8);" title="Porta 8 | GigabitEthernet8&#10;Status: DOWN&#10;Velocidade: --&#10;Entrada: 0 bps&#10;Saida: 0 bps" style="width: 50px; height: 60px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
+<div class="sw-port" data-port="8" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(8);" title="Porta 8 | GigabitEthernet8&#10;Status: DOWN&#10;Velocidade: --&#10;Entrada: 0 bps&#10;Saida: 0 bps" style="width: 50px; height: 62px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
 <div style="width: 100%; display: flex; justify-content: space-between; padding: 0 3px;">
 <span class="sw-led-1" style="width: 6px; height: 4px; border-radius: 1px; background-color: #27303f;  display: inline-block;"></span>
 <span class="sw-led-2" style="width: 6px; height: 4px; border-radius: 1px; background-color: #27303f; opacity: 0.85;  display: inline-block;"></span>
 </div>
-<div style="width: 34px; height: 28px; background: #05070a; border: 1.5px solid #1a2332; border-radius: 2px; position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: space-between;">
-<div style="width: 24px; height: 4px; background: repeating-linear-gradient(90deg, #d4af37 0px, #d4af37 1px, transparent 1px, transparent 2.5px); opacity: 0.85; margin-top: 1px;"></div>
-<div style="width: 14px; height: 6px; background: #0d1420; border-top: 1px solid #192332; border-left: 1px solid #192332; border-right: 1px solid #192332; border-radius: 1px 1px 0 0;"></div>
+<!-- Authentic Shielded RJ45 Jack Receptacle -->
+<div class="sw-rj45-jack" style="width: 36px; height: 30px; background: linear-gradient(180deg, #1c2433 0%, #101622 100%); border: 1.5px solid #2b384e; border-radius: 3px; position: relative; box-shadow: inset 0 1px 2px rgba(255,255,255,0.12), 0 2px 5px rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; box-sizing: border-box;">
+<!-- Metallic Ground Shield Tabs -->
+<div style="position: absolute; top: -1px; left: 6px; width: 4px; height: 1.5px; background: #475569; border-radius: 0 0 1px 1px;"></div>
+<div style="position: absolute; top: -1px; right: 6px; width: 4px; height: 1.5px; background: #475569; border-radius: 0 0 1px 1px;"></div>
+<!-- Inner Cavity with Stepped Silhouette -->
+<div style="width: 28px; height: 23px; background: #030508; border-radius: 2px; position: relative; overflow: hidden; border: 1px solid #151d2a; box-shadow: inset 0 2px 6px rgba(0,0,0,0.95); display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 1px 0 0 0; box-sizing: border-box;">
+<!-- 8 Gold Pins (8P8C) -->
+<div style="width: 22px; height: 5px; display: flex; justify-content: space-between; align-items: flex-start; padding: 0 1px;">
+<span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span>
+<span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span>
+</div>
+<!-- Stepped Shoulders & Central Clip Retention Slot -->
+<div style="width: 100%; display: flex; align-items: flex-end; justify-content: space-between;">
+<div style="width: 6px; height: 10px; background: #0d1420; border-top: 1px solid #1e293b; border-right: 1px solid #1e293b; border-radius: 1px 2px 0 0;"></div>
+<div style="width: 12px; height: 7px; background: #070b12; border-top: 1px solid #222f44; border-left: 1px solid #182232; border-right: 1px solid #182232; border-radius: 1px 1px 0 0; display: flex; justify-content: center; align-items: center;">
+<div style="width: 6px; height: 2px; background: #162030; border-radius: 1px;"></div>
+</div>
+<div style="width: 6px; height: 10px; background: #0d1420; border-top: 1px solid #1e293b; border-left: 1px solid #1e293b; border-radius: 2px 1px 0 0;"></div>
+</div>
+</div>
 </div>
 <div style="font-size: 10.5px; font-weight: 800; color: #8b949e; line-height: 1; font-family: monospace; margin-bottom: 1px;">8</div>
 </div>
-<div class="sw-port" data-port="10" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(10);" title="Porta 10 | GigabitEthernet10&#10;Status: DOWN&#10;Velocidade: --&#10;Entrada: 0 bps&#10;Saida: 0 bps" style="width: 50px; height: 60px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
+<div class="sw-port" data-port="10" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(10);" title="Porta 10 | GigabitEthernet10&#10;Status: DOWN&#10;Velocidade: --&#10;Entrada: 0 bps&#10;Saida: 0 bps" style="width: 50px; height: 62px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
 <div style="width: 100%; display: flex; justify-content: space-between; padding: 0 3px;">
 <span class="sw-led-1" style="width: 6px; height: 4px; border-radius: 1px; background-color: #27303f;  display: inline-block;"></span>
 <span class="sw-led-2" style="width: 6px; height: 4px; border-radius: 1px; background-color: #27303f; opacity: 0.85;  display: inline-block;"></span>
 </div>
-<div style="width: 34px; height: 28px; background: #05070a; border: 1.5px solid #1a2332; border-radius: 2px; position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: space-between;">
-<div style="width: 24px; height: 4px; background: repeating-linear-gradient(90deg, #d4af37 0px, #d4af37 1px, transparent 1px, transparent 2.5px); opacity: 0.85; margin-top: 1px;"></div>
-<div style="width: 14px; height: 6px; background: #0d1420; border-top: 1px solid #192332; border-left: 1px solid #192332; border-right: 1px solid #192332; border-radius: 1px 1px 0 0;"></div>
+<!-- Authentic Shielded RJ45 Jack Receptacle -->
+<div class="sw-rj45-jack" style="width: 36px; height: 30px; background: linear-gradient(180deg, #1c2433 0%, #101622 100%); border: 1.5px solid #2b384e; border-radius: 3px; position: relative; box-shadow: inset 0 1px 2px rgba(255,255,255,0.12), 0 2px 5px rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; box-sizing: border-box;">
+<!-- Metallic Ground Shield Tabs -->
+<div style="position: absolute; top: -1px; left: 6px; width: 4px; height: 1.5px; background: #475569; border-radius: 0 0 1px 1px;"></div>
+<div style="position: absolute; top: -1px; right: 6px; width: 4px; height: 1.5px; background: #475569; border-radius: 0 0 1px 1px;"></div>
+<!-- Inner Cavity with Stepped Silhouette -->
+<div style="width: 28px; height: 23px; background: #030508; border-radius: 2px; position: relative; overflow: hidden; border: 1px solid #151d2a; box-shadow: inset 0 2px 6px rgba(0,0,0,0.95); display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 1px 0 0 0; box-sizing: border-box;">
+<!-- 8 Gold Pins (8P8C) -->
+<div style="width: 22px; height: 5px; display: flex; justify-content: space-between; align-items: flex-start; padding: 0 1px;">
+<span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span>
+<span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span>
+</div>
+<!-- Stepped Shoulders & Central Clip Retention Slot -->
+<div style="width: 100%; display: flex; align-items: flex-end; justify-content: space-between;">
+<div style="width: 6px; height: 10px; background: #0d1420; border-top: 1px solid #1e293b; border-right: 1px solid #1e293b; border-radius: 1px 2px 0 0;"></div>
+<div style="width: 12px; height: 7px; background: #070b12; border-top: 1px solid #222f44; border-left: 1px solid #182232; border-right: 1px solid #182232; border-radius: 1px 1px 0 0; display: flex; justify-content: center; align-items: center;">
+<div style="width: 6px; height: 2px; background: #162030; border-radius: 1px;"></div>
+</div>
+<div style="width: 6px; height: 10px; background: #0d1420; border-top: 1px solid #1e293b; border-left: 1px solid #1e293b; border-radius: 2px 1px 0 0;"></div>
+</div>
+</div>
 </div>
 <div style="font-size: 10.5px; font-weight: 800; color: #8b949e; line-height: 1; font-family: monospace; margin-bottom: 1px;">10</div>
 </div>
-<div class="sw-port" data-port="12" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(12);" title="Porta 12 | GigabitEthernet12&#10;Status: UP (DEGRADADO)&#10;Velocidade: 100 Mb/s&#10;Entrada: 54.7 Kb/s&#10;Saida: 1.06 Mb/s" style="width: 50px; height: 60px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
+<div class="sw-port" data-port="12" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(12);" title="Porta 12 | GigabitEthernet12&#10;Status: UP (DEGRADADO)&#10;Velocidade: 100 Mb/s&#10;Entrada: 21.2 Kb/s&#10;Saida: 130.5 Kb/s" style="width: 50px; height: 62px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
 <div style="width: 100%; display: flex; justify-content: space-between; padding: 0 3px;">
-<span class="sw-led-1" style="width: 6px; height: 4px; border-radius: 1px; background-color: #f59e0b; box-shadow: 0 0 5px #f59e0b; display: inline-block;"></span>
-<span class="sw-led-2" style="width: 6px; height: 4px; border-radius: 1px; background-color: #f59e0b; opacity: 0.85; box-shadow: 0 0 5px #f59e0b; display: inline-block;"></span>
+<span class="sw-led-1" style="width: 6px; height: 4px; border-radius: 1px; background-color: #f59e0b; box-shadow: 0 0 6px #f59e0b; display: inline-block;"></span>
+<span class="sw-led-2 sw-led-act" style="width: 6px; height: 4px; border-radius: 1px; background-color: #f59e0b; opacity: 0.85; box-shadow: 0 0 6px #f59e0b; display: inline-block;"></span>
 </div>
-<div style="width: 34px; height: 28px; background: #05070a; border: 1.5px solid #1a2332; border-radius: 2px; position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: space-between;">
-<div style="width: 24px; height: 4px; background: repeating-linear-gradient(90deg, #d4af37 0px, #d4af37 1px, transparent 1px, transparent 2.5px); opacity: 0.85; margin-top: 1px;"></div>
-<div style="width: 14px; height: 6px; background: #0d1420; border-top: 1px solid #192332; border-left: 1px solid #192332; border-right: 1px solid #192332; border-radius: 1px 1px 0 0;"></div>
+<!-- Authentic Shielded RJ45 Jack Receptacle -->
+<div class="sw-rj45-jack" style="width: 36px; height: 30px; background: linear-gradient(180deg, #1c2433 0%, #101622 100%); border: 1.5px solid #2b384e; border-radius: 3px; position: relative; box-shadow: inset 0 1px 2px rgba(255,255,255,0.12), 0 2px 5px rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; box-sizing: border-box;">
+<!-- Metallic Ground Shield Tabs -->
+<div style="position: absolute; top: -1px; left: 6px; width: 4px; height: 1.5px; background: #475569; border-radius: 0 0 1px 1px;"></div>
+<div style="position: absolute; top: -1px; right: 6px; width: 4px; height: 1.5px; background: #475569; border-radius: 0 0 1px 1px;"></div>
+<!-- Inner Cavity with Stepped Silhouette -->
+<div style="width: 28px; height: 23px; background: #030508; border-radius: 2px; position: relative; overflow: hidden; border: 1px solid #151d2a; box-shadow: inset 0 2px 6px rgba(0,0,0,0.95); display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 1px 0 0 0; box-sizing: border-box;">
+<!-- 8 Gold Pins (8P8C) -->
+<div style="width: 22px; height: 5px; display: flex; justify-content: space-between; align-items: flex-start; padding: 0 1px;">
+<span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span>
+<span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span>
+</div>
+<!-- Stepped Shoulders & Central Clip Retention Slot -->
+<div style="width: 100%; display: flex; align-items: flex-end; justify-content: space-between;">
+<div style="width: 6px; height: 10px; background: #0d1420; border-top: 1px solid #1e293b; border-right: 1px solid #1e293b; border-radius: 1px 2px 0 0;"></div>
+<div style="width: 12px; height: 7px; background: #070b12; border-top: 1px solid #222f44; border-left: 1px solid #182232; border-right: 1px solid #182232; border-radius: 1px 1px 0 0; display: flex; justify-content: center; align-items: center;">
+<div style="width: 6px; height: 2px; background: #162030; border-radius: 1px;"></div>
+</div>
+<div style="width: 6px; height: 10px; background: #0d1420; border-top: 1px solid #1e293b; border-left: 1px solid #1e293b; border-radius: 2px 1px 0 0;"></div>
+</div>
+</div>
 </div>
 <div style="font-size: 10.5px; font-weight: 800; color: #8b949e; line-height: 1; font-family: monospace; margin-bottom: 1px;">12</div>
 </div>
@@ -231,137 +447,353 @@ BAMEX &bull; RACK CPD &bull; COLETA SNMP VIA ZABBIX
 <div style="display: flex; flex-direction: column; gap: 6px;">
 <div style="font-size: 9px; font-weight: 700; color: #64748b; letter-spacing: 1px; text-align: center; text-transform: uppercase;">PORTAS 13 &ndash; 24 &bull; 10/100/1000M</div>
 <div style="display: flex; gap: 18px;">
-<div class="sw-port" data-port="13" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(13);" title="Porta 13 | GigabitEthernet13&#10;Status: DOWN&#10;Velocidade: --&#10;Entrada: 0 bps&#10;Saida: 0 bps" style="width: 50px; height: 60px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
+<div class="sw-port" data-port="13" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(13);" title="Porta 13 | GigabitEthernet13&#10;Status: DOWN&#10;Velocidade: --&#10;Entrada: 0 bps&#10;Saida: 0 bps" style="width: 50px; height: 62px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
 <div style="width: 100%; display: flex; justify-content: space-between; padding: 0 3px;">
 <span class="sw-led-1" style="width: 6px; height: 4px; border-radius: 1px; background-color: #27303f;  display: inline-block;"></span>
 <span class="sw-led-2" style="width: 6px; height: 4px; border-radius: 1px; background-color: #27303f; opacity: 0.85;  display: inline-block;"></span>
 </div>
-<div style="width: 34px; height: 28px; background: #05070a; border: 1.5px solid #1a2332; border-radius: 2px; position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: space-between;">
-<div style="width: 24px; height: 4px; background: repeating-linear-gradient(90deg, #d4af37 0px, #d4af37 1px, transparent 1px, transparent 2.5px); opacity: 0.85; margin-top: 1px;"></div>
-<div style="width: 14px; height: 6px; background: #0d1420; border-top: 1px solid #192332; border-left: 1px solid #192332; border-right: 1px solid #192332; border-radius: 1px 1px 0 0;"></div>
+<!-- Authentic Shielded RJ45 Jack Receptacle -->
+<div class="sw-rj45-jack" style="width: 36px; height: 30px; background: linear-gradient(180deg, #1c2433 0%, #101622 100%); border: 1.5px solid #2b384e; border-radius: 3px; position: relative; box-shadow: inset 0 1px 2px rgba(255,255,255,0.12), 0 2px 5px rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; box-sizing: border-box;">
+<!-- Metallic Ground Shield Tabs -->
+<div style="position: absolute; top: -1px; left: 6px; width: 4px; height: 1.5px; background: #475569; border-radius: 0 0 1px 1px;"></div>
+<div style="position: absolute; top: -1px; right: 6px; width: 4px; height: 1.5px; background: #475569; border-radius: 0 0 1px 1px;"></div>
+<!-- Inner Cavity with Stepped Silhouette -->
+<div style="width: 28px; height: 23px; background: #030508; border-radius: 2px; position: relative; overflow: hidden; border: 1px solid #151d2a; box-shadow: inset 0 2px 6px rgba(0,0,0,0.95); display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 1px 0 0 0; box-sizing: border-box;">
+<!-- 8 Gold Pins (8P8C) -->
+<div style="width: 22px; height: 5px; display: flex; justify-content: space-between; align-items: flex-start; padding: 0 1px;">
+<span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span>
+<span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span>
+</div>
+<!-- Stepped Shoulders & Central Clip Retention Slot -->
+<div style="width: 100%; display: flex; align-items: flex-end; justify-content: space-between;">
+<div style="width: 6px; height: 10px; background: #0d1420; border-top: 1px solid #1e293b; border-right: 1px solid #1e293b; border-radius: 1px 2px 0 0;"></div>
+<div style="width: 12px; height: 7px; background: #070b12; border-top: 1px solid #222f44; border-left: 1px solid #182232; border-right: 1px solid #182232; border-radius: 1px 1px 0 0; display: flex; justify-content: center; align-items: center;">
+<div style="width: 6px; height: 2px; background: #162030; border-radius: 1px;"></div>
+</div>
+<div style="width: 6px; height: 10px; background: #0d1420; border-top: 1px solid #1e293b; border-left: 1px solid #1e293b; border-radius: 2px 1px 0 0;"></div>
+</div>
+</div>
 </div>
 <div style="font-size: 10.5px; font-weight: 800; color: #8b949e; line-height: 1; font-family: monospace; margin-bottom: 1px;">13</div>
 </div>
-<div class="sw-port" data-port="15" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(15);" title="Porta 15 | GigabitEthernet15&#10;Status: DOWN&#10;Velocidade: --&#10;Entrada: 0 bps&#10;Saida: 0 bps" style="width: 50px; height: 60px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
+<div class="sw-port" data-port="15" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(15);" title="Porta 15 | GigabitEthernet15&#10;Status: DOWN&#10;Velocidade: --&#10;Entrada: 0 bps&#10;Saida: 0 bps" style="width: 50px; height: 62px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
 <div style="width: 100%; display: flex; justify-content: space-between; padding: 0 3px;">
 <span class="sw-led-1" style="width: 6px; height: 4px; border-radius: 1px; background-color: #27303f;  display: inline-block;"></span>
 <span class="sw-led-2" style="width: 6px; height: 4px; border-radius: 1px; background-color: #27303f; opacity: 0.85;  display: inline-block;"></span>
 </div>
-<div style="width: 34px; height: 28px; background: #05070a; border: 1.5px solid #1a2332; border-radius: 2px; position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: space-between;">
-<div style="width: 24px; height: 4px; background: repeating-linear-gradient(90deg, #d4af37 0px, #d4af37 1px, transparent 1px, transparent 2.5px); opacity: 0.85; margin-top: 1px;"></div>
-<div style="width: 14px; height: 6px; background: #0d1420; border-top: 1px solid #192332; border-left: 1px solid #192332; border-right: 1px solid #192332; border-radius: 1px 1px 0 0;"></div>
+<!-- Authentic Shielded RJ45 Jack Receptacle -->
+<div class="sw-rj45-jack" style="width: 36px; height: 30px; background: linear-gradient(180deg, #1c2433 0%, #101622 100%); border: 1.5px solid #2b384e; border-radius: 3px; position: relative; box-shadow: inset 0 1px 2px rgba(255,255,255,0.12), 0 2px 5px rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; box-sizing: border-box;">
+<!-- Metallic Ground Shield Tabs -->
+<div style="position: absolute; top: -1px; left: 6px; width: 4px; height: 1.5px; background: #475569; border-radius: 0 0 1px 1px;"></div>
+<div style="position: absolute; top: -1px; right: 6px; width: 4px; height: 1.5px; background: #475569; border-radius: 0 0 1px 1px;"></div>
+<!-- Inner Cavity with Stepped Silhouette -->
+<div style="width: 28px; height: 23px; background: #030508; border-radius: 2px; position: relative; overflow: hidden; border: 1px solid #151d2a; box-shadow: inset 0 2px 6px rgba(0,0,0,0.95); display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 1px 0 0 0; box-sizing: border-box;">
+<!-- 8 Gold Pins (8P8C) -->
+<div style="width: 22px; height: 5px; display: flex; justify-content: space-between; align-items: flex-start; padding: 0 1px;">
+<span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span>
+<span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span>
+</div>
+<!-- Stepped Shoulders & Central Clip Retention Slot -->
+<div style="width: 100%; display: flex; align-items: flex-end; justify-content: space-between;">
+<div style="width: 6px; height: 10px; background: #0d1420; border-top: 1px solid #1e293b; border-right: 1px solid #1e293b; border-radius: 1px 2px 0 0;"></div>
+<div style="width: 12px; height: 7px; background: #070b12; border-top: 1px solid #222f44; border-left: 1px solid #182232; border-right: 1px solid #182232; border-radius: 1px 1px 0 0; display: flex; justify-content: center; align-items: center;">
+<div style="width: 6px; height: 2px; background: #162030; border-radius: 1px;"></div>
+</div>
+<div style="width: 6px; height: 10px; background: #0d1420; border-top: 1px solid #1e293b; border-left: 1px solid #1e293b; border-radius: 2px 1px 0 0;"></div>
+</div>
+</div>
 </div>
 <div style="font-size: 10.5px; font-weight: 800; color: #8b949e; line-height: 1; font-family: monospace; margin-bottom: 1px;">15</div>
 </div>
-<div class="sw-port" data-port="17" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(17);" title="Porta 17 | GigabitEthernet17&#10;Status: DOWN&#10;Velocidade: --&#10;Entrada: 0 bps&#10;Saida: 0 bps" style="width: 50px; height: 60px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
+<div class="sw-port" data-port="17" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(17);" title="Porta 17 | GigabitEthernet17&#10;Status: DOWN&#10;Velocidade: --&#10;Entrada: 0 bps&#10;Saida: 0 bps" style="width: 50px; height: 62px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
 <div style="width: 100%; display: flex; justify-content: space-between; padding: 0 3px;">
 <span class="sw-led-1" style="width: 6px; height: 4px; border-radius: 1px; background-color: #27303f;  display: inline-block;"></span>
 <span class="sw-led-2" style="width: 6px; height: 4px; border-radius: 1px; background-color: #27303f; opacity: 0.85;  display: inline-block;"></span>
 </div>
-<div style="width: 34px; height: 28px; background: #05070a; border: 1.5px solid #1a2332; border-radius: 2px; position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: space-between;">
-<div style="width: 24px; height: 4px; background: repeating-linear-gradient(90deg, #d4af37 0px, #d4af37 1px, transparent 1px, transparent 2.5px); opacity: 0.85; margin-top: 1px;"></div>
-<div style="width: 14px; height: 6px; background: #0d1420; border-top: 1px solid #192332; border-left: 1px solid #192332; border-right: 1px solid #192332; border-radius: 1px 1px 0 0;"></div>
+<!-- Authentic Shielded RJ45 Jack Receptacle -->
+<div class="sw-rj45-jack" style="width: 36px; height: 30px; background: linear-gradient(180deg, #1c2433 0%, #101622 100%); border: 1.5px solid #2b384e; border-radius: 3px; position: relative; box-shadow: inset 0 1px 2px rgba(255,255,255,0.12), 0 2px 5px rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; box-sizing: border-box;">
+<!-- Metallic Ground Shield Tabs -->
+<div style="position: absolute; top: -1px; left: 6px; width: 4px; height: 1.5px; background: #475569; border-radius: 0 0 1px 1px;"></div>
+<div style="position: absolute; top: -1px; right: 6px; width: 4px; height: 1.5px; background: #475569; border-radius: 0 0 1px 1px;"></div>
+<!-- Inner Cavity with Stepped Silhouette -->
+<div style="width: 28px; height: 23px; background: #030508; border-radius: 2px; position: relative; overflow: hidden; border: 1px solid #151d2a; box-shadow: inset 0 2px 6px rgba(0,0,0,0.95); display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 1px 0 0 0; box-sizing: border-box;">
+<!-- 8 Gold Pins (8P8C) -->
+<div style="width: 22px; height: 5px; display: flex; justify-content: space-between; align-items: flex-start; padding: 0 1px;">
+<span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span>
+<span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span>
+</div>
+<!-- Stepped Shoulders & Central Clip Retention Slot -->
+<div style="width: 100%; display: flex; align-items: flex-end; justify-content: space-between;">
+<div style="width: 6px; height: 10px; background: #0d1420; border-top: 1px solid #1e293b; border-right: 1px solid #1e293b; border-radius: 1px 2px 0 0;"></div>
+<div style="width: 12px; height: 7px; background: #070b12; border-top: 1px solid #222f44; border-left: 1px solid #182232; border-right: 1px solid #182232; border-radius: 1px 1px 0 0; display: flex; justify-content: center; align-items: center;">
+<div style="width: 6px; height: 2px; background: #162030; border-radius: 1px;"></div>
+</div>
+<div style="width: 6px; height: 10px; background: #0d1420; border-top: 1px solid #1e293b; border-left: 1px solid #1e293b; border-radius: 2px 1px 0 0;"></div>
+</div>
+</div>
 </div>
 <div style="font-size: 10.5px; font-weight: 800; color: #8b949e; line-height: 1; font-family: monospace; margin-bottom: 1px;">17</div>
 </div>
-<div class="sw-port" data-port="19" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(19);" title="Porta 19 | GigabitEthernet19&#10;Status: DOWN&#10;Velocidade: --&#10;Entrada: 0 bps&#10;Saida: 0 bps" style="width: 50px; height: 60px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
+<div class="sw-port" data-port="19" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(19);" title="Porta 19 | GigabitEthernet19&#10;Status: DOWN&#10;Velocidade: --&#10;Entrada: 0 bps&#10;Saida: 0 bps" style="width: 50px; height: 62px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
 <div style="width: 100%; display: flex; justify-content: space-between; padding: 0 3px;">
 <span class="sw-led-1" style="width: 6px; height: 4px; border-radius: 1px; background-color: #27303f;  display: inline-block;"></span>
 <span class="sw-led-2" style="width: 6px; height: 4px; border-radius: 1px; background-color: #27303f; opacity: 0.85;  display: inline-block;"></span>
 </div>
-<div style="width: 34px; height: 28px; background: #05070a; border: 1.5px solid #1a2332; border-radius: 2px; position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: space-between;">
-<div style="width: 24px; height: 4px; background: repeating-linear-gradient(90deg, #d4af37 0px, #d4af37 1px, transparent 1px, transparent 2.5px); opacity: 0.85; margin-top: 1px;"></div>
-<div style="width: 14px; height: 6px; background: #0d1420; border-top: 1px solid #192332; border-left: 1px solid #192332; border-right: 1px solid #192332; border-radius: 1px 1px 0 0;"></div>
+<!-- Authentic Shielded RJ45 Jack Receptacle -->
+<div class="sw-rj45-jack" style="width: 36px; height: 30px; background: linear-gradient(180deg, #1c2433 0%, #101622 100%); border: 1.5px solid #2b384e; border-radius: 3px; position: relative; box-shadow: inset 0 1px 2px rgba(255,255,255,0.12), 0 2px 5px rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; box-sizing: border-box;">
+<!-- Metallic Ground Shield Tabs -->
+<div style="position: absolute; top: -1px; left: 6px; width: 4px; height: 1.5px; background: #475569; border-radius: 0 0 1px 1px;"></div>
+<div style="position: absolute; top: -1px; right: 6px; width: 4px; height: 1.5px; background: #475569; border-radius: 0 0 1px 1px;"></div>
+<!-- Inner Cavity with Stepped Silhouette -->
+<div style="width: 28px; height: 23px; background: #030508; border-radius: 2px; position: relative; overflow: hidden; border: 1px solid #151d2a; box-shadow: inset 0 2px 6px rgba(0,0,0,0.95); display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 1px 0 0 0; box-sizing: border-box;">
+<!-- 8 Gold Pins (8P8C) -->
+<div style="width: 22px; height: 5px; display: flex; justify-content: space-between; align-items: flex-start; padding: 0 1px;">
+<span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span>
+<span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span>
+</div>
+<!-- Stepped Shoulders & Central Clip Retention Slot -->
+<div style="width: 100%; display: flex; align-items: flex-end; justify-content: space-between;">
+<div style="width: 6px; height: 10px; background: #0d1420; border-top: 1px solid #1e293b; border-right: 1px solid #1e293b; border-radius: 1px 2px 0 0;"></div>
+<div style="width: 12px; height: 7px; background: #070b12; border-top: 1px solid #222f44; border-left: 1px solid #182232; border-right: 1px solid #182232; border-radius: 1px 1px 0 0; display: flex; justify-content: center; align-items: center;">
+<div style="width: 6px; height: 2px; background: #162030; border-radius: 1px;"></div>
+</div>
+<div style="width: 6px; height: 10px; background: #0d1420; border-top: 1px solid #1e293b; border-left: 1px solid #1e293b; border-radius: 2px 1px 0 0;"></div>
+</div>
+</div>
 </div>
 <div style="font-size: 10.5px; font-weight: 800; color: #8b949e; line-height: 1; font-family: monospace; margin-bottom: 1px;">19</div>
 </div>
-<div class="sw-port" data-port="21" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(21);" title="Porta 21 | GigabitEthernet21&#10;Status: DOWN&#10;Velocidade: --&#10;Entrada: 0 bps&#10;Saida: 0 bps" style="width: 50px; height: 60px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
+<div class="sw-port" data-port="21" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(21);" title="Porta 21 | GigabitEthernet21&#10;Status: DOWN&#10;Velocidade: --&#10;Entrada: 0 bps&#10;Saida: 0 bps" style="width: 50px; height: 62px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
 <div style="width: 100%; display: flex; justify-content: space-between; padding: 0 3px;">
 <span class="sw-led-1" style="width: 6px; height: 4px; border-radius: 1px; background-color: #27303f;  display: inline-block;"></span>
 <span class="sw-led-2" style="width: 6px; height: 4px; border-radius: 1px; background-color: #27303f; opacity: 0.85;  display: inline-block;"></span>
 </div>
-<div style="width: 34px; height: 28px; background: #05070a; border: 1.5px solid #1a2332; border-radius: 2px; position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: space-between;">
-<div style="width: 24px; height: 4px; background: repeating-linear-gradient(90deg, #d4af37 0px, #d4af37 1px, transparent 1px, transparent 2.5px); opacity: 0.85; margin-top: 1px;"></div>
-<div style="width: 14px; height: 6px; background: #0d1420; border-top: 1px solid #192332; border-left: 1px solid #192332; border-right: 1px solid #192332; border-radius: 1px 1px 0 0;"></div>
+<!-- Authentic Shielded RJ45 Jack Receptacle -->
+<div class="sw-rj45-jack" style="width: 36px; height: 30px; background: linear-gradient(180deg, #1c2433 0%, #101622 100%); border: 1.5px solid #2b384e; border-radius: 3px; position: relative; box-shadow: inset 0 1px 2px rgba(255,255,255,0.12), 0 2px 5px rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; box-sizing: border-box;">
+<!-- Metallic Ground Shield Tabs -->
+<div style="position: absolute; top: -1px; left: 6px; width: 4px; height: 1.5px; background: #475569; border-radius: 0 0 1px 1px;"></div>
+<div style="position: absolute; top: -1px; right: 6px; width: 4px; height: 1.5px; background: #475569; border-radius: 0 0 1px 1px;"></div>
+<!-- Inner Cavity with Stepped Silhouette -->
+<div style="width: 28px; height: 23px; background: #030508; border-radius: 2px; position: relative; overflow: hidden; border: 1px solid #151d2a; box-shadow: inset 0 2px 6px rgba(0,0,0,0.95); display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 1px 0 0 0; box-sizing: border-box;">
+<!-- 8 Gold Pins (8P8C) -->
+<div style="width: 22px; height: 5px; display: flex; justify-content: space-between; align-items: flex-start; padding: 0 1px;">
+<span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span>
+<span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span>
+</div>
+<!-- Stepped Shoulders & Central Clip Retention Slot -->
+<div style="width: 100%; display: flex; align-items: flex-end; justify-content: space-between;">
+<div style="width: 6px; height: 10px; background: #0d1420; border-top: 1px solid #1e293b; border-right: 1px solid #1e293b; border-radius: 1px 2px 0 0;"></div>
+<div style="width: 12px; height: 7px; background: #070b12; border-top: 1px solid #222f44; border-left: 1px solid #182232; border-right: 1px solid #182232; border-radius: 1px 1px 0 0; display: flex; justify-content: center; align-items: center;">
+<div style="width: 6px; height: 2px; background: #162030; border-radius: 1px;"></div>
+</div>
+<div style="width: 6px; height: 10px; background: #0d1420; border-top: 1px solid #1e293b; border-left: 1px solid #1e293b; border-radius: 2px 1px 0 0;"></div>
+</div>
+</div>
 </div>
 <div style="font-size: 10.5px; font-weight: 800; color: #8b949e; line-height: 1; font-family: monospace; margin-bottom: 1px;">21</div>
 </div>
-<div class="sw-port" data-port="23" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(23);" title="Porta 23 | GigabitEthernet23&#10;Status: UP&#10;Velocidade: 1 Gb/s&#10;Entrada: 220.9 Kb/s&#10;Saida: 380.6 Kb/s" style="width: 50px; height: 60px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
+<div class="sw-port" data-port="23" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(23);" title="Porta 23 | GigabitEthernet23&#10;Status: UP&#10;Velocidade: 1 Gb/s&#10;Entrada: 134.7 Kb/s&#10;Saida: 1.84 Mb/s" style="width: 50px; height: 62px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
 <div style="width: 100%; display: flex; justify-content: space-between; padding: 0 3px;">
-<span class="sw-led-1" style="width: 6px; height: 4px; border-radius: 1px; background-color: #00e676; box-shadow: 0 0 5px #00e676; display: inline-block;"></span>
-<span class="sw-led-2" style="width: 6px; height: 4px; border-radius: 1px; background-color: #00e676; opacity: 0.85; box-shadow: 0 0 5px #00e676; display: inline-block;"></span>
+<span class="sw-led-1" style="width: 6px; height: 4px; border-radius: 1px; background-color: #00e676; box-shadow: 0 0 6px #00e676; display: inline-block;"></span>
+<span class="sw-led-2 sw-led-act" style="width: 6px; height: 4px; border-radius: 1px; background-color: #00e676; opacity: 0.85; box-shadow: 0 0 6px #00e676; display: inline-block;"></span>
 </div>
-<div style="width: 34px; height: 28px; background: #05070a; border: 1.5px solid #1a2332; border-radius: 2px; position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: space-between;">
-<div style="width: 24px; height: 4px; background: repeating-linear-gradient(90deg, #d4af37 0px, #d4af37 1px, transparent 1px, transparent 2.5px); opacity: 0.85; margin-top: 1px;"></div>
-<div style="width: 14px; height: 6px; background: #0d1420; border-top: 1px solid #192332; border-left: 1px solid #192332; border-right: 1px solid #192332; border-radius: 1px 1px 0 0;"></div>
+<!-- Authentic Shielded RJ45 Jack Receptacle -->
+<div class="sw-rj45-jack" style="width: 36px; height: 30px; background: linear-gradient(180deg, #1c2433 0%, #101622 100%); border: 1.5px solid #2b384e; border-radius: 3px; position: relative; box-shadow: inset 0 1px 2px rgba(255,255,255,0.12), 0 2px 5px rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; box-sizing: border-box;">
+<!-- Metallic Ground Shield Tabs -->
+<div style="position: absolute; top: -1px; left: 6px; width: 4px; height: 1.5px; background: #475569; border-radius: 0 0 1px 1px;"></div>
+<div style="position: absolute; top: -1px; right: 6px; width: 4px; height: 1.5px; background: #475569; border-radius: 0 0 1px 1px;"></div>
+<!-- Inner Cavity with Stepped Silhouette -->
+<div style="width: 28px; height: 23px; background: #030508; border-radius: 2px; position: relative; overflow: hidden; border: 1px solid #151d2a; box-shadow: inset 0 2px 6px rgba(0,0,0,0.95); display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 1px 0 0 0; box-sizing: border-box;">
+<!-- 8 Gold Pins (8P8C) -->
+<div style="width: 22px; height: 5px; display: flex; justify-content: space-between; align-items: flex-start; padding: 0 1px;">
+<span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span>
+<span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span>
+</div>
+<!-- Stepped Shoulders & Central Clip Retention Slot -->
+<div style="width: 100%; display: flex; align-items: flex-end; justify-content: space-between;">
+<div style="width: 6px; height: 10px; background: #0d1420; border-top: 1px solid #1e293b; border-right: 1px solid #1e293b; border-radius: 1px 2px 0 0;"></div>
+<div style="width: 12px; height: 7px; background: #070b12; border-top: 1px solid #222f44; border-left: 1px solid #182232; border-right: 1px solid #182232; border-radius: 1px 1px 0 0; display: flex; justify-content: center; align-items: center;">
+<div style="width: 6px; height: 2px; background: #162030; border-radius: 1px;"></div>
+</div>
+<div style="width: 6px; height: 10px; background: #0d1420; border-top: 1px solid #1e293b; border-left: 1px solid #1e293b; border-radius: 2px 1px 0 0;"></div>
+</div>
+</div>
 </div>
 <div style="font-size: 10.5px; font-weight: 800; color: #8b949e; line-height: 1; font-family: monospace; margin-bottom: 1px;">23</div>
 </div>
 </div>
 <div style="display: flex; gap: 18px;">
-<div class="sw-port" data-port="14" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(14);" title="Porta 14 | GigabitEthernet14&#10;Status: DOWN&#10;Velocidade: --&#10;Entrada: 0 bps&#10;Saida: 0 bps" style="width: 50px; height: 60px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
+<div class="sw-port" data-port="14" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(14);" title="Porta 14 | GigabitEthernet14&#10;Status: DOWN&#10;Velocidade: --&#10;Entrada: 0 bps&#10;Saida: 0 bps" style="width: 50px; height: 62px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
 <div style="width: 100%; display: flex; justify-content: space-between; padding: 0 3px;">
 <span class="sw-led-1" style="width: 6px; height: 4px; border-radius: 1px; background-color: #27303f;  display: inline-block;"></span>
 <span class="sw-led-2" style="width: 6px; height: 4px; border-radius: 1px; background-color: #27303f; opacity: 0.85;  display: inline-block;"></span>
 </div>
-<div style="width: 34px; height: 28px; background: #05070a; border: 1.5px solid #1a2332; border-radius: 2px; position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: space-between;">
-<div style="width: 24px; height: 4px; background: repeating-linear-gradient(90deg, #d4af37 0px, #d4af37 1px, transparent 1px, transparent 2.5px); opacity: 0.85; margin-top: 1px;"></div>
-<div style="width: 14px; height: 6px; background: #0d1420; border-top: 1px solid #192332; border-left: 1px solid #192332; border-right: 1px solid #192332; border-radius: 1px 1px 0 0;"></div>
+<!-- Authentic Shielded RJ45 Jack Receptacle -->
+<div class="sw-rj45-jack" style="width: 36px; height: 30px; background: linear-gradient(180deg, #1c2433 0%, #101622 100%); border: 1.5px solid #2b384e; border-radius: 3px; position: relative; box-shadow: inset 0 1px 2px rgba(255,255,255,0.12), 0 2px 5px rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; box-sizing: border-box;">
+<!-- Metallic Ground Shield Tabs -->
+<div style="position: absolute; top: -1px; left: 6px; width: 4px; height: 1.5px; background: #475569; border-radius: 0 0 1px 1px;"></div>
+<div style="position: absolute; top: -1px; right: 6px; width: 4px; height: 1.5px; background: #475569; border-radius: 0 0 1px 1px;"></div>
+<!-- Inner Cavity with Stepped Silhouette -->
+<div style="width: 28px; height: 23px; background: #030508; border-radius: 2px; position: relative; overflow: hidden; border: 1px solid #151d2a; box-shadow: inset 0 2px 6px rgba(0,0,0,0.95); display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 1px 0 0 0; box-sizing: border-box;">
+<!-- 8 Gold Pins (8P8C) -->
+<div style="width: 22px; height: 5px; display: flex; justify-content: space-between; align-items: flex-start; padding: 0 1px;">
+<span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span>
+<span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span>
+</div>
+<!-- Stepped Shoulders & Central Clip Retention Slot -->
+<div style="width: 100%; display: flex; align-items: flex-end; justify-content: space-between;">
+<div style="width: 6px; height: 10px; background: #0d1420; border-top: 1px solid #1e293b; border-right: 1px solid #1e293b; border-radius: 1px 2px 0 0;"></div>
+<div style="width: 12px; height: 7px; background: #070b12; border-top: 1px solid #222f44; border-left: 1px solid #182232; border-right: 1px solid #182232; border-radius: 1px 1px 0 0; display: flex; justify-content: center; align-items: center;">
+<div style="width: 6px; height: 2px; background: #162030; border-radius: 1px;"></div>
+</div>
+<div style="width: 6px; height: 10px; background: #0d1420; border-top: 1px solid #1e293b; border-left: 1px solid #1e293b; border-radius: 2px 1px 0 0;"></div>
+</div>
+</div>
 </div>
 <div style="font-size: 10.5px; font-weight: 800; color: #8b949e; line-height: 1; font-family: monospace; margin-bottom: 1px;">14</div>
 </div>
-<div class="sw-port" data-port="16" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(16);" title="Porta 16 | GigabitEthernet16&#10;Status: UP&#10;Velocidade: 1 Gb/s&#10;Entrada: 40.2 Kb/s&#10;Saida: 93.5 Kb/s" style="width: 50px; height: 60px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
+<div class="sw-port" data-port="16" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(16);" title="Porta 16 | GigabitEthernet16&#10;Status: UP&#10;Velocidade: 1 Gb/s&#10;Entrada: 38.8 Kb/s&#10;Saida: 167.6 Kb/s" style="width: 50px; height: 62px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
 <div style="width: 100%; display: flex; justify-content: space-between; padding: 0 3px;">
-<span class="sw-led-1" style="width: 6px; height: 4px; border-radius: 1px; background-color: #00e676; box-shadow: 0 0 5px #00e676; display: inline-block;"></span>
-<span class="sw-led-2" style="width: 6px; height: 4px; border-radius: 1px; background-color: #00e676; opacity: 0.85; box-shadow: 0 0 5px #00e676; display: inline-block;"></span>
+<span class="sw-led-1" style="width: 6px; height: 4px; border-radius: 1px; background-color: #00e676; box-shadow: 0 0 6px #00e676; display: inline-block;"></span>
+<span class="sw-led-2 sw-led-act" style="width: 6px; height: 4px; border-radius: 1px; background-color: #00e676; opacity: 0.85; box-shadow: 0 0 6px #00e676; display: inline-block;"></span>
 </div>
-<div style="width: 34px; height: 28px; background: #05070a; border: 1.5px solid #1a2332; border-radius: 2px; position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: space-between;">
-<div style="width: 24px; height: 4px; background: repeating-linear-gradient(90deg, #d4af37 0px, #d4af37 1px, transparent 1px, transparent 2.5px); opacity: 0.85; margin-top: 1px;"></div>
-<div style="width: 14px; height: 6px; background: #0d1420; border-top: 1px solid #192332; border-left: 1px solid #192332; border-right: 1px solid #192332; border-radius: 1px 1px 0 0;"></div>
+<!-- Authentic Shielded RJ45 Jack Receptacle -->
+<div class="sw-rj45-jack" style="width: 36px; height: 30px; background: linear-gradient(180deg, #1c2433 0%, #101622 100%); border: 1.5px solid #2b384e; border-radius: 3px; position: relative; box-shadow: inset 0 1px 2px rgba(255,255,255,0.12), 0 2px 5px rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; box-sizing: border-box;">
+<!-- Metallic Ground Shield Tabs -->
+<div style="position: absolute; top: -1px; left: 6px; width: 4px; height: 1.5px; background: #475569; border-radius: 0 0 1px 1px;"></div>
+<div style="position: absolute; top: -1px; right: 6px; width: 4px; height: 1.5px; background: #475569; border-radius: 0 0 1px 1px;"></div>
+<!-- Inner Cavity with Stepped Silhouette -->
+<div style="width: 28px; height: 23px; background: #030508; border-radius: 2px; position: relative; overflow: hidden; border: 1px solid #151d2a; box-shadow: inset 0 2px 6px rgba(0,0,0,0.95); display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 1px 0 0 0; box-sizing: border-box;">
+<!-- 8 Gold Pins (8P8C) -->
+<div style="width: 22px; height: 5px; display: flex; justify-content: space-between; align-items: flex-start; padding: 0 1px;">
+<span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span>
+<span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span>
+</div>
+<!-- Stepped Shoulders & Central Clip Retention Slot -->
+<div style="width: 100%; display: flex; align-items: flex-end; justify-content: space-between;">
+<div style="width: 6px; height: 10px; background: #0d1420; border-top: 1px solid #1e293b; border-right: 1px solid #1e293b; border-radius: 1px 2px 0 0;"></div>
+<div style="width: 12px; height: 7px; background: #070b12; border-top: 1px solid #222f44; border-left: 1px solid #182232; border-right: 1px solid #182232; border-radius: 1px 1px 0 0; display: flex; justify-content: center; align-items: center;">
+<div style="width: 6px; height: 2px; background: #162030; border-radius: 1px;"></div>
+</div>
+<div style="width: 6px; height: 10px; background: #0d1420; border-top: 1px solid #1e293b; border-left: 1px solid #1e293b; border-radius: 2px 1px 0 0;"></div>
+</div>
+</div>
 </div>
 <div style="font-size: 10.5px; font-weight: 800; color: #8b949e; line-height: 1; font-family: monospace; margin-bottom: 1px;">16</div>
 </div>
-<div class="sw-port" data-port="18" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(18);" title="Porta 18 | GigabitEthernet18&#10;Status: DOWN&#10;Velocidade: --&#10;Entrada: 0 bps&#10;Saida: 0 bps" style="width: 50px; height: 60px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
+<div class="sw-port" data-port="18" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(18);" title="Porta 18 | GigabitEthernet18&#10;Status: DOWN&#10;Velocidade: --&#10;Entrada: 0 bps&#10;Saida: 0 bps" style="width: 50px; height: 62px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
 <div style="width: 100%; display: flex; justify-content: space-between; padding: 0 3px;">
 <span class="sw-led-1" style="width: 6px; height: 4px; border-radius: 1px; background-color: #27303f;  display: inline-block;"></span>
 <span class="sw-led-2" style="width: 6px; height: 4px; border-radius: 1px; background-color: #27303f; opacity: 0.85;  display: inline-block;"></span>
 </div>
-<div style="width: 34px; height: 28px; background: #05070a; border: 1.5px solid #1a2332; border-radius: 2px; position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: space-between;">
-<div style="width: 24px; height: 4px; background: repeating-linear-gradient(90deg, #d4af37 0px, #d4af37 1px, transparent 1px, transparent 2.5px); opacity: 0.85; margin-top: 1px;"></div>
-<div style="width: 14px; height: 6px; background: #0d1420; border-top: 1px solid #192332; border-left: 1px solid #192332; border-right: 1px solid #192332; border-radius: 1px 1px 0 0;"></div>
+<!-- Authentic Shielded RJ45 Jack Receptacle -->
+<div class="sw-rj45-jack" style="width: 36px; height: 30px; background: linear-gradient(180deg, #1c2433 0%, #101622 100%); border: 1.5px solid #2b384e; border-radius: 3px; position: relative; box-shadow: inset 0 1px 2px rgba(255,255,255,0.12), 0 2px 5px rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; box-sizing: border-box;">
+<!-- Metallic Ground Shield Tabs -->
+<div style="position: absolute; top: -1px; left: 6px; width: 4px; height: 1.5px; background: #475569; border-radius: 0 0 1px 1px;"></div>
+<div style="position: absolute; top: -1px; right: 6px; width: 4px; height: 1.5px; background: #475569; border-radius: 0 0 1px 1px;"></div>
+<!-- Inner Cavity with Stepped Silhouette -->
+<div style="width: 28px; height: 23px; background: #030508; border-radius: 2px; position: relative; overflow: hidden; border: 1px solid #151d2a; box-shadow: inset 0 2px 6px rgba(0,0,0,0.95); display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 1px 0 0 0; box-sizing: border-box;">
+<!-- 8 Gold Pins (8P8C) -->
+<div style="width: 22px; height: 5px; display: flex; justify-content: space-between; align-items: flex-start; padding: 0 1px;">
+<span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span>
+<span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span>
+</div>
+<!-- Stepped Shoulders & Central Clip Retention Slot -->
+<div style="width: 100%; display: flex; align-items: flex-end; justify-content: space-between;">
+<div style="width: 6px; height: 10px; background: #0d1420; border-top: 1px solid #1e293b; border-right: 1px solid #1e293b; border-radius: 1px 2px 0 0;"></div>
+<div style="width: 12px; height: 7px; background: #070b12; border-top: 1px solid #222f44; border-left: 1px solid #182232; border-right: 1px solid #182232; border-radius: 1px 1px 0 0; display: flex; justify-content: center; align-items: center;">
+<div style="width: 6px; height: 2px; background: #162030; border-radius: 1px;"></div>
+</div>
+<div style="width: 6px; height: 10px; background: #0d1420; border-top: 1px solid #1e293b; border-left: 1px solid #1e293b; border-radius: 2px 1px 0 0;"></div>
+</div>
+</div>
 </div>
 <div style="font-size: 10.5px; font-weight: 800; color: #8b949e; line-height: 1; font-family: monospace; margin-bottom: 1px;">18</div>
 </div>
-<div class="sw-port" data-port="20" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(20);" title="Porta 20 | GigabitEthernet20&#10;Status: DOWN&#10;Velocidade: --&#10;Entrada: 0 bps&#10;Saida: 0 bps" style="width: 50px; height: 60px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
+<div class="sw-port" data-port="20" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(20);" title="Porta 20 | GigabitEthernet20&#10;Status: DOWN&#10;Velocidade: --&#10;Entrada: 0 bps&#10;Saida: 0 bps" style="width: 50px; height: 62px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
 <div style="width: 100%; display: flex; justify-content: space-between; padding: 0 3px;">
 <span class="sw-led-1" style="width: 6px; height: 4px; border-radius: 1px; background-color: #27303f;  display: inline-block;"></span>
 <span class="sw-led-2" style="width: 6px; height: 4px; border-radius: 1px; background-color: #27303f; opacity: 0.85;  display: inline-block;"></span>
 </div>
-<div style="width: 34px; height: 28px; background: #05070a; border: 1.5px solid #1a2332; border-radius: 2px; position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: space-between;">
-<div style="width: 24px; height: 4px; background: repeating-linear-gradient(90deg, #d4af37 0px, #d4af37 1px, transparent 1px, transparent 2.5px); opacity: 0.85; margin-top: 1px;"></div>
-<div style="width: 14px; height: 6px; background: #0d1420; border-top: 1px solid #192332; border-left: 1px solid #192332; border-right: 1px solid #192332; border-radius: 1px 1px 0 0;"></div>
+<!-- Authentic Shielded RJ45 Jack Receptacle -->
+<div class="sw-rj45-jack" style="width: 36px; height: 30px; background: linear-gradient(180deg, #1c2433 0%, #101622 100%); border: 1.5px solid #2b384e; border-radius: 3px; position: relative; box-shadow: inset 0 1px 2px rgba(255,255,255,0.12), 0 2px 5px rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; box-sizing: border-box;">
+<!-- Metallic Ground Shield Tabs -->
+<div style="position: absolute; top: -1px; left: 6px; width: 4px; height: 1.5px; background: #475569; border-radius: 0 0 1px 1px;"></div>
+<div style="position: absolute; top: -1px; right: 6px; width: 4px; height: 1.5px; background: #475569; border-radius: 0 0 1px 1px;"></div>
+<!-- Inner Cavity with Stepped Silhouette -->
+<div style="width: 28px; height: 23px; background: #030508; border-radius: 2px; position: relative; overflow: hidden; border: 1px solid #151d2a; box-shadow: inset 0 2px 6px rgba(0,0,0,0.95); display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 1px 0 0 0; box-sizing: border-box;">
+<!-- 8 Gold Pins (8P8C) -->
+<div style="width: 22px; height: 5px; display: flex; justify-content: space-between; align-items: flex-start; padding: 0 1px;">
+<span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span>
+<span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span>
+</div>
+<!-- Stepped Shoulders & Central Clip Retention Slot -->
+<div style="width: 100%; display: flex; align-items: flex-end; justify-content: space-between;">
+<div style="width: 6px; height: 10px; background: #0d1420; border-top: 1px solid #1e293b; border-right: 1px solid #1e293b; border-radius: 1px 2px 0 0;"></div>
+<div style="width: 12px; height: 7px; background: #070b12; border-top: 1px solid #222f44; border-left: 1px solid #182232; border-right: 1px solid #182232; border-radius: 1px 1px 0 0; display: flex; justify-content: center; align-items: center;">
+<div style="width: 6px; height: 2px; background: #162030; border-radius: 1px;"></div>
+</div>
+<div style="width: 6px; height: 10px; background: #0d1420; border-top: 1px solid #1e293b; border-left: 1px solid #1e293b; border-radius: 2px 1px 0 0;"></div>
+</div>
+</div>
 </div>
 <div style="font-size: 10.5px; font-weight: 800; color: #8b949e; line-height: 1; font-family: monospace; margin-bottom: 1px;">20</div>
 </div>
-<div class="sw-port" data-port="22" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(22);" title="Porta 22 | GigabitEthernet22&#10;Status: DOWN&#10;Velocidade: --&#10;Entrada: 0 bps&#10;Saida: 0 bps" style="width: 50px; height: 60px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
+<div class="sw-port" data-port="22" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(22);" title="Porta 22 | GigabitEthernet22&#10;Status: DOWN&#10;Velocidade: --&#10;Entrada: 0 bps&#10;Saida: 0 bps" style="width: 50px; height: 62px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
 <div style="width: 100%; display: flex; justify-content: space-between; padding: 0 3px;">
 <span class="sw-led-1" style="width: 6px; height: 4px; border-radius: 1px; background-color: #27303f;  display: inline-block;"></span>
 <span class="sw-led-2" style="width: 6px; height: 4px; border-radius: 1px; background-color: #27303f; opacity: 0.85;  display: inline-block;"></span>
 </div>
-<div style="width: 34px; height: 28px; background: #05070a; border: 1.5px solid #1a2332; border-radius: 2px; position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: space-between;">
-<div style="width: 24px; height: 4px; background: repeating-linear-gradient(90deg, #d4af37 0px, #d4af37 1px, transparent 1px, transparent 2.5px); opacity: 0.85; margin-top: 1px;"></div>
-<div style="width: 14px; height: 6px; background: #0d1420; border-top: 1px solid #192332; border-left: 1px solid #192332; border-right: 1px solid #192332; border-radius: 1px 1px 0 0;"></div>
+<!-- Authentic Shielded RJ45 Jack Receptacle -->
+<div class="sw-rj45-jack" style="width: 36px; height: 30px; background: linear-gradient(180deg, #1c2433 0%, #101622 100%); border: 1.5px solid #2b384e; border-radius: 3px; position: relative; box-shadow: inset 0 1px 2px rgba(255,255,255,0.12), 0 2px 5px rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; box-sizing: border-box;">
+<!-- Metallic Ground Shield Tabs -->
+<div style="position: absolute; top: -1px; left: 6px; width: 4px; height: 1.5px; background: #475569; border-radius: 0 0 1px 1px;"></div>
+<div style="position: absolute; top: -1px; right: 6px; width: 4px; height: 1.5px; background: #475569; border-radius: 0 0 1px 1px;"></div>
+<!-- Inner Cavity with Stepped Silhouette -->
+<div style="width: 28px; height: 23px; background: #030508; border-radius: 2px; position: relative; overflow: hidden; border: 1px solid #151d2a; box-shadow: inset 0 2px 6px rgba(0,0,0,0.95); display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 1px 0 0 0; box-sizing: border-box;">
+<!-- 8 Gold Pins (8P8C) -->
+<div style="width: 22px; height: 5px; display: flex; justify-content: space-between; align-items: flex-start; padding: 0 1px;">
+<span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span>
+<span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span>
+</div>
+<!-- Stepped Shoulders & Central Clip Retention Slot -->
+<div style="width: 100%; display: flex; align-items: flex-end; justify-content: space-between;">
+<div style="width: 6px; height: 10px; background: #0d1420; border-top: 1px solid #1e293b; border-right: 1px solid #1e293b; border-radius: 1px 2px 0 0;"></div>
+<div style="width: 12px; height: 7px; background: #070b12; border-top: 1px solid #222f44; border-left: 1px solid #182232; border-right: 1px solid #182232; border-radius: 1px 1px 0 0; display: flex; justify-content: center; align-items: center;">
+<div style="width: 6px; height: 2px; background: #162030; border-radius: 1px;"></div>
+</div>
+<div style="width: 6px; height: 10px; background: #0d1420; border-top: 1px solid #1e293b; border-left: 1px solid #1e293b; border-radius: 2px 1px 0 0;"></div>
+</div>
+</div>
 </div>
 <div style="font-size: 10.5px; font-weight: 800; color: #8b949e; line-height: 1; font-family: monospace; margin-bottom: 1px;">22</div>
 </div>
-<div class="sw-port sw-selected" data-port="24" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(24);" title="Porta 24 | GigabitEthernet24&#10;Status: UP&#10;Velocidade: 1 Gb/s&#10;Entrada: 2.58 Mb/s&#10;Saida: 634.1 Kb/s" style="width: 50px; height: 60px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 2px solid #00b0ff; box-shadow: 0 0 14px rgba(0, 176, 255, 0.9); box-sizing: border-box;">
+<div class="sw-port sw-selected" data-port="24" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(24);" title="Porta 24 | GigabitEthernet24&#10;Status: UP&#10;Velocidade: 1 Gb/s&#10;Entrada: 3.17 Mb/s&#10;Saida: 509.7 Kb/s" style="width: 50px; height: 62px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 2px solid #00b0ff; box-shadow: 0 0 14px rgba(0, 176, 255, 0.9); box-sizing: border-box;">
 <div style="width: 100%; display: flex; justify-content: space-between; padding: 0 3px;">
-<span class="sw-led-1" style="width: 6px; height: 4px; border-radius: 1px; background-color: #00e676; box-shadow: 0 0 5px #00e676; display: inline-block;"></span>
-<span class="sw-led-2" style="width: 6px; height: 4px; border-radius: 1px; background-color: #00e676; opacity: 0.85; box-shadow: 0 0 5px #00e676; display: inline-block;"></span>
+<span class="sw-led-1" style="width: 6px; height: 4px; border-radius: 1px; background-color: #00e676; box-shadow: 0 0 6px #00e676; display: inline-block;"></span>
+<span class="sw-led-2 sw-led-act" style="width: 6px; height: 4px; border-radius: 1px; background-color: #00e676; opacity: 0.85; box-shadow: 0 0 6px #00e676; display: inline-block;"></span>
 </div>
-<div style="width: 34px; height: 28px; background: #05070a; border: 1.5px solid #1a2332; border-radius: 2px; position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: space-between;">
-<div style="width: 24px; height: 4px; background: repeating-linear-gradient(90deg, #d4af37 0px, #d4af37 1px, transparent 1px, transparent 2.5px); opacity: 0.85; margin-top: 1px;"></div>
-<div style="width: 14px; height: 6px; background: #0d1420; border-top: 1px solid #192332; border-left: 1px solid #192332; border-right: 1px solid #192332; border-radius: 1px 1px 0 0;"></div>
+<!-- Authentic Shielded RJ45 Jack Receptacle -->
+<div class="sw-rj45-jack" style="width: 36px; height: 30px; background: linear-gradient(180deg, #1c2433 0%, #101622 100%); border: 1.5px solid #2b384e; border-radius: 3px; position: relative; box-shadow: inset 0 1px 2px rgba(255,255,255,0.12), 0 2px 5px rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; box-sizing: border-box;">
+<!-- Metallic Ground Shield Tabs -->
+<div style="position: absolute; top: -1px; left: 6px; width: 4px; height: 1.5px; background: #475569; border-radius: 0 0 1px 1px;"></div>
+<div style="position: absolute; top: -1px; right: 6px; width: 4px; height: 1.5px; background: #475569; border-radius: 0 0 1px 1px;"></div>
+<!-- Inner Cavity with Stepped Silhouette -->
+<div style="width: 28px; height: 23px; background: #030508; border-radius: 2px; position: relative; overflow: hidden; border: 1px solid #151d2a; box-shadow: inset 0 2px 6px rgba(0,0,0,0.95); display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 1px 0 0 0; box-sizing: border-box;">
+<!-- 8 Gold Pins (8P8C) -->
+<div style="width: 22px; height: 5px; display: flex; justify-content: space-between; align-items: flex-start; padding: 0 1px;">
+<span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span>
+<span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span>
+</div>
+<!-- Stepped Shoulders & Central Clip Retention Slot -->
+<div style="width: 100%; display: flex; align-items: flex-end; justify-content: space-between;">
+<div style="width: 6px; height: 10px; background: #0d1420; border-top: 1px solid #1e293b; border-right: 1px solid #1e293b; border-radius: 1px 2px 0 0;"></div>
+<div style="width: 12px; height: 7px; background: #070b12; border-top: 1px solid #222f44; border-left: 1px solid #182232; border-right: 1px solid #182232; border-radius: 1px 1px 0 0; display: flex; justify-content: center; align-items: center;">
+<div style="width: 6px; height: 2px; background: #162030; border-radius: 1px;"></div>
+</div>
+<div style="width: 6px; height: 10px; background: #0d1420; border-top: 1px solid #1e293b; border-left: 1px solid #1e293b; border-radius: 2px 1px 0 0;"></div>
+</div>
+</div>
 </div>
 <div style="font-size: 10.5px; font-weight: 800; color: #8b949e; line-height: 1; font-family: monospace; margin-bottom: 1px;">24</div>
 </div>
@@ -374,7 +806,7 @@ BAMEX &bull; RACK CPD &bull; COLETA SNMP VIA ZABBIX
 <div style="display: flex; flex-direction: column; gap: 8px;">
 <!-- Row 1: 25, 27 -->
 <div style="display: flex; gap: 14px;">
-<div class="sw-port" data-port="25" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(25);" title="SFP+ 25 | SFP+ 10G&#10;Status: UP&#10;Velocidade: --&#10;Entrada: 0 bps&#10;Saida: 0 bps" style="width: 72px; height: 44px; background: #101622; border: 1px solid #283344; border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 7px; position: relative; cursor: pointer; box-sizing: border-box;">
+<div class="sw-port" data-port="25" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(25);" title="SFP+ 25 | SFP+ 10G&#10;Status: &#10;Velocidade: --&#10;Entrada: 0 bps&#10;Saida: 0 bps" style="width: 72px; height: 44px; background: #101622; border: 1px solid #283344; border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 7px; position: relative; cursor: pointer; box-sizing: border-box;">
 <div style="width: 100%; display: flex; justify-content: space-between; align-items: center;">
 <span class="sw-led-1" style="width: 6px; height: 4px; border-radius: 1px; background: #27303f;  display: inline-block;"></span>
 <span style="font-size: 8px; font-weight: 700; color: #64748b; letter-spacing: 0.5px;">10G</span>
@@ -382,7 +814,7 @@ BAMEX &bull; RACK CPD &bull; COLETA SNMP VIA ZABBIX
 <div style="width: 48px; height: 10px; border-radius: 2px; background: #2d3748; border: 1px solid rgba(0,0,0,0.5);"></div>
 <div style="font-size: 10.5px; font-weight: 800; color: #8b949e; font-family: monospace; line-height: 1;">25</div>
 </div>
-<div class="sw-port" data-port="27" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(27);" title="SFP+ 27 | SFP+ 10G&#10;Status: UP&#10;Velocidade: --&#10;Entrada: 0 bps&#10;Saida: 0 bps" style="width: 72px; height: 44px; background: #101622; border: 1px solid #283344; border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 7px; position: relative; cursor: pointer; box-sizing: border-box;">
+<div class="sw-port" data-port="27" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(27);" title="SFP+ 27 | SFP+ 10G&#10;Status: &#10;Velocidade: --&#10;Entrada: 0 bps&#10;Saida: 0 bps" style="width: 72px; height: 44px; background: #101622; border: 1px solid #283344; border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 7px; position: relative; cursor: pointer; box-sizing: border-box;">
 <div style="width: 100%; display: flex; justify-content: space-between; align-items: center;">
 <span class="sw-led-1" style="width: 6px; height: 4px; border-radius: 1px; background: #27303f;  display: inline-block;"></span>
 <span style="font-size: 8px; font-weight: 700; color: #64748b; letter-spacing: 0.5px;">10G</span>
@@ -393,7 +825,7 @@ BAMEX &bull; RACK CPD &bull; COLETA SNMP VIA ZABBIX
 </div>
 <!-- Row 2: 26, 28 -->
 <div style="display: flex; gap: 14px;">
-<div class="sw-port" data-port="26" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(26);" title="SFP+ 26 | SFP+ 10G&#10;Status: UP&#10;Velocidade: --&#10;Entrada: 0 bps&#10;Saida: 0 bps" style="width: 72px; height: 44px; background: #101622; border: 1px solid #283344; border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 7px; position: relative; cursor: pointer; box-sizing: border-box;">
+<div class="sw-port" data-port="26" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(26);" title="SFP+ 26 | SFP+ 10G&#10;Status: &#10;Velocidade: --&#10;Entrada: 0 bps&#10;Saida: 0 bps" style="width: 72px; height: 44px; background: #101622; border: 1px solid #283344; border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 7px; position: relative; cursor: pointer; box-sizing: border-box;">
 <div style="width: 100%; display: flex; justify-content: space-between; align-items: center;">
 <span class="sw-led-1" style="width: 6px; height: 4px; border-radius: 1px; background: #27303f;  display: inline-block;"></span>
 <span style="font-size: 8px; font-weight: 700; color: #64748b; letter-spacing: 0.5px;">10G</span>
@@ -401,7 +833,7 @@ BAMEX &bull; RACK CPD &bull; COLETA SNMP VIA ZABBIX
 <div style="width: 48px; height: 10px; border-radius: 2px; background: #2d3748; border: 1px solid rgba(0,0,0,0.5);"></div>
 <div style="font-size: 10.5px; font-weight: 800; color: #8b949e; font-family: monospace; line-height: 1;">26</div>
 </div>
-<div class="sw-port" data-port="28" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(28);" title="SFP+ 28 | SFP+ 10G&#10;Status: UP&#10;Velocidade: --&#10;Entrada: 0 bps&#10;Saida: 0 bps" style="width: 72px; height: 44px; background: #101622; border: 1px solid #283344; border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 7px; position: relative; cursor: pointer; box-sizing: border-box;">
+<div class="sw-port" data-port="28" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(28);" title="SFP+ 28 | SFP+ 10G&#10;Status: &#10;Velocidade: --&#10;Entrada: 0 bps&#10;Saida: 0 bps" style="width: 72px; height: 44px; background: #101622; border: 1px solid #283344; border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 7px; position: relative; cursor: pointer; box-sizing: border-box;">
 <div style="width: 100%; display: flex; justify-content: space-between; align-items: center;">
 <span class="sw-led-1" style="width: 6px; height: 4px; border-radius: 1px; background: #27303f;  display: inline-block;"></span>
 <span style="font-size: 8px; font-weight: 700; color: #64748b; letter-spacing: 0.5px;">10G</span>
@@ -511,15 +943,15 @@ Aruba Instant On 1930 24G 4SFP/SFP+ Switch JL682A, InstantOn_1930_2.8.0.0 (17), 
 </div>
 <div>
 <div style="font-size: 9px; font-weight: 700; color: #8b949e; text-transform: uppercase; margin-bottom: 3px;">ENTRADA</div>
-<div id="sel-port-in" style="font-size: 16px; font-weight: 800; color: #ffffff;">2.58 Mb/s</div>
+<div id="sel-port-in" style="font-size: 16px; font-weight: 800; color: #ffffff;">3.17 Mb/s</div>
 </div>
 <div>
 <div style="font-size: 9px; font-weight: 700; color: #8b949e; text-transform: uppercase; margin-bottom: 3px;">SA&Iacute;DA</div>
-<div id="sel-port-out" style="font-size: 16px; font-weight: 800; color: #ffffff;">634.1 Kb/s</div>
+<div id="sel-port-out" style="font-size: 16px; font-weight: 800; color: #ffffff;">509.7 Kb/s</div>
 </div>
 <div>
 <div style="font-size: 9px; font-weight: 700; color: #8b949e; text-transform: uppercase; margin-bottom: 3px;">UTILIZA&Ccedil;&Atilde;O</div>
-<div id="sel-port-util" style="font-size: 16px; font-weight: 800; color: #ffffff;">0.32%</div>
+<div id="sel-port-util" style="font-size: 16px; font-weight: 800; color: #ffffff;">0.37%</div>
 </div>
 <div>
 <div style="font-size: 9px; font-weight: 700; color: #8b949e; text-transform: uppercase; margin-bottom: 3px;">ERROS / DESC</div>
@@ -594,14 +1026,14 @@ Total: <span id="tt-total" style="white-space: nowrap;">0 bps</span>
 </div>
 <div style="display: flex; align-items: center; gap: 6px;">
 <span style="font-size: 9px; font-weight: 700; background: rgba(56, 189, 248, 0.12); color: #38bdf8; padding: 1px 4px; border-radius: 3px;">0.0%</span>
-<span style="font-size: 11px; font-weight: 800; color: #38bdf8; font-family: monospace; white-space: nowrap;">133.7 Kb/s</span>
+<span style="font-size: 11px; font-weight: 800; color: #38bdf8; font-family: monospace; white-space: nowrap;">206.4 Kb/s</span>
 </div>
 </div>
 <div style="display: flex; align-items: center; gap: 8px;">
 <div style="flex: 1; height: 3px; background: #1c2230; border-radius: 2px; overflow: hidden;">
 <div style="width: 100%; height: 100%; background: #00b0ff; border-radius: 2px;"></div>
 </div>
-<span style="font-size: 8.5px; color: #64748b; font-family: monospace; white-space: nowrap;">In: 40.2 Kb/s &bull; Out: 93.5 Kb/s</span>
+<span style="font-size: 8.5px; color: #64748b; font-family: monospace; white-space: nowrap;">In: 38.8 Kb/s &bull; Out: 167.6 Kb/s</span>
 </div>
 </div>
 <div class="sw-top-talker" data-tt-port="12" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(12);" style="background: #0d121c; border-radius: 4px; padding: 6px 10px; cursor: pointer; border: 1px solid #1e293b; transition: all 0.2s ease;">
@@ -612,15 +1044,15 @@ Total: <span id="tt-total" style="white-space: nowrap;">0 bps</span>
 <span style="font-size: 10px; color: #8b949e; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">GigabitEthernet12</span>
 </div>
 <div style="display: flex; align-items: center; gap: 6px;">
-<span style="font-size: 9px; font-weight: 700; background: rgba(56, 189, 248, 0.12); color: #38bdf8; padding: 1px 4px; border-radius: 3px;">1.1%</span>
-<span style="font-size: 11px; font-weight: 800; color: #38bdf8; font-family: monospace; white-space: nowrap;">1.11 Mb/s</span>
+<span style="font-size: 9px; font-weight: 700; background: rgba(56, 189, 248, 0.12); color: #38bdf8; padding: 1px 4px; border-radius: 3px;">0.1%</span>
+<span style="font-size: 11px; font-weight: 800; color: #38bdf8; font-family: monospace; white-space: nowrap;">151.7 Kb/s</span>
 </div>
 </div>
 <div style="display: flex; align-items: center; gap: 8px;">
 <div style="flex: 1; height: 3px; background: #1c2230; border-radius: 2px; overflow: hidden;">
-<div style="width: 100%; height: 100%; background: #00b0ff; border-radius: 2px;"></div>
+<div style="width: 73%; height: 100%; background: #00b0ff; border-radius: 2px;"></div>
 </div>
-<span style="font-size: 8.5px; color: #64748b; font-family: monospace; white-space: nowrap;">In: 54.7 Kb/s &bull; Out: 1.06 Mb/s</span>
+<span style="font-size: 8.5px; color: #64748b; font-family: monospace; white-space: nowrap;">In: 21.2 Kb/s &bull; Out: 130.5 Kb/s</span>
 </div>
 </div>
 <div class="sw-top-talker" data-tt-port="24" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(24);" style="background: #0d121c; border-radius: 4px; padding: 6px 10px; cursor: pointer; border: 1px solid #00b0ff; box-shadow: 0 0 8px rgba(0, 176, 255, 0.3); transition: all 0.2s ease;">
@@ -632,14 +1064,14 @@ Total: <span id="tt-total" style="white-space: nowrap;">0 bps</span>
 </div>
 <div style="display: flex; align-items: center; gap: 6px;">
 <span style="font-size: 9px; font-weight: 700; background: rgba(56, 189, 248, 0.12); color: #38bdf8; padding: 1px 4px; border-radius: 3px;">0.3%</span>
-<span style="font-size: 11px; font-weight: 800; color: #38bdf8; font-family: monospace; white-space: nowrap;">3.21 Mb/s</span>
+<span style="font-size: 11px; font-weight: 800; color: #38bdf8; font-family: monospace; white-space: nowrap;">3.68 Mb/s</span>
 </div>
 </div>
 <div style="display: flex; align-items: center; gap: 8px;">
 <div style="flex: 1; height: 3px; background: #1c2230; border-radius: 2px; overflow: hidden;">
 <div style="width: 100%; height: 100%; background: #00b0ff; border-radius: 2px;"></div>
 </div>
-<span style="font-size: 8.5px; color: #64748b; font-family: monospace; white-space: nowrap;">In: 2.58 Mb/s &bull; Out: 634.1 Kb/s</span>
+<span style="font-size: 8.5px; color: #64748b; font-family: monospace; white-space: nowrap;">In: 3.17 Mb/s &bull; Out: 509.7 Kb/s</span>
 </div>
 </div>
 </div>
