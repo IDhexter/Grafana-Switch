@@ -409,14 +409,20 @@ html_content = r"""
         <span class="sgs-leg-item"><i class="leg-in"></i> Download (Inbound)</span>
         <span class="sgs-leg-item"><i class="leg-out"></i> Upload (Outbound)</span>
         <button id="sgs-btn-reset-zoom" class="sgs-btn-reset-zoom" style="display:none;">↺ RESET ZOOM</button>
+        <span class="sgs-chart-hint">✦ arraste para zoom • duplo clique reset</span>
       </div>
     </div>
     
-    <!-- Canvas container with drag-to-zoom and tooltip -->
+    <!-- Canvas container with drag-to-zoom and tooltip HUD -->
     <div class="sgs-canvas-wrap" id="sgs-canvas-wrap">
+      <!-- Floating Interactive Tooltip HUD like the Switch -->
+      <div id="sgs-canvas-tooltip" class="sgs-canvas-tooltip" style="display: none;">
+        <span id="sgs-tt-time" class="sgs-tt-time">--:--:--</span>
+        <span class="sgs-tt-in"><span class="sgs-tt-dot in"></span>In: <span id="sgs-tt-in-val">0 bps</span></span>
+        <span class="sgs-tt-out"><span class="sgs-tt-dot out"></span>Out: <span id="sgs-tt-out-val">0 bps</span></span>
+        <span class="sgs-tt-total">Total: <span id="sgs-tt-total-val">0 bps</span></span>
+      </div>
       <canvas id="sgs-traffic-canvas"></canvas>
-      <div id="sgs-chart-tooltip" class="sgs-chart-tooltip" style="display:none;"></div>
-      <div id="sgs-zoom-box" class="sgs-zoom-box" style="display:none;"></div>
     </div>
   </div>
 
@@ -964,26 +970,81 @@ css_styles = r"""
   height: 100%;
   display: block;
 }
-.sgs-chart-tooltip {
+.sgs-chart-hint {
+  font-size: 9.5px;
+  color: #64748b;
+  font-family: monospace;
+  margin-left: 6px;
+}
+.sgs-canvas-tooltip {
   position: absolute;
-  background: rgba(13, 19, 31, 0.94);
+  top: 10px;
+  background: rgba(11, 16, 26, 0.96);
   border: 1px solid #00b0ff;
-  border-radius: 5px;
-  padding: 8px 10px;
+  border-radius: 6px;
+  padding: 4px 12px;
   font-size: 11px;
   color: #f8fafc;
   pointer-events: none;
-  box-shadow: 0 4px 14px rgba(0,0,0,0.8);
-  z-index: 10;
-  font-family: monospace;
+  z-index: 1000;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.9);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  white-space: nowrap;
+  width: max-content;
+  flex-shrink: 0;
 }
-.sgs-zoom-box {
-  position: absolute;
-  background: rgba(0, 176, 255, 0.15);
-  border: 1px dashed #00b0ff;
-  pointer-events: none;
-  top: 0;
-  bottom: 0;
+.sgs-tt-time {
+  color: #94a3b8;
+  font-family: monospace;
+  font-size: 10.5px;
+  border-right: 1px solid #334155;
+  padding-right: 8px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.sgs-tt-in {
+  color: #00e676;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.sgs-tt-out {
+  color: #a855f7;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.sgs-tt-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+}
+.sgs-tt-dot.in {
+  background: #00e676;
+  box-shadow: 0 0 6px #00e676;
+}
+.sgs-tt-dot.out {
+  background: #a855f7;
+  box-shadow: 0 0 6px #a855f7;
+}
+.sgs-tt-total {
+  color: #ffffff;
+  font-weight: 700;
+  border-left: 1px solid #334155;
+  padding-left: 8px;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 /* Bottom Grid */
@@ -1206,7 +1267,9 @@ js_script = r"""
     zoomStart: null,
     zoomEnd: null,
     isZooming: false,
-    dragStartX: null
+    dragStartX: null,
+    dragCurrentX: null,
+    hoveredIdx: null
   };
 
   // Helper formatador de banda
@@ -1294,6 +1357,10 @@ js_script = r"""
     updateChassisUI();
     renderIfaceSelect();
     renderInterfacesTable();
+
+    const sub = getEl("sgs-chart-sub");
+    if (sub && state.currentIface) sub.textContent = "Interface: " + state.currentIface.name;
+
     fetchTelemetry();
   }
 
@@ -1594,8 +1661,8 @@ js_script = r"""
     ctx.scale(dpr, dpr);
     ctx.clearRect(0, 0, w, h);
 
-    const inData = state.historyIn;
-    const outData = state.historyOut;
+    const inData = state.historyIn || [];
+    const outData = state.historyOut || [];
 
     if (inData.length === 0 && outData.length === 0) {
       ctx.fillStyle = "#64748b";
@@ -1622,7 +1689,7 @@ js_script = r"""
     const minTime = Math.min(...allClocks);
     const maxTime = Math.max(...allClocks);
     const maxVal = Math.max(...allVals, 1000); // no mínimo 1 Kbps
-    const yMax = maxVal * 1.15; // 15% head room
+    const yMax = maxVal * 1.15; // 15% headroom
 
     const padLeft = 65;
     const padRight = 20;
@@ -1630,6 +1697,8 @@ js_script = r"""
     const padBottom = 28;
     const plotW = w - padLeft - padRight;
     const plotH = h - padTop - padBottom;
+    const bottomY = padTop + plotH;
+    const timeSpan = Math.max(1, maxTime - minTime);
 
     // Desenhar Linhas de Grade Horizontais
     ctx.strokeStyle = "#162032";
@@ -1641,7 +1710,7 @@ js_script = r"""
     const gridLines = 4;
     for (let i = 0; i <= gridLines; i++) {
       const yVal = (yMax / gridLines) * i;
-      const yPos = padTop + plotH - (yVal / yMax) * plotH;
+      const yPos = bottomY - (yVal / yMax) * plotH;
       ctx.beginPath();
       ctx.moveTo(padLeft, yPos);
       ctx.lineTo(w - padRight, yPos);
@@ -1653,7 +1722,6 @@ js_script = r"""
     // Desenhar Linhas de Grade Verticais (Tempo)
     ctx.textAlign = "center";
     const timeSteps = 5;
-    const timeSpan = maxTime - minTime || 1;
     for (let i = 0; i <= timeSteps; i++) {
       const t = minTime + (timeSpan / timeSteps) * i;
       const xPos = padLeft + ((t - minTime) / timeSpan) * plotW;
@@ -1665,63 +1733,206 @@ js_script = r"""
       ctx.beginPath();
       ctx.strokeStyle = "#162032";
       ctx.moveTo(xPos, padTop);
-      ctx.lineTo(xPos, padTop + plotH);
+      ctx.lineTo(xPos, bottomY);
       ctx.stroke();
 
       ctx.fillStyle = "#64748b";
       ctx.fillText(`${hours}:${mins}`, xPos, h - 8);
     }
 
-    // Função para desenhar série com gradiente
-    function drawSeries(dataset, strokeColor, fillColor) {
-      if (dataset.length === 0) return;
-      ctx.beginPath();
-      let firstX = 0, lastX = 0;
-
-      dataset.forEach((p, idx) => {
-        const x = padLeft + ((p.clock - minTime) / timeSpan) * plotW;
-        const y = padTop + plotH - (parseFloat(p.value) / yMax) * plotH;
-        if (idx === 0) {
-          ctx.moveTo(x, y);
-          firstX = x;
-        } else {
-          ctx.lineTo(x, y);
-        }
-        lastX = x;
-      });
-
-      // Linha do traçado
-      ctx.strokeStyle = strokeColor;
-      ctx.lineWidth = 2;
-      ctx.lineJoin = "round";
-      ctx.stroke();
-
-      // Fechamento de área com gradiente
-      ctx.lineTo(lastX, padTop + plotH);
-      ctx.lineTo(firstX, padTop + plotH);
-      ctx.closePath();
-
-      const grad = ctx.createLinearGradient(0, padTop, 0, padTop + plotH);
-      grad.addColorStop(0, fillColor);
-      grad.addColorStop(1, "rgba(0,0,0,0)");
-      ctx.fillStyle = grad;
-      ctx.fill();
+    // Mapear Coordenadas
+    function getX(clock) {
+      if (maxTime === minTime) return padLeft + plotW / 2;
+      return padLeft + ((clock - minTime) / timeSpan) * plotW;
+    }
+    function getY(val) {
+      return bottomY - (val / yMax) * plotH;
     }
 
-    // Desenhar Upload (Roxo/Azul)
-    drawSeries(filteredOut, "#a855f7", "rgba(168, 85, 247, 0.25)");
+    const inCoords = filteredIn.map(p => ({
+      x: getX(parseInt(p.clock)),
+      y: getY(parseFloat(p.value)),
+      clock: parseInt(p.clock),
+      value: parseFloat(p.value)
+    }));
 
-    // Desenhar Download (Verde Esmeralda)
-    drawSeries(filteredIn, "#00e676", "rgba(0, 230, 118, 0.35)");
+    const outCoords = filteredOut.map(p => ({
+      x: getX(parseInt(p.clock)),
+      y: getY(parseFloat(p.value)),
+      clock: parseInt(p.clock),
+      value: parseFloat(p.value)
+    }));
+
+    // Função para desenhar série com gradiente e pontos amostrais
+    function drawSeries(coords, strokeColor, r, g, b) {
+      if (!coords || coords.length === 0) return;
+
+      // Preenchimento com gradiente suave
+      const grad = ctx.createLinearGradient(0, padTop, 0, bottomY);
+      grad.addColorStop(0, `rgba(${r}, ${g}, ${b}, 0.28)`);
+      grad.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0.0)`);
+      ctx.fillStyle = grad;
+
+      ctx.beginPath();
+      ctx.moveTo(coords[0].x, bottomY);
+      coords.forEach(pt => ctx.lineTo(pt.x, pt.y));
+      ctx.lineTo(coords[coords.length - 1].x, bottomY);
+      ctx.closePath();
+      ctx.fill();
+
+      // Traçado da linha
+      ctx.strokeStyle = strokeColor;
+      ctx.lineWidth = 2.2;
+      ctx.lineJoin = "round";
+      ctx.beginPath();
+      coords.forEach((pt, idx) => {
+        if (idx === 0) ctx.moveTo(pt.x, pt.y);
+        else ctx.lineTo(pt.x, pt.y);
+      });
+      ctx.stroke();
+
+      // Pontos amostrais nas curvas (bolinhas guia)
+      if (coords.length <= 160) {
+        coords.forEach((pt, idx) => {
+          const isLast = (idx === coords.length - 1);
+          ctx.fillStyle = strokeColor;
+          ctx.beginPath();
+          ctx.arc(pt.x, pt.y, isLast ? 3.5 : 2.2, 0, Math.PI * 2);
+          ctx.fill();
+
+          if (isLast && state.hoveredIdx == null) {
+            ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, 0.55)`;
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(pt.x, pt.y, 7, 0, Math.PI * 2);
+            ctx.stroke();
+          }
+        });
+      } else {
+        const lastPt = coords[coords.length - 1];
+        ctx.fillStyle = strokeColor;
+        ctx.beginPath();
+        ctx.arc(lastPt.x, lastPt.y, 3.5, 0, Math.PI * 2);
+        ctx.fill();
+
+        if (state.hoveredIdx == null) {
+          ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, 0.55)`;
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.arc(lastPt.x, lastPt.y, 7, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+      }
+    }
+
+    // Desenhar Upload (Roxo/Lilás: #a855f7)
+    drawSeries(outCoords, "#a855f7", 168, 85, 247);
+
+    // Desenhar Download (Verde Esmeralda: #00e676)
+    drawSeries(inCoords, "#00e676", 0, 230, 118);
+
+    // Hover Crosshair (Barrinha Tracejada) e Target Halos (Bolinhas com Auréola)
+    if (state.hoveredIdx !== null) {
+      const primaryCoords = inCoords.length > 0 ? inCoords : outCoords;
+      if (primaryCoords.length > 0) {
+        const hIdx = Math.min(state.hoveredIdx, primaryCoords.length - 1);
+        const hoverX = primaryCoords[hIdx].x;
+
+        // Vertical guideline (barrinha tracejada)
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.45)";
+        ctx.lineWidth = 1;
+        ctx.setLineDash([3, 3]);
+        ctx.beginPath();
+        ctx.moveTo(hoverX, padTop);
+        ctx.lineTo(hoverX, bottomY);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // Ponto Out mais próximo deste hoverX
+        let ptOut = null;
+        if (outCoords.length > 0) {
+          let minDiff = Infinity;
+          outCoords.forEach(p => {
+            const d = Math.abs(p.x - hoverX);
+            if (d < minDiff) { minDiff = d; ptOut = p; }
+          });
+        }
+
+        // Ponto In mais próximo deste hoverX
+        let ptIn = null;
+        if (inCoords.length > 0) {
+          let minDiff = Infinity;
+          inCoords.forEach(p => {
+            const d = Math.abs(p.x - hoverX);
+            if (d < minDiff) { minDiff = d; ptIn = p; }
+          });
+        }
+
+        // Auréola e ponto destacado Out (Upload - Roxo)
+        if (ptOut) {
+          ctx.fillStyle = "#a855f7";
+          ctx.beginPath();
+          ctx.arc(hoverX, ptOut.y, 5.5, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.strokeStyle = "#ffffff";
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+          ctx.strokeStyle = "rgba(168, 85, 247, 0.65)";
+          ctx.lineWidth = 3.5;
+          ctx.beginPath();
+          ctx.arc(hoverX, ptOut.y, 10, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+
+        // Auréola e ponto destacado In (Download - Verde Esmeralda)
+        if (ptIn) {
+          ctx.fillStyle = "#00e676";
+          ctx.beginPath();
+          ctx.arc(hoverX, ptIn.y, 5.5, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.strokeStyle = "#ffffff";
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+          ctx.strokeStyle = "rgba(0, 230, 118, 0.65)";
+          ctx.lineWidth = 3.5;
+          ctx.beginPath();
+          ctx.arc(hoverX, ptIn.y, 10, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+      }
+    }
+
+    // Drag Box Zoom Selection Overlay na tela
+    if (state.isZooming && state.dragStartX != null && state.dragCurrentX != null) {
+      const x1 = Math.max(padLeft, Math.min(state.dragStartX, state.dragCurrentX));
+      const x2 = Math.min(w - padRight, Math.max(state.dragStartX, state.dragCurrentX));
+      const boxW = Math.max(0, x2 - x1);
+
+      ctx.fillStyle = "rgba(0, 176, 255, 0.22)";
+      ctx.fillRect(x1, padTop, boxW, plotH);
+      ctx.strokeStyle = "#00b0ff";
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([4, 2]);
+      ctx.strokeRect(x1, padTop, boxW, plotH);
+      ctx.setLineDash([]);
+    }
   }
 
-  // Configurar Interatividade de Mouse (Crosshair e Drag-to-Zoom)
+  // Configurar Interatividade de Mouse (Crosshair, Tooltip HUD e Drag-to-Zoom)
   function setupCanvasEvents() {
     const wrap = getEl("sgs-canvas-wrap");
-    const tooltip = getEl("sgs-chart-tooltip");
-    const zoomBox = getEl("sgs-zoom-box");
+    const tooltip = getEl("sgs-canvas-tooltip");
     const btnReset = getEl("sgs-btn-reset-zoom");
-    if (!wrap || !tooltip || !zoomBox) return;
+    if (!wrap) return;
+
+    // Auto-resize com ResizeObserver
+    if (!wrap.__hasResizeObserver && window.ResizeObserver) {
+      wrap.__hasResizeObserver = true;
+      const ro = new ResizeObserver(() => {
+        renderCanvas();
+      });
+      ro.observe(wrap);
+    }
 
     wrap.onmousemove = function(e) {
       const rect = wrap.getBoundingClientRect();
@@ -1729,71 +1940,126 @@ js_script = r"""
       const padLeft = 65, padRight = 20;
       const plotW = rect.width - padLeft - padRight;
 
-      // Dragging zoom box
-      if (state.isZooming && state.dragStartX !== null) {
-        const startX = Math.min(state.dragStartX, mouseX);
-        const boxW = Math.abs(mouseX - state.dragStartX);
-        zoomBox.style.display = "block";
-        zoomBox.style.left = startX + "px";
-        zoomBox.style.width = boxW + "px";
+      // Arrastando caixa de zoom
+      if (state.isZooming) {
+        state.dragCurrentX = Math.max(padLeft, Math.min(rect.width - padRight, mouseX));
+        if (tooltip) tooltip.style.display = "none";
+        renderCanvas();
         return;
       }
 
-      // Crosshair Tooltip
+      // Cursor fora da área do gráfico
       if (mouseX < padLeft || mouseX > rect.width - padRight) {
-        tooltip.style.display = "none";
+        if (tooltip) tooltip.style.display = "none";
+        if (state.hoveredIdx !== null) {
+          state.hoveredIdx = null;
+          renderCanvas();
+        }
         return;
       }
 
-      const inData = state.historyIn;
-      if (inData.length === 0) return;
-      const allClocks = inData.map(p => parseInt(p.clock));
+      const inData = state.historyIn || [];
+      const outData = state.historyOut || [];
+      if (inData.length === 0 && outData.length === 0) return;
+
+      let filteredIn = inData;
+      let filteredOut = outData;
+      if (state.zoomStart !== null && state.zoomEnd !== null) {
+        filteredIn = inData.filter(p => p.clock >= state.zoomStart && p.clock <= state.zoomEnd);
+        filteredOut = outData.filter(p => p.clock >= state.zoomStart && p.clock <= state.zoomEnd);
+      }
+
+      const primary = filteredIn.length > 0 ? filteredIn : filteredOut;
+      if (primary.length === 0) return;
+
+      const allClocks = [...filteredIn.map(p => parseInt(p.clock)), ...filteredOut.map(p => parseInt(p.clock))];
       const minTime = Math.min(...allClocks);
       const maxTime = Math.max(...allClocks);
-      const timeSpan = maxTime - minTime || 1;
+      const timeSpan = Math.max(1, maxTime - minTime);
 
-      const hoveredClock = minTime + ((mouseX - padLeft) / plotW) * timeSpan;
-
-      // Encontrar ponto mais próximo
-      let closestIn = inData[0];
-      let minDiff = Math.abs(inData[0].clock - hoveredClock);
-      for (let p of inData) {
-        const diff = Math.abs(p.clock - hoveredClock);
-        if (diff < minDiff) { minDiff = diff; closestIn = p; }
-      }
-
-      let closestOutVal = 0;
-      if (state.historyOut.length > 0) {
-        let minDiffOut = Infinity;
-        for (let p of state.historyOut) {
-          const diff = Math.abs(p.clock - hoveredClock);
-          if (diff < minDiffOut) { minDiffOut = diff; closestOutVal = parseFloat(p.value); }
+      // Encontrar ponto mais próximo no eixo X
+      let bestIdx = 0;
+      let minDiff = Infinity;
+      primary.forEach((p, idx) => {
+        const ptX = (maxTime === minTime) ? (padLeft + plotW / 2) : (padLeft + ((p.clock - minTime) / timeSpan) * plotW);
+        const diff = Math.abs(mouseX - ptX);
+        if (diff < minDiff) {
+          minDiff = diff;
+          bestIdx = idx;
         }
+      });
+
+      state.hoveredIdx = bestIdx;
+      renderCanvas();
+
+      // Atualizar Tooltip HUD
+      const ptIn = filteredIn.length > 0 ? (filteredIn[bestIdx] || filteredIn[filteredIn.length - 1]) : null;
+      const valIn = ptIn ? parseFloat(ptIn.value) : 0;
+      const refClock = ptIn ? ptIn.clock : (primary[bestIdx] ? primary[bestIdx].clock : 0);
+
+      let valOut = 0;
+      if (filteredOut.length > 0) {
+        let minDiffOut = Infinity;
+        filteredOut.forEach(p => {
+          const diff = Math.abs(p.clock - refClock);
+          if (diff < minDiffOut) {
+            minDiffOut = diff;
+            valOut = parseFloat(p.value);
+          }
+        });
       }
 
-      const d = new Date(closestIn.clock * 1000);
-      const timeStr = d.toLocaleTimeString("pt-BR", { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      const d = new Date(refClock * 1000);
+      const hhmmss = d.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+      let timeStr = hhmmss;
+      if (state.timeRangeSec >= 86400) {
+        const day = String(d.getDate()).padStart(2, "0");
+        const mo = String(d.getMonth() + 1).padStart(2, "0");
+        timeStr = `${day}/${mo} ${hhmmss}`;
+      }
 
-      tooltip.innerHTML = `
-        <div style="color: #94a3b8; margin-bottom: 4px; font-weight: 700;">⏱ ${timeStr}</div>
-        <div style="color: #00e676; font-weight: 700;">⬇ IN: ${formatBps(closestIn.value)}</div>
-        <div style="color: #a855f7; font-weight: 700;">⬆ OUT: ${formatBps(closestOutVal)}</div>
-      `;
-      tooltip.style.display = "block";
-      tooltip.style.left = Math.min(mouseX + 14, rect.width - 150) + "px";
-      tooltip.style.top = "20px";
+      const ttTime = getEl("sgs-tt-time");
+      if (ttTime) ttTime.textContent = timeStr;
+      const ttIn = getEl("sgs-tt-in-val");
+      if (ttIn) ttIn.textContent = formatBps(valIn);
+      const ttOut = getEl("sgs-tt-out-val");
+      if (ttOut) ttOut.textContent = formatBps(valOut);
+      const ttTotal = getEl("sgs-tt-total-val");
+      if (ttTotal) ttTotal.textContent = formatBps(valIn + valOut);
+
+      if (tooltip) {
+        const hoverX = (maxTime === minTime) ? (padLeft + plotW / 2) : (padLeft + ((refClock - minTime) / timeSpan) * plotW);
+        const hoverPct = (hoverX / rect.width) * 100;
+        if (hoverPct > 68) {
+          tooltip.style.left = "auto";
+          tooltip.style.right = "14px";
+          tooltip.style.transform = "none";
+        } else if (hoverPct < 32) {
+          tooltip.style.left = "65px";
+          tooltip.style.right = "auto";
+          tooltip.style.transform = "none";
+        } else {
+          tooltip.style.left = hoverPct + "%";
+          tooltip.style.right = "auto";
+          tooltip.style.transform = "translateX(-50%)";
+        }
+        tooltip.style.display = "flex";
+      }
     };
 
     wrap.onmouseleave = function() {
-      tooltip.style.display = "none";
+      if (tooltip) tooltip.style.display = "none";
+      state.hoveredIdx = null;
       if (state.isZooming) {
         state.isZooming = false;
-        zoomBox.style.display = "none";
+        state.dragStartX = null;
+        state.dragCurrentX = null;
       }
+      renderCanvas();
     };
 
     wrap.onmousedown = function(e) {
-      if (e.button !== 0) return; // apenas botão esquerdo
+      if (e.button !== 0) return;
       const rect = wrap.getBoundingClientRect();
       const mouseX = e.clientX - rect.left;
       const padLeft = 65, padRight = 20;
@@ -1801,37 +2067,45 @@ js_script = r"""
 
       state.isZooming = true;
       state.dragStartX = mouseX;
-      zoomBox.style.display = "block";
-      zoomBox.style.left = mouseX + "px";
-      zoomBox.style.width = "0px";
+      state.dragCurrentX = mouseX;
+      if (tooltip) tooltip.style.display = "none";
+      renderCanvas();
     };
 
     wrap.onmouseup = function(e) {
       if (!state.isZooming || state.dragStartX === null) return;
       state.isZooming = false;
-      zoomBox.style.display = "none";
 
       const rect = wrap.getBoundingClientRect();
       const mouseX = e.clientX - rect.left;
       const padLeft = 65, padRight = 20;
       const plotW = rect.width - padLeft - padRight;
 
-      const x1 = Math.min(state.dragStartX, mouseX);
-      const x2 = Math.max(state.dragStartX, mouseX);
+      const x1 = Math.max(padLeft, Math.min(state.dragStartX, mouseX));
+      const x2 = Math.min(rect.width - padRight, Math.max(state.dragStartX, mouseX));
+      state.dragStartX = null;
+      state.dragCurrentX = null;
 
-      if (x2 - x1 > 15 && state.historyIn.length > 0) {
-        const allClocks = state.historyIn.map(p => parseInt(p.clock));
+      if (x2 - x1 > 15 && (state.historyIn.length > 0 || state.historyOut.length > 0)) {
+        const allClocks = [...state.historyIn.map(p => parseInt(p.clock)), ...state.historyOut.map(p => parseInt(p.clock))];
         const minTime = Math.min(...allClocks);
         const maxTime = Math.max(...allClocks);
-        const timeSpan = maxTime - minTime || 1;
+        const timeSpan = Math.max(1, maxTime - minTime);
 
         state.zoomStart = Math.floor(minTime + ((x1 - padLeft) / plotW) * timeSpan);
         state.zoomEnd = Math.ceil(minTime + ((x2 - padLeft) / plotW) * timeSpan);
 
         if (btnReset) btnReset.style.display = "inline-block";
-        renderCanvas();
       }
-      state.dragStartX = null;
+      renderCanvas();
+    };
+
+    // Duplo clique reseta zoom
+    wrap.ondblclick = function() {
+      state.zoomStart = null;
+      state.zoomEnd = null;
+      if (btnReset) btnReset.style.display = "none";
+      renderCanvas();
     };
 
     // Reset Zoom
@@ -1885,6 +2159,9 @@ js_script = r"""
     setupCanvasEvents();
     setupTimeButtons();
     setupDrawer();
+
+    const sub = getEl("sgs-chart-sub");
+    if (sub && state.currentIface) sub.textContent = "Interface: " + state.currentIface.name;
 
     const btnSync = getEl("sgs-sync-btn");
     if (btnSync) {
