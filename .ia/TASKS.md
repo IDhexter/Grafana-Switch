@@ -50,6 +50,12 @@
   - [x] **Design Físico do Conector RJ45 (8P8C):** Receptáculo blindado metálico com degradê, abas de aterramento, cavidade interna com silhueta em degrau (ombros plásticos laterais e trava central) e 8 pinos de contato dourados individuais (`.sw-pin`).
   - [x] **LEDs Duplos de Hardware (Modelo 1 - Indústria):** LED esquerdo fixo (Link/Velocidade) e LED direito com cintilação de atividade de rede (*flicker* TX/RX com `@keyframes swActFlicker`) e cadências desfasadas entre portas.
   - [x] **Enquadramento Geométrico 1080p Sem Rolagem:** Trava de altura do Canvas em 190px, container em 260px e painel Grafana calibrado em `gridPos.h = 28` eliminando estiramento vertical e barras de rolagem.
+- [x] **Evolução Arquitetural v70 (Revisão 70 no Grafana - Multi-Switch, CPU, 64-bit HC e PoE Adaptativo):**
+  - [x] Template SNMP customizado `zbx70_aruba_instanton_1930_snmp.yaml` com 47 UUIDs v4, contadores 64-bit HC (`ifHCInOctets`/`ifHCOutOctets`), multiplicador 1.000.000 em `ifHighSpeed`, `ifAdminStatus` e delays seletivos.
+  - [x] OID nativa de CPU `1.3.6.1.4.1.11.2.1.8.0` validada em tempo real com coleta ativa a 2.0%.
+  - [x] Deploy e padronização multi-switch para 4 switches da rede BAMEX (`SW01` a `SW04`) sob a pasta `POC ALEX` (folderId: 136).
+  - [x] Arquitetura de PoE inteligente e adaptativa (exibe métricas quando presentes; mantém layout 100% limpo em switches Non-PoE como JL682A).
+  - [x] Documentação técnica completa sincronizada no repositório e na memória.
 
 ## 🔜 Backlog Imediato (Próximos Passos)
 - [ ] Criar estrutura base de pastas do repositório (`docker/`, `zabbix/`, `grafana/`, `scripts/`, `.gitignore`).

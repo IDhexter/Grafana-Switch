@@ -1,18 +1,18 @@
 # Especificação Técnica Completa: Gêmeo Digital (Digital Twin) do Switch Aruba Instant On 1930
 **Plataforma de Monitoramento e Observabilidade: Zabbix 7.0 LTS & Grafana OSS**  
-**Versão da Solução: v58 (Multi-Switch, Template 64-bit HC, CPU & PoE Inteligente)**  
+**Versão da Solução: v70 / Revisão 70 no Grafana (Multi-Switch, Template 64-bit HC, CPU & PoE Inteligente)**  
 **Repositório:** [https://github.com/IDhexter/Grafana-Switch](https://github.com/IDhexter/Grafana-Switch) | **Operação:** Rede Corporativa BAMEX
 
 ---
 
-## 1. Sumário Executivo e Objetivos Arquiteturais (v58)
+## 1. Sumário Executivo e Objetivos Arquiteturais (v70 / Revisão 70)
 
 ### 1.1. Contexto Operacional
 Em ambientes de rede corporativos e datacenters (NOC 24/7), a visualização tradicional de switches de acesso e agregação limita-se a tabelas estáticas ou gráficos de séries temporais desconexos da topologia física. 
 
 Este projeto implementa um **Gêmeo Digital Físico Interativo (Digital Twin)** para a família de switches **Aruba Instant On 1930 24G 4SFP+ (Modelos JL682A, JL683A, JL684A)** na rede BAMEX (`SW01`, `SW02`, `SW03`, `SW04`), operando em conjunto com **Zabbix 7.0 LTS** e **Grafana OSS**.
 
-### 1.2. Evolução v57 → v58: O que mudou?
+### 1.2. Evolução v57 (Revisão 62) → v70 (Revisão 70): O que mudou?
 1. **Multi-Switch Padronizado em Produção**:
    - `[BAMEX] - SW01 - Aruba Instant On 1930 (10.50.0.2)` (HostID: 10682, UID: `alpt2p5`) - Rack CPD
    - `[BAMEX] - SW02 - Aruba Instant On 1930 (10.50.0.3)` (HostID: 10683, UID: `bamex-sw02`)
@@ -137,4 +137,4 @@ O script realiza o ciclo completo:
 - **v54 - v55**: Protótipo inicial, prova de conceito de chassi estático.
 - **v56**: Introdução de histórico com Bézier e eventos brutos.
 - **v57**: Auditoria técnica sênior, eliminação de memory leaks com Singleton `__ARUBA_TWIN_RUNTIME__`, Canvas com traçado linear (`lineTo`), travamento de altura 1080p (`gridPos.h = 28`), delimitadores de palavra em regex de alarmes.
-- **v58 (Atual)**: Padronização multi-switch (`SW01` a `SW04`), Template Zabbix 7.0 64-bits High Capacity, CPU 1m (`1.3.6.1.4.1.11.2.1.8.0`), documentação anti-flap noturno e motor inteligente e adaptativo de PoE.
+- **v70 / Revisão 70 no Grafana (Atual)**: Padronização multi-switch (`SW01` a `SW04`), Template Zabbix 7.0 64-bits High Capacity, CPU 1m (`1.3.6.1.4.1.11.2.1.8.0`), documentação anti-flap noturno e motor inteligente e adaptativo de PoE.
