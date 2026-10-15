@@ -138,6 +138,9 @@ if ($uptimeItem -and $uptimeItem["lastvalue"]) {
     }
 }
 
+$cpuItem = $items | Where-Object { $_["key_"] -like "system.cpu.util*" -and [double]($_["lastvalue"]) -ge 0 } | Select-Object -First 1
+$cpuDisplay = if ($cpuItem) { "{0:N1}%" -f [double]$cpuItem["lastvalue"] } else { "--%" }
+
 $pingItem = $items | Where-Object { $_["key_"] -eq "icmpping" }
 $isPingUp = ($pingItem -and [int]$pingItem["lastvalue"] -eq 1)
 $powerColor = if ($isPingUp) { "#00e676" } else { "#ef4444" }
@@ -399,6 +402,7 @@ $null = $sb.AppendLine(@"
       <span id="header-switch-ip">24x GbE RJ45 + 4x SFP+ 10G &bull; L2+ Managed &bull; JL682A &bull; IP: $switchIp</span>
       <span style="background: rgba(0, 230, 118, 0.12); color: #00e676; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px; border: 1px solid rgba(0, 230, 118, 0.25);">PRODUCAO LIVE</span>
       <span id="zabbix-sync-badge" style="background: rgba(0, 176, 255, 0.12); color: #00b0ff; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px; border: 1px solid rgba(0, 176, 255, 0.25); cursor: pointer;" title="Clique para sincronizar agora com o Zabbix">&#x21bb; ZABBIX SYNC: ATIVO</span>
+      <span id="header-cpu-badge" style="background: rgba(168, 85, 247, 0.12); color: #c084fc; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px; border: 1px solid rgba(168, 85, 247, 0.25); $(if (-not $cpuItem) { 'display: none;' })" title="Utilizacao de CPU do Switch">CPU: <span id="header-cpu-val">$cpuDisplay</span></span>
     </div>
   </div>
   <div style="text-align: right;">
@@ -706,12 +710,13 @@ $null = $sb.AppendLine(@"
     <div id="drawer-sysdescr" style="font-size: 12px; font-family: monospace; color: #cbd5e1; line-height: 1.5; word-break: break-all;">
       $sysDescr
     </div>
-    <div style="margin-top: 6px; font-size: 10px; color: #64748b; display: flex; gap: 14px;">
+    <div style="margin-top: 6px; font-size: 10px; color: #64748b; display: flex; gap: 14px; align-items: center;">
       <span>OID: $sysObjectId</span>
       <span>&bull;</span>
       <span>Template: SNMP Network Device</span>
       <span>&bull;</span>
       <span>Host ID Zabbix: $hostId</span>
+      <span id="drawer-cpu-wrap" style="$(if (-not $cpuItem) { 'display: none;' })">&bull; CPU: <span id="drawer-cpu" style="color: #c084fc; font-weight: 700;">$cpuDisplay</span></span>
     </div>
   </div>
 </div>
@@ -2224,6 +2229,20 @@ $jsCodeTemplate = @'
                 }
               }
 
+              // Dynamic CPU utilization from Zabbix
+              if (k.startsWith('system.cpu.util')) {
+                const cpuNum = parseFloat(it.lastvalue);
+                if (!isNaN(cpuNum) && cpuNum >= 0) {
+                  const cpuStr = cpuNum.toFixed(1) + '%';
+                  safeSetText('header-cpu-val', cpuStr);
+                  const badge = getEl('header-cpu-badge');
+                  if (badge) badge.style.display = 'inline-block';
+                  safeSetText('drawer-cpu', cpuStr);
+                  const dCpuWrap = getEl('drawer-cpu-wrap');
+                  if (dCpuWrap) dCpuWrap.style.display = 'inline';
+                }
+              }
+
               const m = it.name.match(/Interface (\d+)\(([^)]*)\)/);
               if (m) {
                 const pNum = parseInt(m[1], 10);
@@ -2234,6 +2253,7 @@ $jsCodeTemplate = @'
                     ports[pNum].Alias = liveAlias;
                   }
                   if (k.startsWith('net.if.status[')) ports[pNum].OperStatus = v;
+                  else if (k.startsWith('net.if.adminstatus[')) ports[pNum].AdminStatus = v;
                   else if (k.startsWith('net.if.speed[')) ports[pNum].Speed = normalizeSpeedBps(v, pNum);
                   else if (k.startsWith('net.if.in[')) {
                     ports[pNum].InBps = v;
