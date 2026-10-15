@@ -279,53 +279,53 @@ html_content = r"""
 
         <!-- Center: Authentic LED Cluster -->
         <div class="sgs-led-cluster">
-          <div class="sgs-led-unit">
+          <div class="sgs-led-unit" title="Status de Alimentação Elétrica (Host UP)">
             <div class="sgs-led sgs-led-pwr sgs-led-green" id="sgs-led-pwr"></div>
             <span class="sgs-led-label">PWR</span>
           </div>
-          <div class="sgs-led-unit">
+          <div class="sgs-led-unit sgs-clickable-wan" id="sgs-btn-wan-pon" title="Sincronismo Óptico / WAN (Clique para ver no osciloscópio)">
             <div class="sgs-led sgs-led-pon sgs-led-green" id="sgs-led-pon"></div>
             <span class="sgs-led-label">PON</span>
           </div>
-          <div class="sgs-led-unit">
+          <div class="sgs-led-unit sgs-clickable-wan" id="sgs-btn-wan-net" title="Tráfego Internet WAN (Clique para ver no osciloscópio)">
             <div class="sgs-led sgs-led-wan sgs-led-cyan sgs-led-flicker" id="sgs-led-wan"></div>
             <span class="sgs-led-label">INTERNET</span>
           </div>
-          <div class="sgs-led-unit">
-            <div class="sgs-led sgs-led-wifi sgs-led-blue" id="sgs-led-wifi"></div>
+          <div class="sgs-led-unit" title="WLAN / Wi-Fi">
+            <div class="sgs-led sgs-led-blue" id="sgs-led-wifi"></div>
             <span class="sgs-led-label">WI-FI</span>
           </div>
           <div class="sgs-led-separator"></div>
           
-          <!-- LAN 1 to 4 Ports (Mini Receptacles with LEDs) -->
-          <div class="sgs-lan-ports">
-            <div class="sgs-lan-unit">
-              <div class="sgs-mini-rj45 active">
+          <!-- LAN 1 to 4 Ports (Mini Receptacles with Dynamic LEDs) -->
+          <div class="sgs-lan-ports" id="sgs-lan-ports">
+            <div class="sgs-lan-unit" id="sgs-lan-unit-0" data-slot="0">
+              <div class="sgs-mini-rj45" id="sgs-rj45-0">
                 <div class="sgs-rj45-pins"><i></i><i></i><i></i><i></i></div>
               </div>
-              <div class="sgs-led sgs-led-lan sgs-led-green sgs-led-flicker" id="sgs-led-lan1"></div>
-              <span class="sgs-led-label">LAN 1</span>
+              <div class="sgs-led sgs-led-lan" id="sgs-led-lan0"></div>
+              <span class="sgs-led-label" id="sgs-label-lan0">LAN 1</span>
             </div>
-            <div class="sgs-lan-unit">
-              <div class="sgs-mini-rj45">
+            <div class="sgs-lan-unit" id="sgs-lan-unit-1" data-slot="1">
+              <div class="sgs-mini-rj45" id="sgs-rj45-1">
+                <div class="sgs-rj45-pins"><i></i><i></i><i></i><i></i></div>
+              </div>
+              <div class="sgs-led sgs-led-lan" id="sgs-led-lan1"></div>
+              <span class="sgs-led-label" id="sgs-label-lan1">LAN 2</span>
+            </div>
+            <div class="sgs-lan-unit" id="sgs-lan-unit-2" data-slot="2">
+              <div class="sgs-mini-rj45" id="sgs-rj45-2">
                 <div class="sgs-rj45-pins"><i></i><i></i><i></i><i></i></div>
               </div>
               <div class="sgs-led sgs-led-lan" id="sgs-led-lan2"></div>
-              <span class="sgs-led-label">LAN 2</span>
+              <span class="sgs-led-label" id="sgs-label-lan2">LAN 3</span>
             </div>
-            <div class="sgs-lan-unit">
-              <div class="sgs-mini-rj45">
+            <div class="sgs-lan-unit" id="sgs-lan-unit-3" data-slot="3">
+              <div class="sgs-mini-rj45" id="sgs-rj45-3">
                 <div class="sgs-rj45-pins"><i></i><i></i><i></i><i></i></div>
               </div>
               <div class="sgs-led sgs-led-lan" id="sgs-led-lan3"></div>
-              <span class="sgs-led-label">LAN 3</span>
-            </div>
-            <div class="sgs-lan-unit">
-              <div class="sgs-mini-rj45">
-                <div class="sgs-rj45-pins"><i></i><i></i><i></i><i></i></div>
-              </div>
-              <div class="sgs-led sgs-led-lan" id="sgs-led-lan4"></div>
-              <span class="sgs-led-label">LAN 4</span>
+              <span class="sgs-led-label" id="sgs-label-lan3">LAN 4</span>
             </div>
           </div>
         </div>
@@ -733,6 +733,10 @@ css_styles = r"""
   background: #ef4444;
   box-shadow: 0 0 8px #ef4444;
 }
+.sgs-led-amber {
+  background: #f59e0b;
+  box-shadow: 0 0 8px #f59e0b;
+}
 @keyframes sgsFlicker {
   0% { opacity: 1; filter: drop-shadow(0 0 3px currentColor); }
   15% { opacity: 0.2; }
@@ -767,6 +771,34 @@ css_styles = r"""
   flex-direction: column;
   align-items: center;
   gap: 3px;
+  padding: 3px 5px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+.sgs-lan-unit.clickable {
+  cursor: pointer;
+}
+.sgs-lan-unit.clickable:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+.sgs-lan-unit.selected {
+  background: rgba(0, 176, 255, 0.2);
+  box-shadow: 0 0 8px rgba(0, 176, 255, 0.5);
+}
+.sgs-clickable-wan {
+  cursor: pointer;
+  padding: 3px 5px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+.sgs-clickable-wan:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+.sgs-clickable-wan.selected {
+  background: rgba(0, 176, 255, 0.2);
+  box-shadow: 0 0 8px rgba(0, 176, 255, 0.5);
 }
 .sgs-mini-rj45 {
   width: 16px;
@@ -778,9 +810,14 @@ css_styles = r"""
   align-items: center;
   justify-content: center;
   box-shadow: inset 0 1px 3px rgba(0,0,0,0.8);
+  transition: all 0.2s ease;
 }
 .sgs-mini-rj45.active {
   border-color: #00e676;
+}
+.sgs-mini-rj45.selected {
+  border-color: #00b0ff;
+  box-shadow: 0 0 8px #00b0ff;
 }
 .sgs-rj45-pins {
   display: flex;
@@ -1375,7 +1412,127 @@ js_script = r"""
     const sub = getEl("sgs-chart-sub");
     if (sub) sub.textContent = "Interface: " + iface.name;
 
+    // Atualizar seletor dropdown
+    const sel = getEl("sgs-iface-select");
+    if (sel) sel.value = iface.id;
+
+    // Atualizar tabela de interfaces para refletir seleção
+    renderInterfacesTable();
+
+    // Atualizar LEDs e destaque das portas no chassi
+    updateChassisLEDs();
+
     fetchTelemetry();
+  }
+
+  // Identificar interfaces LAN do Host
+  function getHostLanInterfaces(host) {
+    if (!host || !host.interfaces) return [];
+    // 1. Procurar interfaces com 'LAN' explícito no nome ou descrição
+    const explicitLan = host.interfaces.filter(i => {
+      const n = (i.name || '').toUpperCase();
+      return n.includes('LAN') && !n.includes('WAN');
+    });
+    if (explicitLan.length > 0) {
+      return explicitLan.slice(0, 4);
+    }
+    // 2. Se não tiver termo 'LAN', pegar interfaces diferentes da WAN principal
+    const otherIfaces = host.interfaces.filter((i, idx) => {
+      const n = (i.name || '').toUpperCase();
+      return !n.includes('WAN') && !n.includes('INTERNET') && idx > 0;
+    });
+    if (otherIfaces.length > 0) return otherIfaces.slice(0, 4);
+
+    // 3. Caso o host tenha várias portas físicas (ex: eth1, eth2)
+    return host.interfaces.slice(1, 5);
+  }
+
+  // Atualizar LEDs do Chassi (WAN + LAN 1 a 4 100% Funcionais)
+  function updateChassisLEDs() {
+    const host = state.currentHost;
+    if (!host) return;
+
+    const wanIface = host.interfaces[0] || null;
+    const lanIfaces = getHostLanInterfaces(host);
+    const isWanSelected = state.currentIface && wanIface && (state.currentIface.id === wanIface.id);
+
+    // WAN Cluster (PON & INTERNET)
+    const btnPon = getEl("sgs-btn-wan-pon");
+    const btnNet = getEl("sgs-btn-wan-net");
+    if (btnPon && wanIface) {
+      btnPon.classList.toggle("selected", isWanSelected);
+      btnPon.title = `WAN / PON: ${wanIface.name}\nStatus: UP\n✦ Clique para inspecionar a WAN no osciloscópio`;
+      btnPon.onclick = () => selectInterface(wanIface);
+    }
+    if (btnNet && wanIface) {
+      btnNet.classList.toggle("selected", isWanSelected);
+      btnNet.title = `INTERNET (WAN): ${wanIface.name}\n✦ Clique para inspecionar a WAN no osciloscópio`;
+      btnNet.onclick = () => selectInterface(wanIface);
+    }
+
+    // LAN 1 a 4
+    for (let slot = 0; slot < 4; slot++) {
+      const unit = getEl("sgs-lan-unit-" + slot);
+      const rj45 = getEl("sgs-rj45-" + slot);
+      const led = getEl("sgs-led-lan" + slot);
+      const label = getEl("sgs-label-lan" + slot);
+      if (!unit || !rj45 || !led) continue;
+
+      const iface = lanIfaces[slot];
+      if (iface) {
+        // Interface LAN Real e Monitorada!
+        const isSelected = state.currentIface && (state.currentIface.id === iface.id);
+        unit.classList.add("clickable");
+        unit.classList.toggle("selected", isSelected);
+        unit.style.opacity = "1";
+
+        rj45.classList.add("active");
+        if (isSelected) {
+          rj45.classList.add("selected");
+        } else {
+          rj45.classList.remove("selected");
+        }
+
+        // Tráfego da porta LAN
+        const inVal = (iface.inItem && iface.inItem.lastvalue) || 0;
+        const outVal = (iface.outItem && iface.outItem.lastvalue) || 0;
+        const totalBps = inVal + outVal;
+        const isUp = iface.status !== 0;
+
+        led.className = "sgs-led sgs-led-lan";
+        if (isUp) {
+          led.classList.add("sgs-led-green");
+          if (totalBps > 0) {
+            led.classList.add("sgs-led-flicker");
+            if (totalBps > 20000000) {
+              led.style.animationDuration = "0.18s";
+            } else if (totalBps > 2000000) {
+              led.style.animationDuration = "0.35s";
+            } else {
+              led.style.animationDuration = "0.7s";
+            }
+          } else {
+            led.style.animationDuration = "";
+          }
+        } else {
+          led.classList.add("sgs-led-red");
+          led.style.animationDuration = "";
+        }
+
+        unit.title = `LAN ${slot + 1}: ${iface.name}\nStatus: ${isUp ? 'UP (Conectada)' : 'DOWN'}\nIn: ${formatBps(inVal)} | Out: ${formatBps(outVal)}\n✦ Clique para abrir esta porta no osciloscópio`;
+
+        unit.onclick = () => selectInterface(iface);
+      } else {
+        // Porta sem interface vinculada / sem cabo no ativo real
+        unit.classList.remove("clickable", "selected");
+        unit.style.opacity = "0.38";
+        unit.title = `LAN ${slot + 1}: Desconectada / Sem Telemetria`;
+        rj45.classList.remove("active", "selected");
+        led.className = "sgs-led sgs-led-lan";
+        led.style.animationDuration = "";
+        unit.onclick = null;
+      }
+    }
   }
 
   // Atualizar UI do Chassi Físico
@@ -1405,6 +1562,9 @@ js_script = r"""
     // Uptime / Status
     const elHealth = getEl("sgs-dev-health");
     if (elHealth) elHealth.textContent = "STATUS: MONITORANDO";
+
+    // Atualizar LEDs dinâmicos das portas LAN e WAN
+    updateChassisLEDs();
 
     // Drawer info
     renderDrawerInfo();
@@ -1639,6 +1799,9 @@ js_script = r"""
         ledWan.style.animationDuration = "0.65s";
       }
     }
+
+    // Atualizar LEDs dinâmicos de WAN e LAN com os dados mais recentes
+    updateChassisLEDs();
   }
 
   // Renderizar Gráfico Canvas
