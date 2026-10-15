@@ -23,6 +23,8 @@ Implantar, automatizar e manter uma infraestrutura completa de observabilidade, 
     - `[BAMEX] - SW02` (Host ID: `10683`, IP: `10.50.0.3`): Dashboard Grafana `bamex-sw02`
     - `[BAMEX] - SW03` (Host ID: `11125`, IP: `10.50.0.4`): Dashboard Grafana `bamex-sw03`
     - `[BAMEX] - SW04` (Host ID: `11126`, IP: `10.50.0.5`): Dashboard Grafana `bamex-sw04`
+  - **Modems & Links WAN Monitorados (Grupo SGS_LINKS):**
+    - `[SGS] - Modems & Links WAN (SGS_LINKS)`: Dashboard Grafana `sgs-modems-wan` (Gêmeo Digital com Seletor Dinâmico de 33 modems/roteadores SNMP, osciloscópio de tráfego WAN em tempo real, KPIs de banda, ranking dos Top 5 links e tabela de interfaces com chaveamento dinâmico).
   - **Grafana:** `http://10.10.1.25:3000` (Pasta `POC ALEX`, Folder ID: 136).
   - **Repositório GitHub:** `https://github.com/IDhexter/Grafana-Switch` (branch `main`).
 - **Arquitetura e Resiliência v70 / NOC 24/7 (Revisão 70 no Grafana):**

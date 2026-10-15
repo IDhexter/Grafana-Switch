@@ -1,0 +1,1699 @@
+
+<div class="sgs-modem-container">
+  <!-- Top Control Bar -->
+  <div class="sgs-top-bar">
+    <div class="sgs-brand-block">
+      <span class="sgs-status-orb" id="sgs-orb-status"></span>
+      <div class="sgs-brand-text">
+        <span class="sgs-title-main">SGS WAN GATEWAY & MODEM TWIN</span>
+        <span class="sgs-title-sub">Digital Twin Gêmeo Digital • Modems & Links SNMP</span>
+      </div>
+    </div>
+    
+    <div class="sgs-selectors-group">
+      <div class="sgs-field">
+        <label><span class="sgs-icon">🌐</span> ATIVO / LINK (SGS_LINKS):</label>
+        <select id="sgs-host-select" class="sgs-select">
+          <!-- Injetado dinamicamente -->
+        </select>
+      </div>
+
+      <div class="sgs-field">
+        <label><span class="sgs-icon">🔌</span> INTERFACE:</label>
+        <select id="sgs-iface-select" class="sgs-select">
+          <!-- Injetado dinamicamente -->
+        </select>
+      </div>
+
+      <div class="sgs-time-pill-group">
+        <button class="sgs-time-pill" data-sec="3600">1H</button>
+        <button class="sgs-time-pill" data-sec="10800">3H</button>
+        <button class="sgs-time-pill active" data-sec="21600">6H</button>
+        <button class="sgs-time-pill" data-sec="43200">12H</button>
+        <button class="sgs-time-pill" data-sec="86400">24H</button>
+      </div>
+
+      <button id="sgs-sync-btn" class="sgs-btn-refresh" title="Atualizar Métricas Agora">
+        <span class="sgs-spin-icon">↺</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Physical Chassis of the Modem / ONT -->
+  <div class="sgs-chassis-wrap">
+    <div class="sgs-chassis">
+      <!-- Metallic Bevel Top -->
+      <div class="sgs-chassis-top-bevel">
+        <div class="sgs-vent-slots">
+          <span></span><span></span><span></span><span></span><span></span>
+          <span></span><span></span><span></span><span></span><span></span>
+        </div>
+      </div>
+
+      <!-- Main Faceplate -->
+      <div class="sgs-faceplate">
+        <!-- Device Info Left -->
+        <div class="sgs-device-badge">
+          <div class="sgs-isp-tag" id="sgs-isp-badge">VIVO FIBRA</div>
+          <div class="sgs-dev-name" id="sgs-dev-name">[SGS] SANTOS - INTERNET VIVO</div>
+          <div class="sgs-dev-meta">
+            <span class="sgs-meta-pill" id="sgs-dev-ip">IP: 186.200.179.145</span>
+            <span class="sgs-meta-pill" id="sgs-dev-ping">LATÊNCIA: --</span>
+            <span class="sgs-meta-pill" id="sgs-dev-health">STATUS: ONLINE 100%</span>
+          </div>
+        </div>
+
+        <!-- Center: Authentic LED Cluster -->
+        <div class="sgs-led-cluster">
+          <div class="sgs-led-unit">
+            <div class="sgs-led sgs-led-pwr sgs-led-green" id="sgs-led-pwr"></div>
+            <span class="sgs-led-label">PWR</span>
+          </div>
+          <div class="sgs-led-unit">
+            <div class="sgs-led sgs-led-pon sgs-led-green" id="sgs-led-pon"></div>
+            <span class="sgs-led-label">PON</span>
+          </div>
+          <div class="sgs-led-unit">
+            <div class="sgs-led sgs-led-wan sgs-led-cyan sgs-led-flicker" id="sgs-led-wan"></div>
+            <span class="sgs-led-label">INTERNET</span>
+          </div>
+          <div class="sgs-led-unit">
+            <div class="sgs-led sgs-led-wifi sgs-led-blue" id="sgs-led-wifi"></div>
+            <span class="sgs-led-label">WI-FI</span>
+          </div>
+          <div class="sgs-led-separator"></div>
+          
+          <!-- LAN 1 to 4 Ports (Mini Receptacles with LEDs) -->
+          <div class="sgs-lan-ports">
+            <div class="sgs-lan-unit">
+              <div class="sgs-mini-rj45 active">
+                <div class="sgs-rj45-pins"><i></i><i></i><i></i><i></i></div>
+              </div>
+              <div class="sgs-led sgs-led-lan sgs-led-green sgs-led-flicker" id="sgs-led-lan1"></div>
+              <span class="sgs-led-label">LAN 1</span>
+            </div>
+            <div class="sgs-lan-unit">
+              <div class="sgs-mini-rj45">
+                <div class="sgs-rj45-pins"><i></i><i></i><i></i><i></i></div>
+              </div>
+              <div class="sgs-led sgs-led-lan" id="sgs-led-lan2"></div>
+              <span class="sgs-led-label">LAN 2</span>
+            </div>
+            <div class="sgs-lan-unit">
+              <div class="sgs-mini-rj45">
+                <div class="sgs-rj45-pins"><i></i><i></i><i></i><i></i></div>
+              </div>
+              <div class="sgs-led sgs-led-lan" id="sgs-led-lan3"></div>
+              <span class="sgs-led-label">LAN 3</span>
+            </div>
+            <div class="sgs-lan-unit">
+              <div class="sgs-mini-rj45">
+                <div class="sgs-rj45-pins"><i></i><i></i><i></i><i></i></div>
+              </div>
+              <div class="sgs-led sgs-led-lan" id="sgs-led-lan4"></div>
+              <span class="sgs-led-label">LAN 4</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Quick Meter -->
+        <div class="sgs-chassis-right">
+          <div class="sgs-speed-pill-box">
+            <div class="sgs-speed-row">
+              <span class="sgs-dir-icon in">⬇ RX:</span>
+              <span class="sgs-speed-val" id="sgs-quick-in">0.00 Mb/s</span>
+            </div>
+            <div class="sgs-speed-row">
+              <span class="sgs-dir-icon out">⬆ TX:</span>
+              <span class="sgs-speed-val" id="sgs-quick-out">0.00 Mb/s</span>
+            </div>
+          </div>
+          <button id="sgs-btn-drawer" class="sgs-btn-info" title="Inventário & Dados do Ativo">
+            ℹ️ INVENTÁRIO
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- KPI Cards Grid -->
+  <div class="sgs-kpi-grid">
+    <div class="sgs-kpi-card sgs-kpi-in">
+      <div class="sgs-kpi-header">
+        <span class="sgs-kpi-title">DOWNLOAD ATUAL (IN)</span>
+        <span class="sgs-kpi-badge in">RX BITS</span>
+      </div>
+      <div class="sgs-kpi-val" id="sgs-kpi-in-val">--</div>
+      <div class="sgs-kpi-sub" id="sgs-kpi-in-sub">Amostragem em tempo real</div>
+    </div>
+
+    <div class="sgs-kpi-card sgs-kpi-out">
+      <div class="sgs-kpi-header">
+        <span class="sgs-kpi-title">UPLOAD ATUAL (OUT)</span>
+        <span class="sgs-kpi-badge out">TX BITS</span>
+      </div>
+      <div class="sgs-kpi-val" id="sgs-kpi-out-val">--</div>
+      <div class="sgs-kpi-sub" id="sgs-kpi-out-sub">Amostragem em tempo real</div>
+    </div>
+
+    <div class="sgs-kpi-card">
+      <div class="sgs-kpi-header">
+        <span class="sgs-kpi-title">PICO MÁXIMO</span>
+        <span class="sgs-kpi-badge peak">MAX RX</span>
+      </div>
+      <div class="sgs-kpi-val" id="sgs-kpi-peak-val">--</div>
+      <div class="sgs-kpi-sub" id="sgs-kpi-peak-sub">No período selecionado</div>
+    </div>
+
+    <div class="sgs-kpi-card">
+      <div class="sgs-kpi-header">
+        <span class="sgs-kpi-title">MÉDIA DE TRÁFEGO</span>
+        <span class="sgs-kpi-badge avg">AVG RX</span>
+      </div>
+      <div class="sgs-kpi-val" id="sgs-kpi-avg-val">--</div>
+      <div class="sgs-kpi-sub" id="sgs-kpi-avg-sub">No período selecionado</div>
+    </div>
+
+    <div class="sgs-kpi-card">
+      <div class="sgs-kpi-header">
+        <span class="sgs-kpi-title">SAÚDE & CONEXÃO</span>
+        <span class="sgs-kpi-badge status">DISCARDS</span>
+      </div>
+      <div class="sgs-kpi-val" id="sgs-kpi-health-val">0 ERROS</div>
+      <div class="sgs-kpi-sub" id="sgs-kpi-health-sub">Buffer e Interface</div>
+    </div>
+  </div>
+
+  <!-- Main Oscilloscope Section -->
+  <div class="sgs-chart-card">
+    <div class="sgs-chart-header">
+      <div class="sgs-chart-title-wrap">
+        <span class="sgs-chart-title">OSCILOSCÓPIO DE TRÁFEGO WAN EM TEMPO REAL</span>
+        <span class="sgs-chart-sub" id="sgs-chart-sub">Interface: --</span>
+      </div>
+      <div class="sgs-chart-legend">
+        <span class="sgs-leg-item"><i class="leg-in"></i> Download (Inbound)</span>
+        <span class="sgs-leg-item"><i class="leg-out"></i> Upload (Outbound)</span>
+        <button id="sgs-btn-reset-zoom" class="sgs-btn-reset-zoom" style="display:none;">↺ RESET ZOOM</button>
+      </div>
+    </div>
+    
+    <!-- Canvas container with drag-to-zoom and tooltip -->
+    <div class="sgs-canvas-wrap" id="sgs-canvas-wrap">
+      <canvas id="sgs-traffic-canvas"></canvas>
+      <div id="sgs-chart-tooltip" class="sgs-chart-tooltip" style="display:none;"></div>
+      <div id="sgs-zoom-box" class="sgs-zoom-box" style="display:none;"></div>
+    </div>
+  </div>
+
+  <!-- Bottom Grid: Interfaces & Top Active Links -->
+  <div class="sgs-bottom-grid">
+    <!-- Left: Interfaces Table -->
+    <div class="sgs-panel-box sgs-iface-box">
+      <div class="sgs-panel-header">
+        <span>INTERFACES DETECTADAS NO MODEM / ATIVO</span>
+        <span class="sgs-panel-badge" id="sgs-iface-count">0 interfaces</span>
+      </div>
+      <div class="sgs-table-wrap">
+        <table class="sgs-table">
+          <thead>
+            <tr>
+              <th>Interface</th>
+              <th>Status</th>
+              <th>In (Download)</th>
+              <th>Out (Upload)</th>
+              <th>Ação</th>
+            </tr>
+          </thead>
+          <tbody id="sgs-iface-tbody">
+            <!-- Populado dinamicamente -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Right: Quick Links / Top Active SGS Links -->
+    <div class="sgs-panel-box sgs-top-links-box">
+      <div class="sgs-panel-header">
+        <span>TOP LINKS SGS (MAIOR CONSUMO AGORA)</span>
+        <span class="sgs-panel-badge live">LIVE</span>
+      </div>
+      <div class="sgs-top-links-list" id="sgs-top-links-list">
+        <!-- Populado dinamicamente -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide-out Inventory Drawer -->
+  <div class="sgs-drawer" id="sgs-drawer" style="display:none;">
+    <div class="sgs-drawer-content">
+      <div class="sgs-drawer-header">
+        <span class="sgs-drawer-title">INVENTÁRIO DO ATIVO & DADOS SNMP</span>
+        <button id="sgs-drawer-close" class="sgs-drawer-close">✕ FECHAR</button>
+      </div>
+      <div class="sgs-drawer-body" id="sgs-drawer-body">
+        <!-- Populado dinamicamente -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.sgs-modem-container {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  color: #e2e8f0;
+  background: #070b12;
+  padding: 16px;
+  border-radius: 8px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* Top Control Bar */
+.sgs-top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #0d131f;
+  border: 1px solid #1e293b;
+  border-radius: 8px;
+  padding: 10px 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.sgs-brand-block {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.sgs-status-orb {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #00e676;
+  box-shadow: 0 0 10px #00e676;
+  display: inline-block;
+  animation: sgsOrbPulse 2s infinite ease-in-out;
+}
+@keyframes sgsOrbPulse {
+  0% { transform: scale(0.9); opacity: 0.8; }
+  50% { transform: scale(1.15); opacity: 1; box-shadow: 0 0 16px #00e676; }
+  100% { transform: scale(0.9); opacity: 0.8; }
+}
+.sgs-brand-text {
+  display: flex;
+  flex-direction: column;
+}
+.sgs-title-main {
+  font-size: 13.5px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  color: #f8fafc;
+}
+.sgs-title-sub {
+  font-size: 10.5px;
+  color: #64748b;
+  letter-spacing: 0.4px;
+}
+.sgs-selectors-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.sgs-field {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: #94a3b8;
+  font-weight: 600;
+}
+.sgs-select {
+  background: #131b2e url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2338bdf8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 10px center;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  color: #38bdf8;
+  border: 1px solid #25334d;
+  border-radius: 5px;
+  padding: 6px 30px 6px 12px;
+  font-size: 11.5px;
+  font-weight: 600;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 250px;
+  max-width: 380px;
+}
+.sgs-select:hover, .sgs-select:focus {
+  border-color: #00b0ff;
+  box-shadow: 0 0 8px rgba(0, 176, 255, 0.4);
+}
+.sgs-time-pill-group {
+  display: flex;
+  background: #131b2e;
+  border: 1px solid #25334d;
+  border-radius: 5px;
+  overflow: hidden;
+}
+.sgs-time-pill {
+  background: transparent;
+  color: #94a3b8;
+  border: none;
+  padding: 6px 10px;
+  font-size: 10.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.sgs-time-pill:hover {
+  color: #f8fafc;
+  background: #1e293b;
+}
+.sgs-time-pill.active {
+  background: #00b0ff;
+  color: #050b14;
+}
+.sgs-btn-refresh {
+  background: #1e293b;
+  color: #38bdf8;
+  border: 1px solid #334155;
+  border-radius: 5px;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.2s ease;
+}
+.sgs-btn-refresh:hover {
+  background: #00b0ff;
+  color: #050b14;
+  border-color: #00b0ff;
+  box-shadow: 0 0 10px rgba(0, 176, 255, 0.5);
+}
+
+/* Modem / ONT Physical Chassis */
+.sgs-chassis-wrap {
+  width: 100%;
+}
+.sgs-chassis {
+  background: linear-gradient(180deg, #161e2e 0%, #0c121d 100%);
+  border: 1px solid #223049;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.08);
+  overflow: hidden;
+}
+.sgs-chassis-top-bevel {
+  background: #101725;
+  border-bottom: 1px solid #1a253a;
+  padding: 4px 16px;
+  display: flex;
+  justify-content: flex-end;
+}
+.sgs-vent-slots {
+  display: flex;
+  gap: 4px;
+}
+.sgs-vent-slots span {
+  width: 14px;
+  height: 2px;
+  background: #06090e;
+  border-radius: 1px;
+}
+.sgs-faceplate {
+  padding: 12px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.sgs-device-badge {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 250px;
+}
+.sgs-isp-tag {
+  display: inline-block;
+  align-self: flex-start;
+  font-size: 9.5px;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  padding: 2px 7px;
+  border-radius: 3px;
+  background: #660099;
+  color: #ffffff;
+  box-shadow: 0 0 8px rgba(102, 0, 153, 0.6);
+}
+.sgs-dev-name {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #f1f5f9;
+  letter-spacing: 0.3px;
+}
+.sgs-dev-meta {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.sgs-meta-pill {
+  font-size: 10px;
+  color: #94a3b8;
+  background: #111827;
+  padding: 2px 6px;
+  border-radius: 3px;
+  border: 1px solid #1f2937;
+  font-family: monospace;
+}
+
+/* LED Cluster */
+.sgs-led-cluster {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: #090e17;
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: 1px solid #182234;
+  box-shadow: inset 0 2px 6px rgba(0,0,0,0.8);
+}
+.sgs-led-unit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.sgs-led {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #334155;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.8);
+  transition: all 0.2s ease;
+}
+.sgs-led-green {
+  background: #00e676;
+  box-shadow: 0 0 8px #00e676, inset 0 1px 1px rgba(255,255,255,0.6);
+}
+.sgs-led-cyan {
+  background: #00b0ff;
+  box-shadow: 0 0 8px #00b0ff, inset 0 1px 1px rgba(255,255,255,0.6);
+}
+.sgs-led-blue {
+  background: #3b82f6;
+  box-shadow: 0 0 8px #3b82f6;
+}
+.sgs-led-red {
+  background: #ef4444;
+  box-shadow: 0 0 8px #ef4444;
+}
+@keyframes sgsFlicker {
+  0% { opacity: 1; filter: drop-shadow(0 0 3px currentColor); }
+  15% { opacity: 0.2; }
+  30% { opacity: 0.95; filter: drop-shadow(0 0 5px currentColor); }
+  55% { opacity: 0.3; }
+  75% { opacity: 1; filter: drop-shadow(0 0 4px currentColor); }
+  90% { opacity: 0.25; }
+  100% { opacity: 1; }
+}
+.sgs-led-flicker {
+  animation: sgsFlicker 0.4s infinite cubic-bezier(0.4, 0, 0.6, 1);
+}
+.sgs-led-label {
+  font-size: 8.5px;
+  font-weight: 700;
+  color: #64748b;
+  letter-spacing: 0.5px;
+}
+.sgs-led-separator {
+  width: 1px;
+  height: 24px;
+  background: #1e293b;
+}
+
+/* LAN Mini Receptacles */
+.sgs-lan-ports {
+  display: flex;
+  gap: 10px;
+}
+.sgs-lan-unit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+.sgs-mini-rj45 {
+  width: 16px;
+  height: 12px;
+  background: #141b27;
+  border: 1px solid #334155;
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.8);
+}
+.sgs-mini-rj45.active {
+  border-color: #00e676;
+}
+.sgs-rj45-pins {
+  display: flex;
+  gap: 1.5px;
+}
+.sgs-rj45-pins i {
+  width: 1px;
+  height: 4px;
+  background: #ffd700;
+  display: inline-block;
+}
+
+/* Chassis Right Info & Button */
+.sgs-chassis-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.sgs-speed-pill-box {
+  background: #090e17;
+  border: 1px solid #1a253a;
+  border-radius: 5px;
+  padding: 6px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.sgs-speed-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-family: monospace;
+}
+.sgs-dir-icon.in { color: #00e676; font-weight: 700; }
+.sgs-dir-icon.out { color: #38bdf8; font-weight: 700; }
+.sgs-speed-val { color: #f8fafc; font-weight: 700; }
+.sgs-btn-info {
+  background: #131b2e;
+  border: 1px solid #25334d;
+  color: #38bdf8;
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 8px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.sgs-btn-info:hover {
+  background: #00b0ff;
+  color: #050b14;
+  border-color: #00b0ff;
+  box-shadow: 0 0 10px rgba(0, 176, 255, 0.5);
+}
+
+/* KPI Cards Grid */
+.sgs-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+}
+.sgs-kpi-card {
+  background: #0d131f;
+  border: 1px solid #1e293b;
+  border-radius: 7px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+}
+.sgs-kpi-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.sgs-kpi-title {
+  font-size: 10px;
+  font-weight: 700;
+  color: #94a3b8;
+  letter-spacing: 0.5px;
+}
+.sgs-kpi-badge {
+  font-size: 9px;
+  font-weight: 800;
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-family: monospace;
+}
+.sgs-kpi-badge.in { background: rgba(0, 230, 118, 0.15); color: #00e676; }
+.sgs-kpi-badge.out { background: rgba(56, 189, 248, 0.15); color: #38bdf8; }
+.sgs-kpi-badge.peak { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
+.sgs-kpi-badge.avg { background: rgba(168, 85, 247, 0.15); color: #a855f7; }
+.sgs-kpi-badge.status { background: rgba(16, 185, 129, 0.15); color: #10b981; }
+.sgs-kpi-val {
+  font-size: 20px;
+  font-weight: 800;
+  color: #f8fafc;
+  letter-spacing: -0.5px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", monospace;
+}
+.sgs-kpi-in .sgs-kpi-val { color: #00e676; }
+.sgs-kpi-out .sgs-kpi-val { color: #38bdf8; }
+.sgs-kpi-sub {
+  font-size: 10px;
+  color: #64748b;
+}
+
+/* Oscilloscope Chart */
+.sgs-chart-card {
+  background: #0d131f;
+  border: 1px solid #1e293b;
+  border-radius: 8px;
+  padding: 14px 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.sgs-chart-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.sgs-chart-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #f8fafc;
+  letter-spacing: 0.6px;
+}
+.sgs-chart-sub {
+  font-size: 11px;
+  color: #38bdf8;
+  margin-left: 8px;
+  font-family: monospace;
+}
+.sgs-chart-legend {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.sgs-leg-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: #94a3b8;
+  font-weight: 600;
+}
+.sgs-leg-item i {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  display: inline-block;
+}
+.sgs-leg-item i.leg-in { background: #00e676; box-shadow: 0 0 6px #00e676; }
+.sgs-leg-item i.leg-out { background: #a855f7; box-shadow: 0 0 6px #a855f7; }
+.sgs-btn-reset-zoom {
+  background: #1e293b;
+  color: #f59e0b;
+  border: 1px solid #f59e0b;
+  border-radius: 4px;
+  padding: 3px 8px;
+  font-size: 10.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.sgs-btn-reset-zoom:hover {
+  background: #f59e0b;
+  color: #050b14;
+}
+.sgs-canvas-wrap {
+  position: relative;
+  width: 100%;
+  height: 220px;
+  background: #080c14;
+  border: 1px solid #162032;
+  border-radius: 6px;
+  overflow: hidden;
+  cursor: crosshair;
+}
+#sgs-traffic-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.sgs-chart-tooltip {
+  position: absolute;
+  background: rgba(13, 19, 31, 0.94);
+  border: 1px solid #00b0ff;
+  border-radius: 5px;
+  padding: 8px 10px;
+  font-size: 11px;
+  color: #f8fafc;
+  pointer-events: none;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.8);
+  z-index: 10;
+  font-family: monospace;
+}
+.sgs-zoom-box {
+  position: absolute;
+  background: rgba(0, 176, 255, 0.15);
+  border: 1px dashed #00b0ff;
+  pointer-events: none;
+  top: 0;
+  bottom: 0;
+}
+
+/* Bottom Grid */
+.sgs-bottom-grid {
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  gap: 14px;
+}
+@media (max-width: 900px) {
+  .sgs-bottom-grid { grid-template-columns: 1fr; }
+}
+.sgs-panel-box {
+  background: #0d131f;
+  border: 1px solid #1e293b;
+  border-radius: 8px;
+  padding: 12px 14px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.sgs-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11px;
+  font-weight: 700;
+  color: #94a3b8;
+  letter-spacing: 0.6px;
+}
+.sgs-panel-badge {
+  font-size: 9.5px;
+  background: #1e293b;
+  color: #38bdf8;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-family: monospace;
+}
+.sgs-panel-badge.live {
+  background: rgba(0, 230, 118, 0.2);
+  color: #00e676;
+}
+.sgs-table-wrap {
+  overflow-x: auto;
+}
+.sgs-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+}
+.sgs-table th {
+  text-align: left;
+  color: #64748b;
+  padding: 6px 8px;
+  border-bottom: 1px solid #1e293b;
+  font-weight: 700;
+}
+.sgs-table td {
+  padding: 6px 8px;
+  border-bottom: 1px solid #141c2c;
+  color: #cbd5e1;
+}
+.sgs-table tr:hover td {
+  background: #141d2e;
+}
+.sgs-badge-status {
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-size: 9px;
+  font-weight: 700;
+}
+.sgs-badge-status.up { background: rgba(0, 230, 118, 0.15); color: #00e676; }
+.sgs-badge-status.down { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+.sgs-btn-select-if {
+  background: #1e293b;
+  border: 1px solid #334155;
+  color: #38bdf8;
+  padding: 2px 7px;
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.sgs-btn-select-if:hover {
+  background: #00b0ff;
+  color: #050b14;
+}
+
+/* Top Links Quick List */
+.sgs-top-links-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.sgs-top-link-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #111827;
+  border: 1px solid #1f2937;
+  border-radius: 5px;
+  padding: 8px 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.sgs-top-link-item:hover {
+  border-color: #00b0ff;
+  background: #152238;
+  transform: translateX(3px);
+}
+.sgs-top-link-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.sgs-top-link-name {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #f1f5f9;
+}
+.sgs-top-link-meta {
+  font-size: 10px;
+  color: #64748b;
+  font-family: monospace;
+}
+.sgs-top-link-rate {
+  font-size: 12px;
+  font-weight: 800;
+  color: #00e676;
+  font-family: monospace;
+}
+
+/* Slide Drawer */
+.sgs-drawer {
+  position: fixed;
+  top: 0; right: 0; bottom: 0;
+  width: 360px;
+  background: #0d131f;
+  border-left: 1px solid #00b0ff;
+  box-shadow: -8px 0 24px rgba(0,0,0,0.8);
+  z-index: 99999;
+  display: flex;
+  flex-direction: column;
+}
+.sgs-drawer-content {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  height: 100%;
+}
+.sgs-drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #1e293b;
+  padding-bottom: 10px;
+}
+.sgs-drawer-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #38bdf8;
+}
+.sgs-drawer-close {
+  background: #1e293b;
+  border: 1px solid #334155;
+  color: #cbd5e1;
+  padding: 3px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.sgs-drawer-close:hover {
+  background: #ef4444;
+  color: #fff;
+}
+.sgs-drawer-body {
+  font-size: 11px;
+  color: #94a3b8;
+  line-height: 1.6;
+  overflow-y: auto;
+}
+</style>
+<script>
+(function() {
+  const ZABBIX_URL = "http://10.10.1.26/api_jsonrpc.php";
+  const ZABBIX_TOKEN = "9b8689b25b296761debefd24a7fe6757c227b2da6c00ba81e903672b036ede51";
+  const CATALOG = [{"hostid": "10811", "name": "[SGS] ARATU - INTERNET VIVO", "isp": "VIVO", "ip": "186.201.222.65", "templates": ["Network Generic Device by SNMP", "Template Geobase GeoIP API"], "interfaces": [{"id": "15", "name": "eth1.453(CNX_WAN_LP-711390199607896ID-1996078_PE-i-br-ba-sdr-tcs-rsd-01)", "rawName": "Interface eth1.453(CNX_WAN_LP-711390199607896ID-1996078_PE-i-br-ba-sdr-tcs-rsd-01): Inbound packets discarded", "inItem": {"itemid": "563525", "key": "net.if.in[ifInOctets.15]", "valueType": "3", "lastvalue": 4675032.0}, "outItem": {"itemid": "563534", "key": "net.if.out[ifOutOctets.15]", "valueType": "3", "lastvalue": 896544.0}, "errorsItem": "563531", "discardsItem": "563528", "speed": 1000000000, "status": 1}, {"id": "11", "name": "eth1()", "rawName": "Interface eth1(): Inbound packets discarded", "inItem": {"itemid": "563524", "key": "net.if.in[ifInOctets.11]", "valueType": "3", "lastvalue": 4801976.0}, "outItem": {"itemid": "563533", "key": "net.if.out[ifOutOctets.11]", "valueType": "3", "lastvalue": 908728.0}, "errorsItem": "563530", "discardsItem": "563527", "speed": 1000000000, "status": 1}, {"id": "10", "name": "eth2(CNX_LAN)", "rawName": "Interface eth2(CNX_LAN): Inbound packets discarded", "inItem": {"itemid": "563523", "key": "net.if.in[ifInOctets.10]", "valueType": "3", "lastvalue": 908680.0}, "outItem": {"itemid": "563532", "key": "net.if.out[ifOutOctets.10]", "valueType": "3", "lastvalue": 4754984.0}, "errorsItem": "563529", "discardsItem": "563526", "speed": 1000000000, "status": 1}], "pingItem": "543972", "secItem": "543980", "lossItem": "543976", "totalTraffic": 16945944.0}, {"hostid": "11505", "name": "[SGS] CABO - INTERNET VIVO", "isp": "VIVO", "ip": "187.93.81.105", "templates": ["Network Generic Device by SNMP", "Template Geobase GeoIP API"], "interfaces": [{"id": "11", "name": "eth1(CNX WAN LP-816020199611997 ID-1996119 PE-i-br-pe-rce-rce-rsd-01)", "rawName": "Interface eth1(CNX WAN LP-816020199611997 ID-1996119 PE-i-br-pe-rce-rce-rsd-01): Duplex status", "inItem": {"itemid": "545128", "key": "net.if.in[ifInOctets.11]", "valueType": "3", "lastvalue": 6274688.0}, "outItem": {"itemid": "545134", "key": "net.if.out[ifOutOctets.11]", "valueType": "3", "lastvalue": 23088504.0}, "errorsItem": "545132", "discardsItem": "545130", "speed": 1000000000, "status": 1}, {"id": "10", "name": "eth2(CNX_LAN)", "rawName": "Interface eth2(CNX_LAN): Duplex status", "inItem": {"itemid": "545127", "key": "net.if.in[ifInOctets.10]", "valueType": "3", "lastvalue": 23307168.0}, "outItem": {"itemid": "545133", "key": "net.if.out[ifOutOctets.10]", "valueType": "3", "lastvalue": 6127024.0}, "errorsItem": "545131", "discardsItem": "545129", "speed": 1000000000, "status": 1}], "pingItem": "544579", "secItem": "544583", "lossItem": "544581", "totalTraffic": 58797384.0}, {"hostid": "11416", "name": "[SGS] DATA CENTER - INTERNET ALGAR", "isp": "ALGAR", "ip": "187.32.13.222", "templates": ["Network Generic Device by SNMP", "Template Geobase GeoIP API"], "interfaces": [{"id": "2", "name": "Gi0/0(hostname cl-rt-spo-SGS-01(08461412-SPO))", "rawName": "Interface Gi0/0(hostname cl-rt-spo-SGS-01(08461412-SPO)): Inbound packets discarded", "inItem": {"itemid": "545103", "key": "net.if.in[ifInOctets.2]", "valueType": "3", "lastvalue": 64260856.0}, "outItem": {"itemid": "545109", "key": "net.if.out[ifOutOctets.2]", "valueType": "3", "lastvalue": 68933096.0}, "errorsItem": "545107", "discardsItem": "545105", "speed": 1000000000, "status": 1}, {"id": "3", "name": "Gi0/1(Ambiente_do_cliente)", "rawName": "Interface Gi0/1(Ambiente_do_cliente): Inbound packets discarded", "inItem": {"itemid": "545104", "key": "net.if.in[ifInOctets.3]", "valueType": "3", "lastvalue": 68257248.0}, "outItem": {"itemid": "545110", "key": "net.if.out[ifOutOctets.3]", "valueType": "3", "lastvalue": 63963728.0}, "errorsItem": "545108", "discardsItem": "545106", "speed": 1000000000, "status": 1}], "pingItem": "174827", "secItem": "174829", "lossItem": "174828", "totalTraffic": 265414928.0}, {"hostid": "11518", "name": "[SGS] DATA CENTER - INTERNET VIVO 01", "isp": "VIVO", "ip": "179.175.37.19", "templates": ["Network Generic Device by SNMP", "Template Geobase GeoIP API"], "interfaces": [{"id": "2", "name": "Gi0/0/1(CNX WAN LP - 115894153157393 ID - 1426442 PE - i-br-sp-spo-am-ra)", "rawName": "Interface Gi0/0/1(CNX WAN LP - 115894153157393 ID - 1426442 PE - i-br-sp-spo-am-ra): Inbound packets discarded", "inItem": {"itemid": "544765", "key": "net.if.in[ifInOctets.2]", "valueType": "3", "lastvalue": 3248.0}, "outItem": {"itemid": "544786", "key": "net.if.out[ifOutOctets.2]", "valueType": "3", "lastvalue": 1896.0}, "errorsItem": "544779", "discardsItem": "544772", "speed": 1000000000, "status": 1}, {"id": "1", "name": "Gi0/0/0(CNX LAN)", "rawName": "Interface Gi0/0/0(CNX LAN): Inbound packets discarded", "inItem": {"itemid": "544764", "key": "net.if.in[ifInOctets.1]", "valueType": "3", "lastvalue": 376.0}, "outItem": {"itemid": "544785", "key": "net.if.out[ifOutOctets.1]", "valueType": "3", "lastvalue": 312.0}, "errorsItem": "544778", "discardsItem": "544771", "speed": 1000000000, "status": 1}, {"id": "3", "name": "Gi0/1/0()", "rawName": "Interface Gi0/1/0(): Inbound packets discarded", "inItem": {"itemid": "544766", "key": "net.if.in[ifInOctets.3]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "544787", "key": "net.if.out[ifOutOctets.3]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "544780", "discardsItem": "544773", "speed": 1000000000, "status": 1}, {"id": "4", "name": "Gi0/1/1()", "rawName": "Interface Gi0/1/1(): Inbound packets discarded", "inItem": {"itemid": "544767", "key": "net.if.in[ifInOctets.4]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "544788", "key": "net.if.out[ifOutOctets.4]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "544781", "discardsItem": "544774", "speed": 1000000000, "status": 1}, {"id": "5", "name": "Gi0/1/2()", "rawName": "Interface Gi0/1/2(): Inbound packets discarded", "inItem": {"itemid": "544768", "key": "net.if.in[ifInOctets.5]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "544789", "key": "net.if.out[ifOutOctets.5]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "544782", "discardsItem": "544775", "speed": 1000000000, "status": 1}, {"id": "6", "name": "Gi0/1/3()", "rawName": "Interface Gi0/1/3(): Inbound packets discarded", "inItem": {"itemid": "544769", "key": "net.if.in[ifInOctets.6]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "544790", "key": "net.if.out[ifOutOctets.6]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "544783", "discardsItem": "544776", "speed": 1000000000, "status": 1}, {"id": "8", "name": "Vl1()", "rawName": "Interface Vl1(): Inbound packets discarded", "inItem": {"itemid": "544770", "key": "net.if.in[ifInOctets.8]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "544791", "key": "net.if.out[ifOutOctets.8]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "544784", "discardsItem": "544777", "speed": 1000000000, "status": 1}], "pingItem": "326860", "secItem": "326862", "lossItem": "326861", "totalTraffic": 5832.0}, {"hostid": "11423", "name": "[SGS] DATA CENTER - INTERNET VIVO 02", "isp": "VIVO", "ip": "186.200.211.25", "templates": ["Network Generic Device by SNMP", "Template Geobase GeoIP API"], "interfaces": [{"id": "2", "name": "Gi0/0/1(CNX WAN - LP 115894152480093 ID 1440653 PE -br-sp-spo-mb-rai-02)", "rawName": "Interface Gi0/0/1(CNX WAN - LP 115894152480093 ID 1440653 PE -br-sp-spo-mb-rai-02): Duplex status", "inItem": {"itemid": "545248", "key": "net.if.in[ifInOctets.2]", "valueType": "3", "lastvalue": 50634176.0}, "outItem": {"itemid": "545266", "key": "net.if.out[ifOutOctets.2]", "valueType": "3", "lastvalue": 6779944.0}, "errorsItem": "545260", "discardsItem": "545254", "speed": 1000000000, "status": 1}, {"id": "1", "name": "Gi0/0/0(CNX LAN)", "rawName": "Interface Gi0/0/0(CNX LAN): Duplex status", "inItem": {"itemid": "545247", "key": "net.if.in[ifInOctets.1]", "valueType": "3", "lastvalue": 6697000.0}, "outItem": {"itemid": "545265", "key": "net.if.out[ifOutOctets.1]", "valueType": "3", "lastvalue": 56676328.0}, "errorsItem": "545259", "discardsItem": "545253", "speed": 1000000000, "status": 1}, {"id": "3", "name": "Gi0/1/0(CNX LAN)", "rawName": "Interface Gi0/1/0(CNX LAN): Inbound packets discarded", "inItem": {"itemid": "545249", "key": "net.if.in[ifInOctets.3]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "545267", "key": "net.if.out[ifOutOctets.3]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "545261", "discardsItem": "545255", "speed": 1000000000, "status": 1}, {"id": "4", "name": "Gi0/1/1()", "rawName": "Interface Gi0/1/1(): Inbound packets discarded", "inItem": {"itemid": "545250", "key": "net.if.in[ifInOctets.4]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "545268", "key": "net.if.out[ifOutOctets.4]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "545262", "discardsItem": "545256", "speed": 1000000000, "status": 1}, {"id": "5", "name": "Gi0/1/2()", "rawName": "Interface Gi0/1/2(): Inbound packets discarded", "inItem": {"itemid": "545251", "key": "net.if.in[ifInOctets.5]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "545269", "key": "net.if.out[ifOutOctets.5]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "545263", "discardsItem": "545257", "speed": 1000000000, "status": 1}, {"id": "6", "name": "Gi0/1/3()", "rawName": "Interface Gi0/1/3(): Inbound packets discarded", "inItem": {"itemid": "545252", "key": "net.if.in[ifInOctets.6]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "545270", "key": "net.if.out[ifOutOctets.6]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "545264", "discardsItem": "545258", "speed": 1000000000, "status": 1}], "pingItem": "182127", "secItem": "182129", "lossItem": "182128", "totalTraffic": 120787448.0}, {"hostid": "10674", "name": "[SGS] DUQUE ARLANXEO - INTERNET VEGANET", "isp": "VEGANET", "ip": "10.242.13.254", "templates": ["Mikrotik by SNMP"], "interfaces": [{"id": "1", "name": "ETH1-WAN-STARLINK()", "rawName": "Interface ETH1-WAN-STARLINK(): Inbound packets discarded", "inItem": {"itemid": "52429", "key": "net.if.in[ifHCInOctets.1]", "valueType": "3", "lastvalue": 14299408.0}, "outItem": {"itemid": "52453", "key": "net.if.out[ifHCOutOctets.1]", "valueType": "3", "lastvalue": 5620928.0}, "errorsItem": "52445", "discardsItem": "52437", "speed": 1000000000, "status": 1}, {"id": "2", "name": "ETH2-LAN()", "rawName": "Interface ETH2-LAN(): Inbound packets discarded", "inItem": {"itemid": "52422", "key": "net.if.in[ifHCInOctets.2]", "valueType": "3", "lastvalue": 6511344.0}, "outItem": {"itemid": "52446", "key": "net.if.out[ifHCOutOctets.2]", "valueType": "3", "lastvalue": 13408920.0}, "errorsItem": "52438", "discardsItem": "52430", "speed": 1000000000, "status": 1}, {"id": "7", "name": "BRIDGE-LAN()", "rawName": "Interface BRIDGE-LAN(): Inbound packets discarded", "inItem": {"itemid": "52428", "key": "net.if.in[ifHCInOctets.7]", "valueType": "3", "lastvalue": 6169744.0}, "outItem": {"itemid": "52452", "key": "net.if.out[ifHCOutOctets.7]", "valueType": "3", "lastvalue": 13354968.0}, "errorsItem": "52444", "discardsItem": "52436", "speed": 1000000000, "status": 1}, {"id": "3", "name": "ETH3-LAN()", "rawName": "Interface ETH3-LAN(): Inbound packets discarded", "inItem": {"itemid": "52426", "key": "net.if.in[ifHCInOctets.3]", "valueType": "3", "lastvalue": 5656.0}, "outItem": {"itemid": "52450", "key": "net.if.out[ifHCOutOctets.3]", "valueType": "3", "lastvalue": 15088.0}, "errorsItem": "52442", "discardsItem": "52434", "speed": 1000000000, "status": 1}, {"id": "10", "name": "loopback0()", "rawName": "Interface loopback0(): Inbound packets discarded", "inItem": {"itemid": "52424", "key": "net.if.in[ifHCInOctets.10]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "52448", "key": "net.if.out[ifHCOutOctets.10]", "valueType": "3", "lastvalue": 176.0}, "errorsItem": "52440", "discardsItem": "52432", "speed": 1000000000, "status": 1}, {"id": "5", "name": "ETH5-LAN()", "rawName": "Interface ETH5-LAN(): Inbound packets discarded", "inItem": {"itemid": "52423", "key": "net.if.in[ifHCInOctets.5]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "52447", "key": "net.if.out[ifHCOutOctets.5]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "52439", "discardsItem": "52431", "speed": 1000000000, "status": 1}, {"id": "4", "name": "ETH4-LAN()", "rawName": "Interface ETH4-LAN(): Inbound packets discarded", "inItem": {"itemid": "52425", "key": "net.if.in[ifHCInOctets.4]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "52449", "key": "net.if.out[ifHCOutOctets.4]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "52441", "discardsItem": "52433", "speed": 1000000000, "status": 1}], "pingItem": "52272", "secItem": "52274", "lossItem": "52273", "totalTraffic": 59386232.0}, {"hostid": "10673", "name": "[SGS] DUQUE BRASKEM Q4 - INTERNET VEGANET", "isp": "VEGANET", "ip": "10.242.6.254", "templates": ["Mikrotik by SNMP"], "interfaces": [{"id": "14", "name": "ETH1-WAN-STARLINK()", "rawName": "Interface ETH1-WAN-STARLINK(): Inbound packets discarded", "inItem": {"itemid": "52501", "key": "net.if.in[ifHCInOctets.14]", "valueType": "3", "lastvalue": 4279024.0}, "outItem": {"itemid": "52513", "key": "net.if.out[ifHCOutOctets.14]", "valueType": "3", "lastvalue": 2058344.0}, "errorsItem": "52509", "discardsItem": "52505", "speed": 1000000000, "status": 1}, {"id": "5", "name": "ETH5-LAN()", "rawName": "Interface ETH5-LAN(): Inbound packets discarded", "inItem": {"itemid": "52350", "key": "net.if.in[ifHCInOctets.5]", "valueType": "3", "lastvalue": 2272376.0}, "outItem": {"itemid": "52374", "key": "net.if.out[ifHCOutOctets.5]", "valueType": "3", "lastvalue": 4176392.0}, "errorsItem": "52366", "discardsItem": "52358", "speed": 1000000000, "status": 1}, {"id": "6", "name": "BRIDGE-LAN()", "rawName": "Interface BRIDGE-LAN(): Inbound packets discarded", "inItem": {"itemid": "52500", "key": "net.if.in[ifHCInOctets.6]", "valueType": "3", "lastvalue": 2263936.0}, "outItem": {"itemid": "52512", "key": "net.if.out[ifHCOutOctets.6]", "valueType": "3", "lastvalue": 4155832.0}, "errorsItem": "52508", "discardsItem": "52504", "speed": 1000000000, "status": 1}, {"id": "8", "name": "loopback0()", "rawName": "Interface loopback0(): Inbound packets discarded", "inItem": {"itemid": "52499", "key": "net.if.in[ifHCInOctets.8]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "52511", "key": "net.if.out[ifHCOutOctets.8]", "valueType": "3", "lastvalue": 176.0}, "errorsItem": "52507", "discardsItem": "52503", "speed": 1000000000, "status": 1}, {"id": "11", "name": "VID172-WL-GUEST()", "rawName": "Interface VID172-WL-GUEST(): Inbound packets discarded", "inItem": {"itemid": "52354", "key": "net.if.in[ifHCInOctets.11]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "52378", "key": "net.if.out[ifHCOutOctets.11]", "valueType": "3", "lastvalue": 112.0}, "errorsItem": "52370", "discardsItem": "52362", "speed": 1000000000, "status": 1}, {"id": "2", "name": "ETH2-LAN()", "rawName": "Interface ETH2-LAN(): Inbound packets discarded", "inItem": {"itemid": "52349", "key": "net.if.in[ifHCInOctets.2]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "52373", "key": "net.if.out[ifHCOutOctets.2]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "52365", "discardsItem": "52357", "speed": 1000000000, "status": 1}, {"id": "4", "name": "ETH4-LAN()", "rawName": "Interface ETH4-LAN(): Inbound packets discarded", "inItem": {"itemid": "52352", "key": "net.if.in[ifHCInOctets.4]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "52376", "key": "net.if.out[ifHCOutOctets.4]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "52368", "discardsItem": "52360", "speed": 1000000000, "status": 1}, {"id": "3", "name": "ETH3-LAN()", "rawName": "Interface ETH3-LAN(): Inbound packets discarded", "inItem": {"itemid": "52353", "key": "net.if.in[ifHCInOctets.3]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "52377", "key": "net.if.out[ifHCOutOctets.3]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "52369", "discardsItem": "52361", "speed": 1000000000, "status": 1}], "pingItem": "52208", "secItem": "52210", "lossItem": "52209", "totalTraffic": 19206192.0}, {"hostid": "10666", "name": "[SGS] DUQUE PP5 - INTERNET VEGANET", "isp": "VEGANET", "ip": "10.242.26.254", "templates": ["Mikrotik by SNMP"], "interfaces": [{"id": "1", "name": "ETH1-WAN-STARLINK()", "rawName": "Interface ETH1-WAN-STARLINK(): Inbound packets discarded", "inItem": {"itemid": "51693", "key": "net.if.in[ifHCInOctets.1]", "valueType": "3", "lastvalue": 10552.0}, "outItem": {"itemid": "51720", "key": "net.if.out[ifHCOutOctets.1]", "valueType": "3", "lastvalue": 85152.0}, "errorsItem": "51711", "discardsItem": "51702", "speed": 1000000000, "status": 1}, {"id": "4", "name": "ETH4-LAN()", "rawName": "Interface ETH4-LAN(): Inbound packets discarded", "inItem": {"itemid": "51690", "key": "net.if.in[ifHCInOctets.4]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "51717", "key": "net.if.out[ifHCOutOctets.4]", "valueType": "3", "lastvalue": 352.0}, "errorsItem": "51708", "discardsItem": "51699", "speed": 1000000000, "status": 1}, {"id": "7", "name": "BRIDGE-LAN()", "rawName": "Interface BRIDGE-LAN(): Inbound packets discarded", "inItem": {"itemid": "51692", "key": "net.if.in[ifHCInOctets.7]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "51719", "key": "net.if.out[ifHCOutOctets.7]", "valueType": "3", "lastvalue": 184.0}, "errorsItem": "51710", "discardsItem": "51701", "speed": 1000000000, "status": 1}, {"id": "8", "name": "VID172-WL-GUEST()", "rawName": "Interface VID172-WL-GUEST(): Inbound packets discarded", "inItem": {"itemid": "51687", "key": "net.if.in[ifHCInOctets.8]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "51714", "key": "net.if.out[ifHCOutOctets.8]", "valueType": "3", "lastvalue": 112.0}, "errorsItem": "51705", "discardsItem": "51696", "speed": 1000000000, "status": 1}, {"id": "2", "name": "ETH2-LAN()", "rawName": "Interface ETH2-LAN(): Inbound packets discarded", "inItem": {"itemid": "51685", "key": "net.if.in[ifHCInOctets.2]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "51712", "key": "net.if.out[ifHCOutOctets.2]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "51703", "discardsItem": "51694", "speed": 1000000000, "status": 1}, {"id": "5", "name": "ETH5-LAN()", "rawName": "Interface ETH5-LAN(): Inbound packets discarded", "inItem": {"itemid": "51686", "key": "net.if.in[ifHCInOctets.5]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "51713", "key": "net.if.out[ifHCOutOctets.5]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "51704", "discardsItem": "51695", "speed": 1000000000, "status": 1}, {"id": "3", "name": "ETH3-LAN()", "rawName": "Interface ETH3-LAN(): Inbound packets discarded", "inItem": {"itemid": "51691", "key": "net.if.in[ifHCInOctets.3]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "51718", "key": "net.if.out[ifHCOutOctets.3]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "51709", "discardsItem": "51700", "speed": 1000000000, "status": 1}], "pingItem": "51606", "secItem": "51608", "lossItem": "51607", "totalTraffic": 96352.0}, {"hostid": "11458", "name": "[SGS] ESTEIO - INTERNET ALGAR", "isp": "ALGAR", "ip": "187.32.234.162", "templates": ["Network Generic Device by SNMP", "Template Geobase GeoIP API"], "interfaces": [{"id": "11", "name": "Vlan-interface100(INTERNET LINK (09860352))", "rawName": "Interface Vlan-interface100(INTERNET LINK (09860352)): Inbound packets discarded", "inItem": {"itemid": "544846", "key": "net.if.in[ifInOctets.11]", "valueType": "3", "lastvalue": 997488.0}, "outItem": {"itemid": "544876", "key": "net.if.out[ifOutOctets.11]", "valueType": "3", "lastvalue": 1266728.0}, "errorsItem": "544866", "discardsItem": "544856", "speed": 1000000000, "status": 1}, {"id": "4", "name": "Ethernet0/1(LAN CLIENTE)", "rawName": "Interface Ethernet0/1(LAN CLIENTE): Duplex status", "inItem": {"itemid": "544840", "key": "net.if.in[ifInOctets.4]", "valueType": "3", "lastvalue": 1007768.0}, "outItem": {"itemid": "544870", "key": "net.if.out[ifOutOctets.4]", "valueType": "3", "lastvalue": 1268952.0}, "errorsItem": "544860", "discardsItem": "544850", "speed": 1000000000, "status": 1}, {"id": "3", "name": "Ethernet0/0(cl-rt-eio-sgsdobrasil-01(09860352))", "rawName": "Interface Ethernet0/0(cl-rt-eio-sgsdobrasil-01(09860352)): Duplex status", "inItem": {"itemid": "544839", "key": "net.if.in[ifInOctets.3]", "valueType": "3", "lastvalue": 1262176.0}, "outItem": {"itemid": "544869", "key": "net.if.out[ifOutOctets.3]", "valueType": "3", "lastvalue": 998800.0}, "errorsItem": "544859", "discardsItem": "544849", "speed": 1000000000, "status": 1}, {"id": "1", "name": "Aux0(Aux0 Interface)", "rawName": "Interface Aux0(Aux0 Interface): Inbound packets discarded", "inItem": {"itemid": "544837", "key": "net.if.in[ifInOctets.1]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "544867", "key": "net.if.out[ifOutOctets.1]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "544857", "discardsItem": "544847", "speed": 1000000000, "status": 1}, {"id": "2", "name": "Cellular0/0(Cellular0/0 Interface)", "rawName": "Interface Cellular0/0(Cellular0/0 Interface): Inbound packets discarded", "inItem": {"itemid": "544838", "key": "net.if.in[ifInOctets.2]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "544868", "key": "net.if.out[ifOutOctets.2]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "544858", "discardsItem": "544848", "speed": 1000000000, "status": 1}, {"id": "5", "name": "Ethernet0/2(Ethernet0/2 Interface)", "rawName": "Interface Ethernet0/2(Ethernet0/2 Interface): Inbound packets discarded", "inItem": {"itemid": "544841", "key": "net.if.in[ifInOctets.5]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "544871", "key": "net.if.out[ifOutOctets.5]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "544861", "discardsItem": "544851", "speed": 1000000000, "status": 1}, {"id": "6", "name": "Ethernet0/3(Ethernet0/3 Interface)", "rawName": "Interface Ethernet0/3(Ethernet0/3 Interface): Inbound packets discarded", "inItem": {"itemid": "544842", "key": "net.if.in[ifInOctets.6]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "544872", "key": "net.if.out[ifOutOctets.6]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "544862", "discardsItem": "544852", "speed": 1000000000, "status": 1}, {"id": "7", "name": "Ethernet0/4(Ethernet0/4 Interface)", "rawName": "Interface Ethernet0/4(Ethernet0/4 Interface): Inbound packets discarded", "inItem": {"itemid": "544843", "key": "net.if.in[ifInOctets.7]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "544873", "key": "net.if.out[ifOutOctets.7]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "544863", "discardsItem": "544853", "speed": 1000000000, "status": 1}, {"id": "9", "name": "Serial0/0(Serial0/0 Interface)", "rawName": "Interface Serial0/0(Serial0/0 Interface): Inbound packets discarded", "inItem": {"itemid": "544844", "key": "net.if.in[ifInOctets.9]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "544874", "key": "net.if.out[ifOutOctets.9]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "544864", "discardsItem": "544854", "speed": 1000000000, "status": 1}, {"id": "10", "name": "Vlan-interface1(Vlan-interface1 Interface)", "rawName": "Interface Vlan-interface1(Vlan-interface1 Interface): Inbound packets discarded", "inItem": {"itemid": "544845", "key": "net.if.in[ifInOctets.10]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "544875", "key": "net.if.out[ifOutOctets.10]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "544865", "discardsItem": "544855", "speed": 1000000000, "status": 1}], "pingItem": "247852", "secItem": "247854", "lossItem": "247853", "totalTraffic": 6801912.0}, {"hostid": "10821", "name": "[SGS] ESTEIO - INTERNET VIVO", "isp": "VIVO", "ip": "186.215.245.89", "templates": ["Network Generic Device by SNMP", "Template Geobase GeoIP API"], "interfaces": [{"id": "17413", "name": "GigabitEthernet0/0.2004(WAN)", "rawName": "Interface GigabitEthernet0/0.2004(WAN): Inbound packets discarded", "inItem": {"itemid": "564170", "key": "net.if.in[ifInOctets.17413]", "valueType": "3", "lastvalue": 1343272.0}, "outItem": {"itemid": "564194", "key": "net.if.out[ifOutOctets.17413]", "valueType": "3", "lastvalue": 369112.0}, "errorsItem": "564186", "discardsItem": "564178", "speed": 1000000000, "status": 1}, {"id": "2", "name": "GigabitEthernet0/0(GigabitEthernet0/0 Interface)", "rawName": "Interface GigabitEthernet0/0(GigabitEthernet0/0 Interface): Inbound packets discarded", "inItem": {"itemid": "564164", "key": "net.if.in[ifInOctets.2]", "valueType": "3", "lastvalue": 1349984.0}, "outItem": {"itemid": "564188", "key": "net.if.out[ifOutOctets.2]", "valueType": "3", "lastvalue": 369184.0}, "errorsItem": "564180", "discardsItem": "564172", "speed": 1000000000, "status": 1}, {"id": "3", "name": "GigabitEthernet0/1(GigabitEthernet0/1 Interface)", "rawName": "Interface GigabitEthernet0/1(GigabitEthernet0/1 Interface): Inbound packets discarded", "inItem": {"itemid": "564165", "key": "net.if.in[ifInOctets.3]", "valueType": "3", "lastvalue": 352072.0}, "outItem": {"itemid": "564189", "key": "net.if.out[ifOutOctets.3]", "valueType": "3", "lastvalue": 1330328.0}, "errorsItem": "564181", "discardsItem": "564173", "speed": 1000000000, "status": 1}, {"id": "8", "name": "Cellular0/0(Cellular0/0 Interface)", "rawName": "Interface Cellular0/0(Cellular0/0 Interface): Inbound packets discarded", "inItem": {"itemid": "564166", "key": "net.if.in[ifInOctets.8]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "564190", "key": "net.if.out[ifOutOctets.8]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "564182", "discardsItem": "564174", "speed": 1000000000, "status": 1}, {"id": "9", "name": "Cellular0/1(Cellular0/1 Interface)", "rawName": "Interface Cellular0/1(Cellular0/1 Interface): Inbound packets discarded", "inItem": {"itemid": "564167", "key": "net.if.in[ifInOctets.9]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "564191", "key": "net.if.out[ifOutOctets.9]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "564183", "discardsItem": "564175", "speed": 1000000000, "status": 1}, {"id": "17411", "name": "InLoopBack0(InLoopBack0 Interface)", "rawName": "Interface InLoopBack0(InLoopBack0 Interface): Inbound packets discarded", "inItem": {"itemid": "564168", "key": "net.if.in[ifInOctets.17411]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "564192", "key": "net.if.out[ifOutOctets.17411]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "564184", "discardsItem": "564176", "speed": 1000000000, "status": 1}, {"id": "17412", "name": "Register-Tunnel0(Register-Tunnel0 Interface)", "rawName": "Interface Register-Tunnel0(Register-Tunnel0 Interface): Inbound packets discarded", "inItem": {"itemid": "564169", "key": "net.if.in[ifInOctets.17412]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "564193", "key": "net.if.out[ifOutOctets.17412]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "564185", "discardsItem": "564177", "speed": 1000000000, "status": 1}, {"id": "17414", "name": "LoopBack0(LoopBack0 Interface)", "rawName": "Interface LoopBack0(LoopBack0 Interface): Inbound packets discarded", "inItem": {"itemid": "564171", "key": "net.if.in[ifInOctets.17414]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "564195", "key": "net.if.out[ifOutOctets.17414]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "564187", "discardsItem": "564179", "speed": 1000000000, "status": 1}], "pingItem": "543637", "secItem": "543667", "lossItem": "543652", "totalTraffic": 5113952.0}, {"hostid": "11417", "name": "[SGS] FOOD LAB - INTERNET ALGAR", "isp": "ALGAR", "ip": "187.32.143.10", "templates": ["Network Generic Device by SNMP", "Template Geobase GeoIP API"], "interfaces": [{"id": "2", "name": "GigabitEthernet0/0(cl-rt-sbo-sgsdobrasi-01 (09916263-SBO))", "rawName": "Interface GigabitEthernet0/0(cl-rt-sbo-sgsdobrasi-01 (09916263-SBO)): Duplex status", "inItem": {"itemid": "545163", "key": "net.if.in[ifInOctets.2]", "valueType": "3", "lastvalue": 6664.0}, "outItem": {"itemid": "545193", "key": "net.if.out[ifOutOctets.2]", "valueType": "3", "lastvalue": 7984.0}, "errorsItem": "545183", "discardsItem": "545173", "speed": 1000000000, "status": 1}, {"id": "3", "name": "GigabitEthernet0/1(Ambiente_Cliente)", "rawName": "Interface GigabitEthernet0/1(Ambiente_Cliente): Duplex status", "inItem": {"itemid": "545164", "key": "net.if.in[ifInOctets.3]", "valueType": "3", "lastvalue": 5352.0}, "outItem": {"itemid": "545194", "key": "net.if.out[ifOutOctets.3]", "valueType": "3", "lastvalue": 5216.0}, "errorsItem": "545184", "discardsItem": "545174", "speed": 1000000000, "status": 1}, {"id": "4", "name": "GigabitEthernet0/2(GigabitEthernet0/2 Interface)", "rawName": "Interface GigabitEthernet0/2(GigabitEthernet0/2 Interface): Inbound packets discarded", "inItem": {"itemid": "545165", "key": "net.if.in[ifInOctets.4]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "545195", "key": "net.if.out[ifOutOctets.4]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "545185", "discardsItem": "545175", "speed": 1000000000, "status": 1}, {"id": "5", "name": "GigabitEthernet0/3(GigabitEthernet0/3 Interface)", "rawName": "Interface GigabitEthernet0/3(GigabitEthernet0/3 Interface): Inbound packets discarded", "inItem": {"itemid": "545166", "key": "net.if.in[ifInOctets.5]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "545196", "key": "net.if.out[ifOutOctets.5]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "545186", "discardsItem": "545176", "speed": 1000000000, "status": 1}, {"id": "6", "name": "GigabitEthernet0/4(GigabitEthernet0/4 Interface)", "rawName": "Interface GigabitEthernet0/4(GigabitEthernet0/4 Interface): Inbound packets discarded", "inItem": {"itemid": "545167", "key": "net.if.in[ifInOctets.6]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "545197", "key": "net.if.out[ifOutOctets.6]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "545187", "discardsItem": "545177", "speed": 1000000000, "status": 1}, {"id": "7", "name": "GigabitEthernet0/5(GigabitEthernet0/5 Interface)", "rawName": "Interface GigabitEthernet0/5(GigabitEthernet0/5 Interface): Inbound packets discarded", "inItem": {"itemid": "545168", "key": "net.if.in[ifInOctets.7]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "545198", "key": "net.if.out[ifOutOctets.7]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "545188", "discardsItem": "545178", "speed": 1000000000, "status": 1}, {"id": "8", "name": "Cellular0/0(Cellular0/0 Interface)", "rawName": "Interface Cellular0/0(Cellular0/0 Interface): Inbound packets discarded", "inItem": {"itemid": "545169", "key": "net.if.in[ifInOctets.8]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "545199", "key": "net.if.out[ifOutOctets.8]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "545189", "discardsItem": "545179", "speed": 1000000000, "status": 1}, {"id": "9", "name": "Cellular0/1(Cellular0/1 Interface)", "rawName": "Interface Cellular0/1(Cellular0/1 Interface): Inbound packets discarded", "inItem": {"itemid": "545170", "key": "net.if.in[ifInOctets.9]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "545200", "key": "net.if.out[ifOutOctets.9]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "545190", "discardsItem": "545180", "speed": 1000000000, "status": 1}, {"id": "17474", "name": "InLoopBack0(InLoopBack0 Interface)", "rawName": "Interface InLoopBack0(InLoopBack0 Interface): Inbound packets discarded", "inItem": {"itemid": "545171", "key": "net.if.in[ifInOctets.17474]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "545201", "key": "net.if.out[ifOutOctets.17474]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "545191", "discardsItem": "545181", "speed": 1000000000, "status": 1}, {"id": "17475", "name": "Register-Tunnel0(Register-Tunnel0 Interface)", "rawName": "Interface Register-Tunnel0(Register-Tunnel0 Interface): Inbound packets discarded", "inItem": {"itemid": "545172", "key": "net.if.in[ifInOctets.17475]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "545202", "key": "net.if.out[ifOutOctets.17475]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "545192", "discardsItem": "545182", "speed": 1000000000, "status": 1}], "pingItem": "175987", "secItem": "175989", "lossItem": "175988", "totalTraffic": 25216.0}, {"hostid": "11402", "name": "[SGS] FOOD LAB - INTERNET VIVO", "isp": "VIVO", "ip": "201.63.21.217", "templates": ["Network Generic Device by SNMP", "Template Geobase GeoIP API"], "interfaces": [{"id": "7", "name": "GigabitEthernet0/0/4(CNX WAN - LP 115484361002892 - ID 2103035 - PE i-br-sp-sne-sa-rai-02)", "rawName": "Interface GigabitEthernet0/0/4(CNX WAN - LP 115484361002892 - ID 2103035 - PE i-br-sp-sne-sa-rai-02): Inbound packets discarded", "inItem": {"itemid": "545013", "key": "net.if.in[ifInOctets.7]", "valueType": "3", "lastvalue": 5072328.0}, "outItem": {"itemid": "545040", "key": "net.if.out[ifOutOctets.7]", "valueType": "3", "lastvalue": 2315744.0}, "errorsItem": "545031", "discardsItem": "545022", "speed": 1000000000, "status": 1}, {"id": "3", "name": "GigabitEthernet0/0/0(CNX LAN)", "rawName": "Interface GigabitEthernet0/0/0(CNX LAN): Inbound packets discarded", "inItem": {"itemid": "545009", "key": "net.if.in[ifInOctets.3]", "valueType": "3", "lastvalue": 2314696.0}, "outItem": {"itemid": "545036", "key": "net.if.out[ifOutOctets.3]", "valueType": "3", "lastvalue": 5071560.0}, "errorsItem": "545027", "discardsItem": "545018", "speed": 1000000000, "status": 1}, {"id": "8", "name": "GigabitEthernet0/0/5(VirtualPort)", "rawName": "Interface GigabitEthernet0/0/5(VirtualPort): Inbound packets discarded", "inItem": {"itemid": "545014", "key": "net.if.in[ifInOctets.8]", "valueType": "3", "lastvalue": 384.0}, "outItem": {"itemid": "545041", "key": "net.if.out[ifOutOctets.8]", "valueType": "3", "lastvalue": 160.0}, "errorsItem": "545032", "discardsItem": "545023", "speed": 1000000000, "status": 1}, {"id": "1", "name": "InLoopBack0(HUAWEI, AR Series, InLoopBack0 Interface)", "rawName": "Interface InLoopBack0(HUAWEI, AR Series, InLoopBack0 Interface): Inbound packets discarded", "inItem": {"itemid": "545008", "key": "net.if.in[ifInOctets.1]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "545035", "key": "net.if.out[ifOutOctets.1]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "545026", "discardsItem": "545017", "speed": 1000000000, "status": 1}, {"id": "4", "name": "GigabitEthernet0/0/1(HUAWEI, AR Series, GigabitEthernet0/0/1 Interface)", "rawName": "Interface GigabitEthernet0/0/1(HUAWEI, AR Series, GigabitEthernet0/0/1 Interface): Inbound packets discarded", "inItem": {"itemid": "545010", "key": "net.if.in[ifInOctets.4]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "545037", "key": "net.if.out[ifOutOctets.4]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "545028", "discardsItem": "545019", "speed": 1000000000, "status": 1}, {"id": "5", "name": "GigabitEthernet0/0/2(HUAWEI, AR Series, GigabitEthernet0/0/2 Interface)", "rawName": "Interface GigabitEthernet0/0/2(HUAWEI, AR Series, GigabitEthernet0/0/2 Interface): Inbound packets discarded", "inItem": {"itemid": "545011", "key": "net.if.in[ifInOctets.5]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "545038", "key": "net.if.out[ifOutOctets.5]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "545029", "discardsItem": "545020", "speed": 1000000000, "status": 1}, {"id": "6", "name": "GigabitEthernet0/0/3(HUAWEI, AR Series, GigabitEthernet0/0/3 Interface)", "rawName": "Interface GigabitEthernet0/0/3(HUAWEI, AR Series, GigabitEthernet0/0/3 Interface): Inbound packets discarded", "inItem": {"itemid": "545012", "key": "net.if.in[ifInOctets.6]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "545039", "key": "net.if.out[ifOutOctets.6]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "545030", "discardsItem": "545021", "speed": 1000000000, "status": 1}, {"id": "9", "name": "Vlanif1(CNX LAN)", "rawName": "Interface Vlanif1(CNX LAN): Inbound packets discarded", "inItem": {"itemid": "545015", "key": "net.if.in[ifInOctets.9]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "545042", "key": "net.if.out[ifOutOctets.9]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "545033", "discardsItem": "545024", "speed": 1000000000, "status": 1}, {"id": "10", "name": "LoopBack0(GERENCIA VIVO)", "rawName": "Interface LoopBack0(GERENCIA VIVO): Inbound packets discarded", "inItem": {"itemid": "545016", "key": "net.if.in[ifInOctets.10]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "545043", "key": "net.if.out[ifOutOctets.10]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "545034", "discardsItem": "545025", "speed": 1000000000, "status": 1}], "pingItem": "543646", "secItem": "543676", "lossItem": "543661", "totalTraffic": 14774872.0}, {"hostid": "10663", "name": "[SGS] ITAGUAÍ - INTERNET VEGANET", "isp": "VEGANET", "ip": "10.242.1.254", "templates": ["Mikrotik by SNMP"], "interfaces": [{"id": "1", "name": "ETH1-WAN-STARLINK()", "rawName": "Interface ETH1-WAN-STARLINK(): Inbound packets discarded", "inItem": {"itemid": "51334", "key": "net.if.in[ifHCInOctets.1]", "valueType": "3", "lastvalue": 5465144.0}, "outItem": {"itemid": "51358", "key": "net.if.out[ifHCOutOctets.1]", "valueType": "3", "lastvalue": 194456.0}, "errorsItem": "51350", "discardsItem": "51342", "speed": 1000000000, "status": 1}, {"id": "2", "name": "ETH2-LAN()", "rawName": "Interface ETH2-LAN(): Inbound packets discarded", "inItem": {"itemid": "51328", "key": "net.if.in[ifHCInOctets.2]", "valueType": "3", "lastvalue": 191128.0}, "outItem": {"itemid": "51352", "key": "net.if.out[ifHCOutOctets.2]", "valueType": "3", "lastvalue": 5466208.0}, "errorsItem": "51344", "discardsItem": "51336", "speed": 1000000000, "status": 1}, {"id": "7", "name": "BRIDGE-LAN()", "rawName": "Interface BRIDGE-LAN(): Inbound packets discarded", "inItem": {"itemid": "51333", "key": "net.if.in[ifHCInOctets.7]", "valueType": "3", "lastvalue": 188256.0}, "outItem": {"itemid": "51357", "key": "net.if.out[ifHCOutOctets.7]", "valueType": "3", "lastvalue": 5464152.0}, "errorsItem": "51349", "discardsItem": "51341", "speed": 1000000000, "status": 1}, {"id": "3", "name": "ETH3-LAN()", "rawName": "Interface ETH3-LAN(): Inbound packets discarded", "inItem": {"itemid": "51331", "key": "net.if.in[ifHCInOctets.3]", "valueType": "3", "lastvalue": 288.0}, "outItem": {"itemid": "51355", "key": "net.if.out[ifHCOutOctets.3]", "valueType": "3", "lastvalue": 1784.0}, "errorsItem": "51347", "discardsItem": "51339", "speed": 1000000000, "status": 1}, {"id": "11", "name": "loopback0()", "rawName": "Interface loopback0(): Inbound packets discarded", "inItem": {"itemid": "51332", "key": "net.if.in[ifHCInOctets.11]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "51356", "key": "net.if.out[ifHCOutOctets.11]", "valueType": "3", "lastvalue": 112.0}, "errorsItem": "51348", "discardsItem": "51340", "speed": 1000000000, "status": 1}, {"id": "5", "name": "ETH5-LAN()", "rawName": "Interface ETH5-LAN(): Inbound packets discarded", "inItem": {"itemid": "51329", "key": "net.if.in[ifHCInOctets.5]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "51353", "key": "net.if.out[ifHCOutOctets.5]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "51345", "discardsItem": "51337", "speed": 1000000000, "status": 1}, {"id": "4", "name": "ETH4-LAN()", "rawName": "Interface ETH4-LAN(): Inbound packets discarded", "inItem": {"itemid": "51330", "key": "net.if.in[ifHCInOctets.4]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "51354", "key": "net.if.out[ifHCOutOctets.4]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "51346", "discardsItem": "51338", "speed": 1000000000, "status": 1}], "pingItem": "51250", "secItem": "51252", "lossItem": "51251", "totalTraffic": 16971528.0}, {"hostid": "11654", "name": "[SGS] ITAPETININGA - INTERNET DESKTOP", "isp": "DESKTOP", "ip": "10.174.7.1", "templates": ["FortiGate by SNMP"], "interfaces": [{"id": "2", "name": "wan2(ISP_DESKTOP)", "rawName": "Interface wan2(ISP_DESKTOP): Inbound packets discarded", "inItem": {"itemid": "481851", "key": "net.if.in[ifHCInOctets.2]", "valueType": "3", "lastvalue": 1256808.0}, "outItem": {"itemid": "481887", "key": "net.if.out[ifHCOutOctets.2]", "valueType": "3", "lastvalue": 239208.0}, "errorsItem": "481875", "discardsItem": "481863", "speed": 1000000000, "status": 1}, {"id": "1", "name": "wan1()", "rawName": "Interface wan1(): Inbound packets discarded", "inItem": {"itemid": "481858", "key": "net.if.in[ifHCInOctets.1]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "481894", "key": "net.if.out[ifHCOutOctets.1]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "481882", "discardsItem": "481870", "speed": 1000000000, "status": 1}, {"id": "16", "name": "VPN()", "rawName": "Interface VPN(): Inbound packets discarded", "inItem": {"itemid": "481848", "key": "net.if.in[ifHCInOctets.16]", "valueType": "3", "lastvalue": 1258360.0}, "outItem": {"itemid": "481884", "key": "net.if.out[ifHCOutOctets.16]", "valueType": "3", "lastvalue": 156992.0}, "errorsItem": "481872", "discardsItem": "481860", "speed": 1000000000, "status": 1}, {"id": "7", "name": "internal1(LAN)", "rawName": "Interface internal1(LAN): Inbound packets discarded", "inItem": {"itemid": "481857", "key": "net.if.in[ifHCInOctets.7]", "valueType": "3", "lastvalue": 159160.0}, "outItem": {"itemid": "481893", "key": "net.if.out[ifHCOutOctets.7]", "valueType": "3", "lastvalue": 1162184.0}, "errorsItem": "481881", "discardsItem": "481869", "speed": 1000000000, "status": 1}, {"id": "17", "name": "loopback()", "rawName": "Interface loopback(): Inbound packets discarded", "inItem": {"itemid": "481847", "key": "net.if.in[ifHCInOctets.17]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "481883", "key": "net.if.out[ifHCOutOctets.17]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "481871", "discardsItem": "481859", "speed": 1000000000, "status": 1}, {"id": "13", "name": "internal7()", "rawName": "Interface internal7(): Inbound packets discarded", "inItem": {"itemid": "481849", "key": "net.if.in[ifHCInOctets.13]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "481885", "key": "net.if.out[ifHCOutOctets.13]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "481873", "discardsItem": "481861", "speed": 1000000000, "status": 1}, {"id": "15", "name": "l2t.root()", "rawName": "Interface l2t.root(): Inbound packets discarded", "inItem": {"itemid": "481850", "key": "net.if.in[ifHCInOctets.15]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "481886", "key": "net.if.out[ifHCOutOctets.15]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "481874", "discardsItem": "481862", "speed": 1000000000, "status": 1}, {"id": "5", "name": "ssl.root(SSL VPN interface)", "rawName": "Interface ssl.root(SSL VPN interface): Inbound packets discarded", "inItem": {"itemid": "481852", "key": "net.if.in[ifHCInOctets.5]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "481888", "key": "net.if.out[ifHCOutOctets.5]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "481876", "discardsItem": "481864", "speed": 1000000000, "status": 1}, {"id": "18", "name": "VPN2()", "rawName": "Interface VPN2(): Inbound packets discarded", "inItem": {"itemid": "481853", "key": "net.if.in[ifHCInOctets.18]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "481889", "key": "net.if.out[ifHCOutOctets.18]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "481877", "discardsItem": "481865", "speed": 1000000000, "status": 1}, {"id": "3", "name": "dmz()", "rawName": "Interface dmz(): Inbound packets discarded", "inItem": {"itemid": "481854", "key": "net.if.in[ifHCInOctets.3]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "481890", "key": "net.if.out[ifHCOutOctets.3]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "481878", "discardsItem": "481866", "speed": 1000000000, "status": 1}, {"id": "6", "name": "internal(MGMT)", "rawName": "Interface internal(MGMT): Inbound packets discarded", "inItem": {"itemid": "481855", "key": "net.if.in[ifHCInOctets.6]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "481891", "key": "net.if.out[ifHCOutOctets.6]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "481879", "discardsItem": "481867", "speed": 1000000000, "status": 1}, {"id": "14", "name": "naf.root()", "rawName": "Interface naf.root(): Inbound packets discarded", "inItem": {"itemid": "481856", "key": "net.if.in[ifHCInOctets.14]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "481892", "key": "net.if.out[ifHCOutOctets.14]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "481880", "discardsItem": "481868", "speed": 1000000000, "status": 1}], "pingItem": "477543", "secItem": "477545", "lossItem": "477544", "totalTraffic": 4232712.0}, {"hostid": "11401", "name": "[SGS] LUIZ EDUARDO MAGALHÃES - INTERNET DBT", "isp": "NET", "ip": "138.99.107.237", "templates": ["Template Module ICMP Ping", "Template Module Interfaces SNMP"], "interfaces": [{"id": "2", "name": "DBT_ALVORADA-SGS()", "rawName": "Interface DBT_ALVORADA-SGS(): Inbound packets discarded", "inItem": {"itemid": "162849", "key": "net.if.in[ifHCInOctets.2]", "valueType": "3", "lastvalue": 16768.0}, "outItem": {"itemid": "162858", "key": "net.if.out[ifHCOutOctets.2]", "valueType": "3", "lastvalue": 2408.0}, "errorsItem": "162855", "discardsItem": "162852", "speed": 1000000000, "status": 1}, {"id": "4", "name": "pppoe-out1()", "rawName": "Interface pppoe-out1(): Inbound packets discarded", "inItem": {"itemid": "162850", "key": "net.if.in[ifHCInOctets.4]", "valueType": "3", "lastvalue": 1536.0}, "outItem": {"itemid": "162859", "key": "net.if.out[ifHCOutOctets.4]", "valueType": "3", "lastvalue": 1784.0}, "errorsItem": "162856", "discardsItem": "162853", "speed": 1000000000, "status": 1}, {"id": "1", "name": "ether1()", "rawName": "Interface ether1(): Inbound packets discarded", "inItem": {"itemid": "162848", "key": "net.if.in[ifHCInOctets.1]", "valueType": "3", "lastvalue": 536.0}, "outItem": {"itemid": "162857", "key": "net.if.out[ifHCOutOctets.1]", "valueType": "3", "lastvalue": 864.0}, "errorsItem": "162854", "discardsItem": "162851", "speed": 1000000000, "status": 1}], "pingItem": "162645", "secItem": "162647", "lossItem": "162646", "totalTraffic": 23896.0}, {"hostid": "10826", "name": "[SGS] PARANAGUÁ - INTERNET VIVO", "isp": "VIVO", "ip": "187.50.44.169", "templates": ["Network Generic Device by SNMP", "Template Geobase GeoIP API"], "interfaces": [{"id": "2", "name": "GigabitEthernet0/0(CNX WAN LP - 414640129747292 ID - 1297472 PE - i-br-pr-cta-cbr-r)", "rawName": "Interface GigabitEthernet0/0(CNX WAN LP - 414640129747292 ID - 1297472 PE - i-br-pr-cta-cbr-r): Duplex status", "inItem": {"itemid": "544146", "key": "net.if.in[ifInOctets.2]", "valueType": "3", "lastvalue": 5597512.0}, "outItem": {"itemid": "544179", "key": "net.if.out[ifOutOctets.2]", "valueType": "3", "lastvalue": 1678088.0}, "errorsItem": "544168", "discardsItem": "544157", "speed": 1000000000, "status": 1}, {"id": "3", "name": "GigabitEthernet0/1(CNX LAN)", "rawName": "Interface GigabitEthernet0/1(CNX LAN): Duplex status", "inItem": {"itemid": "544147", "key": "net.if.in[ifInOctets.3]", "valueType": "3", "lastvalue": 1678432.0}, "outItem": {"itemid": "544180", "key": "net.if.out[ifOutOctets.3]", "valueType": "3", "lastvalue": 5595312.0}, "errorsItem": "544169", "discardsItem": "544158", "speed": 1000000000, "status": 1}, {"id": "4", "name": "GigabitEthernet0/2(GigabitEthernet0/2 Interface)", "rawName": "Interface GigabitEthernet0/2(GigabitEthernet0/2 Interface): Inbound packets discarded", "inItem": {"itemid": "544148", "key": "net.if.in[ifInOctets.4]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "544181", "key": "net.if.out[ifOutOctets.4]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "544170", "discardsItem": "544159", "speed": 1000000000, "status": 1}, {"id": "5", "name": "GigabitEthernet0/3(GigabitEthernet0/3 Interface)", "rawName": "Interface GigabitEthernet0/3(GigabitEthernet0/3 Interface): Inbound packets discarded", "inItem": {"itemid": "544149", "key": "net.if.in[ifInOctets.5]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "544182", "key": "net.if.out[ifOutOctets.5]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "544171", "discardsItem": "544160", "speed": 1000000000, "status": 1}, {"id": "6", "name": "GigabitEthernet0/4(GigabitEthernet0/4 Interface)", "rawName": "Interface GigabitEthernet0/4(GigabitEthernet0/4 Interface): Inbound packets discarded", "inItem": {"itemid": "544150", "key": "net.if.in[ifInOctets.6]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "544183", "key": "net.if.out[ifOutOctets.6]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "544172", "discardsItem": "544161", "speed": 1000000000, "status": 1}, {"id": "7", "name": "GigabitEthernet0/5(GigabitEthernet0/5 Interface)", "rawName": "Interface GigabitEthernet0/5(GigabitEthernet0/5 Interface): Inbound packets discarded", "inItem": {"itemid": "544151", "key": "net.if.in[ifInOctets.7]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "544184", "key": "net.if.out[ifOutOctets.7]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "544173", "discardsItem": "544162", "speed": 1000000000, "status": 1}, {"id": "8", "name": "Cellular0/0(Cellular0/0 Interface)", "rawName": "Interface Cellular0/0(Cellular0/0 Interface): Inbound packets discarded", "inItem": {"itemid": "544152", "key": "net.if.in[ifInOctets.8]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "544185", "key": "net.if.out[ifOutOctets.8]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "544174", "discardsItem": "544163", "speed": 1000000000, "status": 1}, {"id": "9", "name": "Cellular0/1(Cellular0/1 Interface)", "rawName": "Interface Cellular0/1(Cellular0/1 Interface): Inbound packets discarded", "inItem": {"itemid": "544153", "key": "net.if.in[ifInOctets.9]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "544186", "key": "net.if.out[ifOutOctets.9]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "544175", "discardsItem": "544164", "speed": 1000000000, "status": 1}, {"id": "17474", "name": "InLoopBack0(InLoopBack0 Interface)", "rawName": "Interface InLoopBack0(InLoopBack0 Interface): Inbound packets discarded", "inItem": {"itemid": "544154", "key": "net.if.in[ifInOctets.17474]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "544187", "key": "net.if.out[ifOutOctets.17474]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "544176", "discardsItem": "544165", "speed": 1000000000, "status": 1}, {"id": "17475", "name": "Register-Tunnel0(Register-Tunnel0 Interface)", "rawName": "Interface Register-Tunnel0(Register-Tunnel0 Interface): Inbound packets discarded", "inItem": {"itemid": "544155", "key": "net.if.in[ifInOctets.17475]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "544188", "key": "net.if.out[ifOutOctets.17475]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "544177", "discardsItem": "544166", "speed": 1000000000, "status": 1}, {"id": "17536", "name": "LoopBack0(GERENCIA VIVO)", "rawName": "Interface LoopBack0(GERENCIA VIVO): Inbound packets discarded", "inItem": {"itemid": "544156", "key": "net.if.in[ifInOctets.17536]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "544189", "key": "net.if.out[ifOutOctets.17536]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "544178", "discardsItem": "544167", "speed": 1000000000, "status": 1}], "pingItem": "544096", "secItem": "544098", "lossItem": "544097", "totalTraffic": 14549344.0}, {"hostid": "11413", "name": "[SGS] PIRACICABA - INTERNET ALGAR", "isp": "ALGAR", "ip": "177.69.152.14", "templates": ["Network Generic Device by SNMP", "Template Geobase GeoIP API"], "interfaces": [{"id": "3", "name": "Ethernet0/0(Link WAN Cliente -> (0000179639-PAA))", "rawName": "Interface Ethernet0/0(Link WAN Cliente -> (0000179639-PAA)): Duplex status", "inItem": {"itemid": "544392", "key": "net.if.in[ifInOctets.3]", "valueType": "3", "lastvalue": 13760232.0}, "outItem": {"itemid": "544407", "key": "net.if.out[ifOutOctets.3]", "valueType": "3", "lastvalue": 21386792.0}, "errorsItem": "544402", "discardsItem": "544397", "speed": 1000000000, "status": 1}, {"id": "4", "name": "Ethernet0/1(Ethernet0/1 Interface)", "rawName": "Interface Ethernet0/1(Ethernet0/1 Interface): Duplex status", "inItem": {"itemid": "544393", "key": "net.if.in[ifInOctets.4]", "valueType": "3", "lastvalue": 21374192.0}, "outItem": {"itemid": "544408", "key": "net.if.out[ifOutOctets.4]", "valueType": "3", "lastvalue": 15622832.0}, "errorsItem": "544403", "discardsItem": "544398", "speed": 1000000000, "status": 1}, {"id": "1", "name": "Aux0(Aux0 Interface)", "rawName": "Interface Aux0(Aux0 Interface): Inbound packets discarded", "inItem": {"itemid": "544390", "key": "net.if.in[ifInOctets.1]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "544405", "key": "net.if.out[ifOutOctets.1]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "544400", "discardsItem": "544395", "speed": 1000000000, "status": 1}, {"id": "2", "name": "Cellular0/0(Cellular0/0 Interface)", "rawName": "Interface Cellular0/0(Cellular0/0 Interface): Inbound packets discarded", "inItem": {"itemid": "544391", "key": "net.if.in[ifInOctets.2]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "544406", "key": "net.if.out[ifOutOctets.2]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "544401", "discardsItem": "544396", "speed": 1000000000, "status": 1}, {"id": "10", "name": "Vlan-interface1(Vlan-interface1 Interface)", "rawName": "Interface Vlan-interface1(Vlan-interface1 Interface): Inbound packets discarded", "inItem": {"itemid": "544394", "key": "net.if.in[ifInOctets.10]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "544409", "key": "net.if.out[ifOutOctets.10]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "544404", "discardsItem": "544399", "speed": 1000000000, "status": 1}], "pingItem": "544353", "secItem": "544355", "lossItem": "544354", "totalTraffic": 72144048.0}, {"hostid": "10829", "name": "[SGS] PIRACICABA - INTERNET VIVO", "isp": "VIVO", "ip": "186.201.99.81", "templates": ["Network Generic Device by SNMP", "Template Geobase GeoIP API"], "interfaces": [{"id": "3", "name": "GigabitEthernet0/1(interface_WAN_VIVO - LP 114743421032390 ID 1297574 PE i-br-sp-ca)", "rawName": "Interface GigabitEthernet0/1(interface_WAN_VIVO - LP 114743421032390 ID 1297574 PE i-br-sp-ca): Duplex status", "inItem": {"itemid": "544277", "key": "net.if.in[ifInOctets.3]", "valueType": "3", "lastvalue": 11768096.0}, "outItem": {"itemid": "544310", "key": "net.if.out[ifOutOctets.3]", "valueType": "3", "lastvalue": 5492400.0}, "errorsItem": "544299", "discardsItem": "544288", "speed": 1000000000, "status": 1}, {"id": "2", "name": "GigabitEthernet0/0(CNX LAN)", "rawName": "Interface GigabitEthernet0/0(CNX LAN): Duplex status", "inItem": {"itemid": "544276", "key": "net.if.in[ifInOctets.2]", "valueType": "3", "lastvalue": 5482136.0}, "outItem": {"itemid": "544309", "key": "net.if.out[ifOutOctets.2]", "valueType": "3", "lastvalue": 11750488.0}, "errorsItem": "544298", "discardsItem": "544287", "speed": 1000000000, "status": 1}, {"id": "4", "name": "GigabitEthernet0/2(GigabitEthernet0/2 Interface)", "rawName": "Interface GigabitEthernet0/2(GigabitEthernet0/2 Interface): Inbound packets discarded", "inItem": {"itemid": "544278", "key": "net.if.in[ifInOctets.4]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "544311", "key": "net.if.out[ifOutOctets.4]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "544300", "discardsItem": "544289", "speed": 1000000000, "status": 1}, {"id": "5", "name": "GigabitEthernet0/3(GigabitEthernet0/3 Interface)", "rawName": "Interface GigabitEthernet0/3(GigabitEthernet0/3 Interface): Inbound packets discarded", "inItem": {"itemid": "544279", "key": "net.if.in[ifInOctets.5]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "544312", "key": "net.if.out[ifOutOctets.5]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "544301", "discardsItem": "544290", "speed": 1000000000, "status": 1}, {"id": "6", "name": "GigabitEthernet0/4(GigabitEthernet0/4 Interface)", "rawName": "Interface GigabitEthernet0/4(GigabitEthernet0/4 Interface): Inbound packets discarded", "inItem": {"itemid": "544280", "key": "net.if.in[ifInOctets.6]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "544313", "key": "net.if.out[ifOutOctets.6]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "544302", "discardsItem": "544291", "speed": 1000000000, "status": 1}, {"id": "7", "name": "GigabitEthernet0/5(GigabitEthernet0/5 Interface)", "rawName": "Interface GigabitEthernet0/5(GigabitEthernet0/5 Interface): Inbound packets discarded", "inItem": {"itemid": "544281", "key": "net.if.in[ifInOctets.7]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "544314", "key": "net.if.out[ifOutOctets.7]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "544303", "discardsItem": "544292", "speed": 1000000000, "status": 1}, {"id": "8", "name": "Cellular0/0(Cellular0/0 Interface)", "rawName": "Interface Cellular0/0(Cellular0/0 Interface): Inbound packets discarded", "inItem": {"itemid": "544282", "key": "net.if.in[ifInOctets.8]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "544315", "key": "net.if.out[ifOutOctets.8]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "544304", "discardsItem": "544293", "speed": 1000000000, "status": 1}, {"id": "9", "name": "Cellular0/1(Cellular0/1 Interface)", "rawName": "Interface Cellular0/1(Cellular0/1 Interface): Inbound packets discarded", "inItem": {"itemid": "544283", "key": "net.if.in[ifInOctets.9]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "544316", "key": "net.if.out[ifOutOctets.9]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "544305", "discardsItem": "544294", "speed": 1000000000, "status": 1}, {"id": "17474", "name": "InLoopBack0(InLoopBack0 Interface)", "rawName": "Interface InLoopBack0(InLoopBack0 Interface): Inbound packets discarded", "inItem": {"itemid": "544284", "key": "net.if.in[ifInOctets.17474]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "544317", "key": "net.if.out[ifOutOctets.17474]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "544306", "discardsItem": "544295", "speed": 1000000000, "status": 1}, {"id": "17475", "name": "Register-Tunnel0(Register-Tunnel0 Interface)", "rawName": "Interface Register-Tunnel0(Register-Tunnel0 Interface): Inbound packets discarded", "inItem": {"itemid": "544285", "key": "net.if.in[ifInOctets.17475]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "544318", "key": "net.if.out[ifOutOctets.17475]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "544307", "discardsItem": "544296", "speed": 1000000000, "status": 1}, {"id": "17536", "name": "LoopBack0(GERENCIA VIVO)", "rawName": "Interface LoopBack0(GERENCIA VIVO): Inbound packets discarded", "inItem": {"itemid": "544286", "key": "net.if.in[ifInOctets.17536]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "544319", "key": "net.if.out[ifOutOctets.17536]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "544308", "discardsItem": "544297", "speed": 1000000000, "status": 1}], "pingItem": "544228", "secItem": "544230", "lossItem": "544229", "totalTraffic": 34493120.0}, {"hostid": "11414", "name": "[SGS] RECREIO - INTERNET ALGAR", "isp": "ALGAR", "ip": "177.69.228.86", "templates": ["Network Generic Device by SNMP", "Template Geobase GeoIP API"], "interfaces": [{"id": "7", "name": "Gi1()", "rawName": "Interface Gi1(): Duplex status", "inItem": {"itemid": "545755", "key": "net.if.in[ifInOctets.7]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "545794", "key": "net.if.out[ifOutOctets.7]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "545781", "discardsItem": "545768", "speed": 1000000000, "status": 1}, {"id": "8", "name": "Gi2(cl-rt-rjo-sgs-01(09860198-RJO))", "rawName": "Interface Gi2(cl-rt-rjo-sgs-01(09860198-RJO)): Duplex status", "inItem": {"itemid": "545756", "key": "net.if.in[ifInOctets.8]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "545795", "key": "net.if.out[ifOutOctets.8]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "545782", "discardsItem": "545769", "speed": 1000000000, "status": 1}, {"id": "3", "name": "Fa0()", "rawName": "Interface Fa0(): Inbound packets discarded", "inItem": {"itemid": "545751", "key": "net.if.in[ifInOctets.3]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "545790", "key": "net.if.out[ifOutOctets.3]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "545777", "discardsItem": "545764", "speed": 1000000000, "status": 1}, {"id": "4", "name": "Fa1()", "rawName": "Interface Fa1(): Inbound packets discarded", "inItem": {"itemid": "545752", "key": "net.if.in[ifInOctets.4]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "545791", "key": "net.if.out[ifOutOctets.4]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "545778", "discardsItem": "545765", "speed": 1000000000, "status": 1}, {"id": "5", "name": "Fa2()", "rawName": "Interface Fa2(): Inbound packets discarded", "inItem": {"itemid": "545753", "key": "net.if.in[ifInOctets.5]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "545792", "key": "net.if.out[ifOutOctets.5]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "545779", "discardsItem": "545766", "speed": 1000000000, "status": 1}, {"id": "6", "name": "Gi0()", "rawName": "Interface Gi0(): Inbound packets discarded", "inItem": {"itemid": "545754", "key": "net.if.in[ifInOctets.6]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "545793", "key": "net.if.out[ifOutOctets.6]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "545780", "discardsItem": "545767", "speed": 1000000000, "status": 1}, {"id": "9", "name": "Vo0()", "rawName": "Interface Vo0(): Inbound packets discarded", "inItem": {"itemid": "545757", "key": "net.if.in[ifInOctets.9]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "545796", "key": "net.if.out[ifOutOctets.9]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "545783", "discardsItem": "545770", "speed": 1000000000, "status": 1}, {"id": "11", "name": "ATM0-atm layer()", "rawName": "Interface ATM0-atm layer(): Inbound packets discarded", "inItem": {"itemid": "545758", "key": "net.if.in[ifInOctets.11]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "545797", "key": "net.if.out[ifOutOctets.11]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "545784", "discardsItem": "545771", "speed": 1000000000, "status": 1}, {"id": "12", "name": "ATM0.0-atm subif()", "rawName": "Interface ATM0.0-atm subif(): Inbound packets discarded", "inItem": {"itemid": "545759", "key": "net.if.in[ifInOctets.12]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "545798", "key": "net.if.out[ifOutOctets.12]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "545785", "discardsItem": "545772", "speed": 1000000000, "status": 1}, {"id": "13", "name": "ATM0-aal5 layer()", "rawName": "Interface ATM0-aal5 layer(): Inbound packets discarded", "inItem": {"itemid": "545760", "key": "net.if.in[ifInOctets.13]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "545799", "key": "net.if.out[ifOutOctets.13]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "545786", "discardsItem": "545773", "speed": 1000000000, "status": 1}, {"id": "14", "name": "ATM0.0-aal5 layer()", "rawName": "Interface ATM0.0-aal5 layer(): Inbound packets discarded", "inItem": {"itemid": "545761", "key": "net.if.in[ifInOctets.14]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "545800", "key": "net.if.out[ifOutOctets.14]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "545787", "discardsItem": "545774", "speed": 1000000000, "status": 1}, {"id": "17", "name": "Vl1()", "rawName": "Interface Vl1(): Inbound packets discarded", "inItem": {"itemid": "545762", "key": "net.if.in[ifInOctets.17]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "545801", "key": "net.if.out[ifOutOctets.17]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "545788", "discardsItem": "545775", "speed": 1000000000, "status": 1}, {"id": "18", "name": "Vl10(Ambiente_do_Cliente)", "rawName": "Interface Vl10(Ambiente_do_Cliente): Inbound packets discarded", "inItem": {"itemid": "545763", "key": "net.if.in[ifInOctets.18]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "545802", "key": "net.if.out[ifOutOctets.18]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "545789", "discardsItem": "545776", "speed": 1000000000, "status": 1}], "pingItem": "174474", "secItem": "174476", "lossItem": "174475", "totalTraffic": 0.0}, {"hostid": "10830", "name": "[SGS] RECREIO - INTERNET VIVO", "isp": "VIVO", "ip": "187.50.48.9", "templates": ["Network Generic Device by SNMP", "Template Geobase GeoIP API"], "interfaces": [{"id": "2", "name": "Fa0/1(CNX WAN LP - 210000129756890 ID - 1297568 PE - i-br-rj-rjo-bar-r)", "rawName": "Interface Fa0/1(CNX WAN LP - 210000129756890 ID - 1297568 PE - i-br-rj-rjo-bar-r): Duplex status", "inItem": {"itemid": "545447", "key": "net.if.in[ifInOctets.2]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "545459", "key": "net.if.out[ifOutOctets.2]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "545455", "discardsItem": "545451", "speed": 1000000000, "status": 1}, {"id": "1", "name": "Fa0/0(CNX LAN)", "rawName": "Interface Fa0/0(CNX LAN): Duplex status", "inItem": {"itemid": "545446", "key": "net.if.in[ifInOctets.1]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "545458", "key": "net.if.out[ifOutOctets.1]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "545454", "discardsItem": "545450", "speed": 1000000000, "status": 1}, {"id": "3", "name": "Vo0()", "rawName": "Interface Vo0(): Inbound packets discarded", "inItem": {"itemid": "545448", "key": "net.if.in[ifInOctets.3]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "545460", "key": "net.if.out[ifOutOctets.3]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "545456", "discardsItem": "545452", "speed": 1000000000, "status": 1}, {"id": "6", "name": "NV0()", "rawName": "Interface NV0(): Inbound packets discarded", "inItem": {"itemid": "545449", "key": "net.if.in[ifInOctets.6]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "545461", "key": "net.if.out[ifOutOctets.6]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "545457", "discardsItem": "545453", "speed": 1000000000, "status": 1}], "pingItem": "543640", "secItem": "543670", "lossItem": "543655", "totalTraffic": 0.0}, {"hostid": "11418", "name": "[SGS] RIO GRANDE - INTERNET ALGAR", "isp": "ALGAR", "ip": "177.69.37.78", "templates": ["Network Generic Device by SNMP", "Template Geobase GeoIP API"], "interfaces": [{"id": "3", "name": "Gi0(Ambiente do Cliente)", "rawName": "Interface Gi0(Ambiente do Cliente): Inbound packets discarded", "inItem": {"itemid": "549976", "key": "net.if.in[ifInOctets.3]", "valueType": "3", "lastvalue": 130320.0}, "outItem": {"itemid": "549985", "key": "net.if.out[ifOutOctets.3]", "valueType": "3", "lastvalue": 814896.0}, "errorsItem": "549982", "discardsItem": "549979", "speed": 1000000000, "status": 1}, {"id": "1", "name": "Gi4(rt-rgr-07181-sgsdobrasi-01-(09860341))", "rawName": "Interface Gi4(rt-rgr-07181-sgsdobrasi-01-(09860341)): Duplex status", "inItem": {"itemid": "549975", "key": "net.if.in[ifInOctets.1]", "valueType": "3", "lastvalue": 799496.0}, "outItem": {"itemid": "549984", "key": "net.if.out[ifOutOctets.1]", "valueType": "3", "lastvalue": 129848.0}, "errorsItem": "549981", "discardsItem": "549978", "speed": 1000000000, "status": 1}, {"id": "9", "name": "Vl10(Ambiente do cliente)", "rawName": "Interface Vl10(Ambiente do cliente): Inbound packets discarded", "inItem": {"itemid": "549977", "key": "net.if.in[ifInOctets.9]", "valueType": "3", "lastvalue": 127576.0}, "outItem": {"itemid": "549986", "key": "net.if.out[ifOutOctets.9]", "valueType": "3", "lastvalue": 797824.0}, "errorsItem": "549983", "discardsItem": "549980", "speed": 1000000000, "status": 1}], "pingItem": "176038", "secItem": "176040", "lossItem": "176039", "totalTraffic": 2799960.0}, {"hostid": "11419", "name": "[SGS] SANTOS - INTERNET ALGAR", "isp": "ALGAR", "ip": "177.69.86.162", "templates": ["Network Generic Device by SNMP", "Template Geobase GeoIP API"], "interfaces": [{"id": "1", "name": "ether1(WAN-09305097)", "rawName": "Interface ether1(WAN-09305097): Inbound packets discarded", "inItem": {"itemid": "545956", "key": "net.if.in[ifInOctets.1]", "valueType": "3", "lastvalue": 13475872.0}, "outItem": {"itemid": "545965", "key": "net.if.out[ifOutOctets.1]", "valueType": "3", "lastvalue": 2508144.0}, "errorsItem": "545962", "discardsItem": "545959", "speed": 1000000000, "status": 1}, {"id": "2", "name": "ether2(Ambiente_do_Cliente)", "rawName": "Interface ether2(Ambiente_do_Cliente): Inbound packets discarded", "inItem": {"itemid": "545957", "key": "net.if.in[ifInOctets.2]", "valueType": "3", "lastvalue": 2507168.0}, "outItem": {"itemid": "545966", "key": "net.if.out[ifOutOctets.2]", "valueType": "3", "lastvalue": 13470864.0}, "errorsItem": "545963", "discardsItem": "545960", "speed": 1000000000, "status": 1}, {"id": "6", "name": "LAN-DADOS(Ambiente_do_Cliente)", "rawName": "Interface LAN-DADOS(Ambiente_do_Cliente): Inbound packets discarded", "inItem": {"itemid": "545958", "key": "net.if.in[ifInOctets.6]", "valueType": "3", "lastvalue": 2472472.0}, "outItem": {"itemid": "545967", "key": "net.if.out[ifOutOctets.6]", "valueType": "3", "lastvalue": 13413808.0}, "errorsItem": "545964", "discardsItem": "545961", "speed": 1000000000, "status": 1}], "pingItem": "543647", "secItem": "543677", "lossItem": "543662", "totalTraffic": 47848328.0}, {"hostid": "10837", "name": "[SGS] SANTOS - INTERNET VIVO", "isp": "VIVO", "ip": "186.200.179.145", "templates": ["Network Generic Device by SNMP", "Template Geobase GeoIP API"], "interfaces": [{"id": "3", "name": "GigabitEthernet0/1(CNX WAN LP - 115923295440890 ID - 2103073 PE - i-br-sp-sts-wl-ra)", "rawName": "Interface GigabitEthernet0/1(CNX WAN LP - 115923295440890 ID - 2103073 PE - i-br-sp-sts-wl-ra): Duplex status", "inItem": {"itemid": "545499", "key": "net.if.in[ifInOctets.3]", "valueType": "3", "lastvalue": 48055264.0}, "outItem": {"itemid": "545532", "key": "net.if.out[ifOutOctets.3]", "valueType": "3", "lastvalue": 6666920.0}, "errorsItem": "545521", "discardsItem": "545510", "speed": 1000000000, "status": 1}, {"id": "2", "name": "GigabitEthernet0/0(CNX LAN)", "rawName": "Interface GigabitEthernet0/0(CNX LAN): Duplex status", "inItem": {"itemid": "545498", "key": "net.if.in[ifInOctets.2]", "valueType": "3", "lastvalue": 6663640.0}, "outItem": {"itemid": "545531", "key": "net.if.out[ifOutOctets.2]", "valueType": "3", "lastvalue": 75616728.0}, "errorsItem": "545520", "discardsItem": "545509", "speed": 1000000000, "status": 1}, {"id": "4", "name": "GigabitEthernet0/2(GigabitEthernet0/2 Interface)", "rawName": "Interface GigabitEthernet0/2(GigabitEthernet0/2 Interface): Inbound packets discarded", "inItem": {"itemid": "545500", "key": "net.if.in[ifInOctets.4]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "545533", "key": "net.if.out[ifOutOctets.4]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "545522", "discardsItem": "545511", "speed": 1000000000, "status": 1}, {"id": "5", "name": "GigabitEthernet0/3(GigabitEthernet0/3 Interface)", "rawName": "Interface GigabitEthernet0/3(GigabitEthernet0/3 Interface): Inbound packets discarded", "inItem": {"itemid": "545501", "key": "net.if.in[ifInOctets.5]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "545534", "key": "net.if.out[ifOutOctets.5]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "545523", "discardsItem": "545512", "speed": 1000000000, "status": 1}, {"id": "6", "name": "GigabitEthernet0/4(GigabitEthernet0/4 Interface)", "rawName": "Interface GigabitEthernet0/4(GigabitEthernet0/4 Interface): Inbound packets discarded", "inItem": {"itemid": "545502", "key": "net.if.in[ifInOctets.6]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "545535", "key": "net.if.out[ifOutOctets.6]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "545524", "discardsItem": "545513", "speed": 1000000000, "status": 1}, {"id": "7", "name": "GigabitEthernet0/5(GigabitEthernet0/5 Interface)", "rawName": "Interface GigabitEthernet0/5(GigabitEthernet0/5 Interface): Inbound packets discarded", "inItem": {"itemid": "545503", "key": "net.if.in[ifInOctets.7]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "545536", "key": "net.if.out[ifOutOctets.7]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "545525", "discardsItem": "545514", "speed": 1000000000, "status": 1}, {"id": "8", "name": "Cellular0/0(Cellular0/0 Interface)", "rawName": "Interface Cellular0/0(Cellular0/0 Interface): Inbound packets discarded", "inItem": {"itemid": "545504", "key": "net.if.in[ifInOctets.8]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "545537", "key": "net.if.out[ifOutOctets.8]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "545526", "discardsItem": "545515", "speed": 1000000000, "status": 1}, {"id": "9", "name": "Cellular0/1(Cellular0/1 Interface)", "rawName": "Interface Cellular0/1(Cellular0/1 Interface): Inbound packets discarded", "inItem": {"itemid": "545505", "key": "net.if.in[ifInOctets.9]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "545538", "key": "net.if.out[ifOutOctets.9]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "545527", "discardsItem": "545516", "speed": 1000000000, "status": 1}, {"id": "17474", "name": "InLoopBack0(InLoopBack0 Interface)", "rawName": "Interface InLoopBack0(InLoopBack0 Interface): Inbound packets discarded", "inItem": {"itemid": "545506", "key": "net.if.in[ifInOctets.17474]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "545539", "key": "net.if.out[ifOutOctets.17474]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "545528", "discardsItem": "545517", "speed": 1000000000, "status": 1}, {"id": "17475", "name": "Register-Tunnel0(Register-Tunnel0 Interface)", "rawName": "Interface Register-Tunnel0(Register-Tunnel0 Interface): Inbound packets discarded", "inItem": {"itemid": "545507", "key": "net.if.in[ifInOctets.17475]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "545540", "key": "net.if.out[ifOutOctets.17475]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "545529", "discardsItem": "545518", "speed": 1000000000, "status": 1}, {"id": "17536", "name": "LoopBack0(GERENCIA VIVO)", "rawName": "Interface LoopBack0(GERENCIA VIVO): Inbound packets discarded", "inItem": {"itemid": "545508", "key": "net.if.in[ifInOctets.17536]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "545541", "key": "net.if.out[ifOutOctets.17536]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "545530", "discardsItem": "545519", "speed": 1000000000, "status": 1}], "pingItem": "543641", "secItem": "543671", "lossItem": "543656", "totalTraffic": 137002552.0}, {"hostid": "11420", "name": "[SGS] SERRA INDUSTRIAL - INTERNET ALGAR", "isp": "ALGAR", "ip": "189.112.136.130", "templates": ["Network Generic Device by SNMP", "Template Geobase GeoIP API"], "interfaces": [{"id": "8", "name": "Gi2(\"WAN\")", "rawName": "Interface Gi2(\"WAN\"): Duplex status", "inItem": {"itemid": "546008", "key": "net.if.in[ifInOctets.8]", "valueType": "3", "lastvalue": 3508888.0}, "outItem": {"itemid": "546044", "key": "net.if.out[ifOutOctets.8]", "valueType": "3", "lastvalue": 827248.0}, "errorsItem": "546032", "discardsItem": "546020", "speed": 1000000000, "status": 1}, {"id": "7", "name": "Gi1(Ambiente do Cliente)", "rawName": "Interface Gi1(Ambiente do Cliente): Duplex status", "inItem": {"itemid": "546007", "key": "net.if.in[ifInOctets.7]", "valueType": "3", "lastvalue": 622944.0}, "outItem": {"itemid": "546043", "key": "net.if.out[ifOutOctets.7]", "valueType": "3", "lastvalue": 3412560.0}, "errorsItem": "546031", "discardsItem": "546019", "speed": 1000000000, "status": 1}, {"id": "18", "name": "Vl10(Ambiente do cliente)", "rawName": "Interface Vl10(Ambiente do cliente): Inbound packets discarded", "inItem": {"itemid": "546014", "key": "net.if.in[ifInOctets.18]", "valueType": "3", "lastvalue": 639832.0}, "outItem": {"itemid": "546050", "key": "net.if.out[ifOutOctets.18]", "valueType": "3", "lastvalue": 1893160.0}, "errorsItem": "546038", "discardsItem": "546026", "speed": 1000000000, "status": 1}, {"id": "3", "name": "Fa0()", "rawName": "Interface Fa0(): Inbound packets discarded", "inItem": {"itemid": "546003", "key": "net.if.in[ifInOctets.3]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "546039", "key": "net.if.out[ifOutOctets.3]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "546027", "discardsItem": "546015", "speed": 1000000000, "status": 1}, {"id": "4", "name": "Fa1()", "rawName": "Interface Fa1(): Inbound packets discarded", "inItem": {"itemid": "546004", "key": "net.if.in[ifInOctets.4]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "546040", "key": "net.if.out[ifOutOctets.4]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "546028", "discardsItem": "546016", "speed": 1000000000, "status": 1}, {"id": "5", "name": "Fa2()", "rawName": "Interface Fa2(): Inbound packets discarded", "inItem": {"itemid": "546005", "key": "net.if.in[ifInOctets.5]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "546041", "key": "net.if.out[ifOutOctets.5]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "546029", "discardsItem": "546017", "speed": 1000000000, "status": 1}, {"id": "6", "name": "Gi0()", "rawName": "Interface Gi0(): Inbound packets discarded", "inItem": {"itemid": "546006", "key": "net.if.in[ifInOctets.6]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "546042", "key": "net.if.out[ifOutOctets.6]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "546030", "discardsItem": "546018", "speed": 1000000000, "status": 1}, {"id": "9", "name": "Vo0()", "rawName": "Interface Vo0(): Inbound packets discarded", "inItem": {"itemid": "546009", "key": "net.if.in[ifInOctets.9]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "546045", "key": "net.if.out[ifOutOctets.9]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "546033", "discardsItem": "546021", "speed": 1000000000, "status": 1}, {"id": "11", "name": "ATM0-atm layer()", "rawName": "Interface ATM0-atm layer(): Inbound packets discarded", "inItem": {"itemid": "546010", "key": "net.if.in[ifInOctets.11]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "546046", "key": "net.if.out[ifOutOctets.11]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "546034", "discardsItem": "546022", "speed": 1000000000, "status": 1}, {"id": "12", "name": "ATM0.0-atm subif()", "rawName": "Interface ATM0.0-atm subif(): Inbound packets discarded", "inItem": {"itemid": "546011", "key": "net.if.in[ifInOctets.12]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "546047", "key": "net.if.out[ifOutOctets.12]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "546035", "discardsItem": "546023", "speed": 1000000000, "status": 1}, {"id": "13", "name": "ATM0-aal5 layer()", "rawName": "Interface ATM0-aal5 layer(): Inbound packets discarded", "inItem": {"itemid": "546012", "key": "net.if.in[ifInOctets.13]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "546048", "key": "net.if.out[ifOutOctets.13]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "546036", "discardsItem": "546024", "speed": 1000000000, "status": 1}, {"id": "14", "name": "ATM0.0-aal5 layer()", "rawName": "Interface ATM0.0-aal5 layer(): Inbound packets discarded", "inItem": {"itemid": "546013", "key": "net.if.in[ifInOctets.14]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "546049", "key": "net.if.out[ifOutOctets.14]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "546037", "discardsItem": "546025", "speed": 1000000000, "status": 1}], "pingItem": "176142", "secItem": "176144", "lossItem": "176143", "totalTraffic": 10904632.0}, {"hostid": "10842", "name": "[SGS] SERRA INDUSTRIAL - INTERNET VIVO", "isp": "VIVO", "ip": "179.184.128.209", "templates": ["Network Generic Device by SNMP", "Template Geobase GeoIP API"], "interfaces": [{"id": "17413", "name": "GigabitEthernet0/0.1978(CNX WAN - I-BR-ES-VTA-AS-RAI-01 - LP 271990210304498)", "rawName": "Interface GigabitEthernet0/0.1978(CNX WAN - I-BR-ES-VTA-AS-RAI-01 - LP 271990210304498): Inbound packets discarded", "inItem": {"itemid": "545671", "key": "net.if.in[ifInOctets.17413]", "valueType": "3", "lastvalue": 1406280.0}, "outItem": {"itemid": "545695", "key": "net.if.out[ifOutOctets.17413]", "valueType": "3", "lastvalue": 202088.0}, "errorsItem": "545687", "discardsItem": "545679", "speed": 1000000000, "status": 1}, {"id": "2", "name": "GigabitEthernet0/0(GigabitEthernet0/0 Interface)", "rawName": "Interface GigabitEthernet0/0(GigabitEthernet0/0 Interface): Duplex status", "inItem": {"itemid": "545665", "key": "net.if.in[ifInOctets.2]", "valueType": "3", "lastvalue": 1411952.0}, "outItem": {"itemid": "545689", "key": "net.if.out[ifOutOctets.2]", "valueType": "3", "lastvalue": 202144.0}, "errorsItem": "545681", "discardsItem": "545673", "speed": 1000000000, "status": 1}, {"id": "3", "name": "GigabitEthernet0/1(CNX LAN)", "rawName": "Interface GigabitEthernet0/1(CNX LAN): Duplex status", "inItem": {"itemid": "545666", "key": "net.if.in[ifInOctets.3]", "valueType": "3", "lastvalue": 198528.0}, "outItem": {"itemid": "545690", "key": "net.if.out[ifOutOctets.3]", "valueType": "3", "lastvalue": 1405056.0}, "errorsItem": "545682", "discardsItem": "545674", "speed": 1000000000, "status": 1}, {"id": "8", "name": "Cellular0/0(Cellular0/0 Interface)", "rawName": "Interface Cellular0/0(Cellular0/0 Interface): Inbound packets discarded", "inItem": {"itemid": "545667", "key": "net.if.in[ifInOctets.8]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "545691", "key": "net.if.out[ifOutOctets.8]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "545683", "discardsItem": "545675", "speed": 1000000000, "status": 1}, {"id": "9", "name": "Cellular0/1(Cellular0/1 Interface)", "rawName": "Interface Cellular0/1(Cellular0/1 Interface): Inbound packets discarded", "inItem": {"itemid": "545668", "key": "net.if.in[ifInOctets.9]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "545692", "key": "net.if.out[ifOutOctets.9]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "545684", "discardsItem": "545676", "speed": 1000000000, "status": 1}, {"id": "17411", "name": "InLoopBack0(InLoopBack0 Interface)", "rawName": "Interface InLoopBack0(InLoopBack0 Interface): Inbound packets discarded", "inItem": {"itemid": "545669", "key": "net.if.in[ifInOctets.17411]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "545693", "key": "net.if.out[ifOutOctets.17411]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "545685", "discardsItem": "545677", "speed": 1000000000, "status": 1}, {"id": "17412", "name": "Register-Tunnel0(Register-Tunnel0 Interface)", "rawName": "Interface Register-Tunnel0(Register-Tunnel0 Interface): Inbound packets discarded", "inItem": {"itemid": "545670", "key": "net.if.in[ifInOctets.17412]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "545694", "key": "net.if.out[ifOutOctets.17412]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "545686", "discardsItem": "545678", "speed": 1000000000, "status": 1}, {"id": "17414", "name": "LoopBack0(LoopBack0 Interface)", "rawName": "Interface LoopBack0(LoopBack0 Interface): Inbound packets discarded", "inItem": {"itemid": "545672", "key": "net.if.in[ifInOctets.17414]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "545696", "key": "net.if.out[ifOutOctets.17414]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "545688", "discardsItem": "545680", "speed": 1000000000, "status": 1}], "pingItem": "543643", "secItem": "543673", "lossItem": "543658", "totalTraffic": 4826048.0}, {"hostid": "11415", "name": "[SGS] SERRA MINERALS - INTERNET ALGAR", "isp": "ALGAR", "ip": "177.69.230.14", "templates": ["Network Generic Device by SNMP", "Template Geobase GeoIP API"], "interfaces": [{"id": "8", "name": "Gi2(\"WAN\")", "rawName": "Interface Gi2(\"WAN\"): Inbound packets discarded", "inItem": {"itemid": "545871", "key": "net.if.in[ifInOctets.8]", "valueType": "3", "lastvalue": 8224656.0}, "outItem": {"itemid": "545907", "key": "net.if.out[ifOutOctets.8]", "valueType": "3", "lastvalue": 966856.0}, "errorsItem": "545895", "discardsItem": "545883", "speed": 1000000000, "status": 1}, {"id": "18", "name": "Vl10(Ambiente do cliente)", "rawName": "Interface Vl10(Ambiente do cliente): Inbound packets discarded", "inItem": {"itemid": "545877", "key": "net.if.in[ifInOctets.18]", "valueType": "3", "lastvalue": 1161408.0}, "outItem": {"itemid": "545913", "key": "net.if.out[ifOutOctets.18]", "valueType": "3", "lastvalue": 7663760.0}, "errorsItem": "545901", "discardsItem": "545889", "speed": 1000000000, "status": 1}, {"id": "7", "name": "Gi1(Ambiente do Cliente)", "rawName": "Interface Gi1(Ambiente do Cliente): Inbound packets discarded", "inItem": {"itemid": "545870", "key": "net.if.in[ifInOctets.7]", "valueType": "3", "lastvalue": 1016256.0}, "outItem": {"itemid": "545906", "key": "net.if.out[ifOutOctets.7]", "valueType": "3", "lastvalue": 7768808.0}, "errorsItem": "545894", "discardsItem": "545882", "speed": 1000000000, "status": 1}, {"id": "3", "name": "Fa0()", "rawName": "Interface Fa0(): Inbound packets discarded", "inItem": {"itemid": "545866", "key": "net.if.in[ifInOctets.3]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "545902", "key": "net.if.out[ifOutOctets.3]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "545890", "discardsItem": "545878", "speed": 1000000000, "status": 1}, {"id": "4", "name": "Fa1()", "rawName": "Interface Fa1(): Inbound packets discarded", "inItem": {"itemid": "545867", "key": "net.if.in[ifInOctets.4]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "545903", "key": "net.if.out[ifOutOctets.4]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "545891", "discardsItem": "545879", "speed": 1000000000, "status": 1}, {"id": "5", "name": "Fa2()", "rawName": "Interface Fa2(): Inbound packets discarded", "inItem": {"itemid": "545868", "key": "net.if.in[ifInOctets.5]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "545904", "key": "net.if.out[ifOutOctets.5]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "545892", "discardsItem": "545880", "speed": 1000000000, "status": 1}, {"id": "6", "name": "Gi0()", "rawName": "Interface Gi0(): Inbound packets discarded", "inItem": {"itemid": "545869", "key": "net.if.in[ifInOctets.6]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "545905", "key": "net.if.out[ifOutOctets.6]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "545893", "discardsItem": "545881", "speed": 1000000000, "status": 1}, {"id": "9", "name": "Vo0()", "rawName": "Interface Vo0(): Inbound packets discarded", "inItem": {"itemid": "545872", "key": "net.if.in[ifInOctets.9]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "545908", "key": "net.if.out[ifOutOctets.9]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "545896", "discardsItem": "545884", "speed": 1000000000, "status": 1}, {"id": "11", "name": "ATM0-atm layer()", "rawName": "Interface ATM0-atm layer(): Inbound packets discarded", "inItem": {"itemid": "545873", "key": "net.if.in[ifInOctets.11]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "545909", "key": "net.if.out[ifOutOctets.11]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "545897", "discardsItem": "545885", "speed": 1000000000, "status": 1}, {"id": "12", "name": "ATM0.0-atm subif()", "rawName": "Interface ATM0.0-atm subif(): Inbound packets discarded", "inItem": {"itemid": "545874", "key": "net.if.in[ifInOctets.12]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "545910", "key": "net.if.out[ifOutOctets.12]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "545898", "discardsItem": "545886", "speed": 1000000000, "status": 1}, {"id": "13", "name": "ATM0-aal5 layer()", "rawName": "Interface ATM0-aal5 layer(): Inbound packets discarded", "inItem": {"itemid": "545875", "key": "net.if.in[ifInOctets.13]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "545911", "key": "net.if.out[ifOutOctets.13]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "545899", "discardsItem": "545887", "speed": 1000000000, "status": 1}, {"id": "14", "name": "ATM0.0-aal5 layer()", "rawName": "Interface ATM0.0-aal5 layer(): Inbound packets discarded", "inItem": {"itemid": "545876", "key": "net.if.in[ifInOctets.14]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "545912", "key": "net.if.out[ifOutOctets.14]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "545900", "discardsItem": "545888", "speed": 1000000000, "status": 1}], "pingItem": "174653", "secItem": "174655", "lossItem": "174654", "totalTraffic": 26801744.0}, {"hostid": "10844", "name": "[SGS] SERRA MINERALS - INTERNET VIVO", "isp": "VIVO", "ip": "177.135.138.81", "templates": ["Network Generic Device by SNMP", "Template Geobase GeoIP API"], "interfaces": [{"id": "17414", "name": "GigabitEthernet0/0.2038(CNX WAN - i-br-es-vta-sne-rsd-01)", "rawName": "Interface GigabitEthernet0/0.2038(CNX WAN - i-br-es-vta-sne-rsd-01): Inbound packets discarded", "inItem": {"itemid": "545598", "key": "net.if.in[ifInOctets.17414]", "valueType": "3", "lastvalue": 401312.0}, "outItem": {"itemid": "545622", "key": "net.if.out[ifOutOctets.17414]", "valueType": "3", "lastvalue": 187912.0}, "errorsItem": "545614", "discardsItem": "545606", "speed": 1000000000, "status": 1}, {"id": "2", "name": "GigabitEthernet0/0(GigabitEthernet0/0 Interface)", "rawName": "Interface GigabitEthernet0/0(GigabitEthernet0/0 Interface): Inbound packets discarded", "inItem": {"itemid": "545591", "key": "net.if.in[ifInOctets.2]", "valueType": "3", "lastvalue": 404120.0}, "outItem": {"itemid": "545615", "key": "net.if.out[ifOutOctets.2]", "valueType": "3", "lastvalue": 187208.0}, "errorsItem": "545607", "discardsItem": "545599", "speed": 1000000000, "status": 1}, {"id": "3", "name": "GigabitEthernet0/1(CNX LAN)", "rawName": "Interface GigabitEthernet0/1(CNX LAN): Inbound packets discarded", "inItem": {"itemid": "545592", "key": "net.if.in[ifInOctets.3]", "valueType": "3", "lastvalue": 179888.0}, "outItem": {"itemid": "545616", "key": "net.if.out[ifOutOctets.3]", "valueType": "3", "lastvalue": 400648.0}, "errorsItem": "545608", "discardsItem": "545600", "speed": 1000000000, "status": 1}, {"id": "8", "name": "Cellular0/0(Cellular0/0 Interface)", "rawName": "Interface Cellular0/0(Cellular0/0 Interface): Inbound packets discarded", "inItem": {"itemid": "545593", "key": "net.if.in[ifInOctets.8]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "545617", "key": "net.if.out[ifOutOctets.8]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "545609", "discardsItem": "545601", "speed": 1000000000, "status": 1}, {"id": "9", "name": "Cellular0/1(Cellular0/1 Interface)", "rawName": "Interface Cellular0/1(Cellular0/1 Interface): Inbound packets discarded", "inItem": {"itemid": "545594", "key": "net.if.in[ifInOctets.9]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "545618", "key": "net.if.out[ifOutOctets.9]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "545610", "discardsItem": "545602", "speed": 1000000000, "status": 1}, {"id": "17411", "name": "InLoopBack0(InLoopBack0 Interface)", "rawName": "Interface InLoopBack0(InLoopBack0 Interface): Inbound packets discarded", "inItem": {"itemid": "545595", "key": "net.if.in[ifInOctets.17411]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "545619", "key": "net.if.out[ifOutOctets.17411]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "545611", "discardsItem": "545603", "speed": 1000000000, "status": 1}, {"id": "17412", "name": "Register-Tunnel0(Register-Tunnel0 Interface)", "rawName": "Interface Register-Tunnel0(Register-Tunnel0 Interface): Inbound packets discarded", "inItem": {"itemid": "545596", "key": "net.if.in[ifInOctets.17412]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "545620", "key": "net.if.out[ifOutOctets.17412]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "545612", "discardsItem": "545604", "speed": 1000000000, "status": 1}, {"id": "17413", "name": "LoopBack0(LoopBack0 Interface)", "rawName": "Interface LoopBack0(LoopBack0 Interface): Inbound packets discarded", "inItem": {"itemid": "545597", "key": "net.if.in[ifInOctets.17413]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "545621", "key": "net.if.out[ifOutOctets.17413]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "545613", "discardsItem": "545605", "speed": 1000000000, "status": 1}], "pingItem": "543974", "secItem": "543982", "lossItem": "543978", "totalTraffic": 1761088.0}, {"hostid": "11515", "name": "[SGS] SÃO BERNARDO - INTERNET ALGAR", "isp": "ALGAR", "ip": "189.39.8.138", "templates": ["Network Generic Device by SNMP", "Template Geobase GeoIP API"], "interfaces": [{"id": "1", "name": "Gi0/0(cl-rt-spo--01 (-SPO))", "rawName": "Interface Gi0/0(cl-rt-spo--01 (-SPO)): Inbound packets discarded", "inItem": {"itemid": "560262", "key": "net.if.in[ifInOctets.1]", "valueType": "3", "lastvalue": 7697136.0}, "outItem": {"itemid": "560268", "key": "net.if.out[ifOutOctets.1]", "valueType": "3", "lastvalue": 3791208.0}, "errorsItem": "560266", "discardsItem": "560264", "speed": 1000000000, "status": 1}, {"id": "2", "name": "Gi0/1(Ambiente_do_cliente)", "rawName": "Interface Gi0/1(Ambiente_do_cliente): Inbound packets discarded", "inItem": {"itemid": "560263", "key": "net.if.in[ifInOctets.2]", "valueType": "3", "lastvalue": 3792984.0}, "outItem": {"itemid": "560269", "key": "net.if.out[ifOutOctets.2]", "valueType": "3", "lastvalue": 7694104.0}, "errorsItem": "560267", "discardsItem": "560265", "speed": 1000000000, "status": 1}], "pingItem": "317490", "secItem": "317492", "lossItem": "317491", "totalTraffic": 22975432.0}, {"hostid": "10839", "name": "[SGS] SÃO BERNARDO - INTERNET VIVO", "isp": "VIVO", "ip": "187.92.197.81", "templates": ["Network Generic Device by SNMP", "Template Geobase GeoIP API"], "interfaces": [{"id": "11", "name": "eth1(CNX_WAN_LP-115484335055992ID-2103048_PE-i-br-sp-sne-sa-rai-02)", "rawName": "Interface eth1(CNX_WAN_LP-115484335055992ID-2103048_PE-i-br-sp-sne-sa-rai-02): Inbound packets discarded", "inItem": {"itemid": "564698", "key": "net.if.in[ifInOctets.11]", "valueType": "3", "lastvalue": 4917560.0}, "outItem": {"itemid": "564704", "key": "net.if.out[ifOutOctets.11]", "valueType": "3", "lastvalue": 3169592.0}, "errorsItem": "564702", "discardsItem": "564700", "speed": 1000000000, "status": 1}, {"id": "10", "name": "eth2(CNX_LAN)", "rawName": "Interface eth2(CNX_LAN): Inbound packets discarded", "inItem": {"itemid": "564697", "key": "net.if.in[ifInOctets.10]", "valueType": "3", "lastvalue": 70936.0}, "outItem": {"itemid": "564703", "key": "net.if.out[ifOutOctets.10]", "valueType": "3", "lastvalue": 3720808.0}, "errorsItem": "564701", "discardsItem": "564699", "speed": 1000000000, "status": 1}], "pingItem": "543642", "secItem": "543672", "lossItem": "543657", "totalTraffic": 11878896.0}, {"hostid": "11687", "name": "[SGS] SÃO JOÃO DA BARRA - INTERNET VEGANET", "isp": "VEGANET", "ip": "10.242.24.254", "templates": ["Mikrotik by SNMP"], "interfaces": [{"id": "1", "name": "ETH1-WAN-STARLINK()", "rawName": "Interface ETH1-WAN-STARLINK(): Inbound packets discarded", "inItem": {"itemid": "513561", "key": "net.if.in[ifHCInOctets.1]", "valueType": "3", "lastvalue": 55808.0}, "outItem": {"itemid": "513585", "key": "net.if.out[ifHCOutOctets.1]", "valueType": "3", "lastvalue": 35296.0}, "errorsItem": "513577", "discardsItem": "513569", "speed": 1000000000, "status": 1}, {"id": "2", "name": "ETH2-LAN()", "rawName": "Interface ETH2-LAN(): Inbound packets discarded", "inItem": {"itemid": "513554", "key": "net.if.in[ifHCInOctets.2]", "valueType": "3", "lastvalue": 33224.0}, "outItem": {"itemid": "513578", "key": "net.if.out[ifHCOutOctets.2]", "valueType": "3", "lastvalue": 54120.0}, "errorsItem": "513570", "discardsItem": "513562", "speed": 1000000000, "status": 1}, {"id": "6", "name": "BRIDGE-LAN()", "rawName": "Interface BRIDGE-LAN(): Inbound packets discarded", "inItem": {"itemid": "513559", "key": "net.if.in[ifHCInOctets.6]", "valueType": "3", "lastvalue": 31920.0}, "outItem": {"itemid": "513583", "key": "net.if.out[ifHCOutOctets.6]", "valueType": "3", "lastvalue": 52928.0}, "errorsItem": "513575", "discardsItem": "513567", "speed": 1000000000, "status": 1}, {"id": "7", "name": "VID172-WL-GUEST()", "rawName": "Interface VID172-WL-GUEST(): Inbound packets discarded", "inItem": {"itemid": "513560", "key": "net.if.in[ifHCInOctets.7]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "513584", "key": "net.if.out[ifHCOutOctets.7]", "valueType": "3", "lastvalue": 120.0}, "errorsItem": "513576", "discardsItem": "513568", "speed": 1000000000, "status": 1}, {"id": "5", "name": "ETH5-LAN()", "rawName": "Interface ETH5-LAN(): Inbound packets discarded", "inItem": {"itemid": "513555", "key": "net.if.in[ifHCInOctets.5]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "513579", "key": "net.if.out[ifHCOutOctets.5]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "513571", "discardsItem": "513563", "speed": 1000000000, "status": 1}, {"id": "4", "name": "ETH4-LAN()", "rawName": "Interface ETH4-LAN(): Inbound packets discarded", "inItem": {"itemid": "513557", "key": "net.if.in[ifHCInOctets.4]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "513581", "key": "net.if.out[ifHCOutOctets.4]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "513573", "discardsItem": "513565", "speed": 1000000000, "status": 1}, {"id": "3", "name": "ETH3-LAN()", "rawName": "Interface ETH3-LAN(): Inbound packets discarded", "inItem": {"itemid": "513558", "key": "net.if.in[ifHCInOctets.3]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "513582", "key": "net.if.out[ifHCOutOctets.3]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "513574", "discardsItem": "513566", "speed": 1000000000, "status": 1}], "pingItem": "513477", "secItem": "513479", "lossItem": "513478", "totalTraffic": 263416.0}, {"hostid": "11292", "name": "[SGS] SÃO LUIS - INTERNET VIVO", "isp": "VIVO", "ip": "191.31.107.17", "templates": ["Network Generic Device by SNMP", "Template Geobase GeoIP API"], "interfaces": [{"id": "7", "name": "GigabitEthernet0/5(CNX WAN LP - 980000179058895 ID - 1790588 PE - i-br-ma-sls-sfr-r)", "rawName": "Interface GigabitEthernet0/5(CNX WAN LP - 980000179058895 ID - 1790588 PE - i-br-ma-sls-sfr-r): Duplex status", "inItem": {"itemid": "544487", "key": "net.if.in[ifInOctets.7]", "valueType": "3", "lastvalue": 98088.0}, "outItem": {"itemid": "544523", "key": "net.if.out[ifOutOctets.7]", "valueType": "3", "lastvalue": 122896.0}, "errorsItem": "544511", "discardsItem": "544499", "speed": 1000000000, "status": 1}, {"id": "17414", "name": "GigabitEthernet0/5.104(WAN)", "rawName": "Interface GigabitEthernet0/5.104(WAN): Inbound packets discarded", "inItem": {"itemid": "544493", "key": "net.if.in[ifInOctets.17414]", "valueType": "3", "lastvalue": 91456.0}, "outItem": {"itemid": "544529", "key": "net.if.out[ifOutOctets.17414]", "valueType": "3", "lastvalue": 121464.0}, "errorsItem": "544517", "discardsItem": "544505", "speed": 1000000000, "status": 1}, {"id": "3", "name": "GigabitEthernet0/1(CNX LAN SAG)", "rawName": "Interface GigabitEthernet0/1(CNX LAN SAG): Duplex status", "inItem": {"itemid": "544483", "key": "net.if.in[ifInOctets.3]", "valueType": "3", "lastvalue": 87216.0}, "outItem": {"itemid": "544519", "key": "net.if.out[ifOutOctets.3]", "valueType": "3", "lastvalue": 58320.0}, "errorsItem": "544507", "discardsItem": "544495", "speed": 1000000000, "status": 1}, {"id": "17413", "name": "GigabitEthernet0/5.3530(GigabitEthernet0/5.3530 Interface)", "rawName": "Interface GigabitEthernet0/5.3530(GigabitEthernet0/5.3530 Interface): Inbound packets discarded", "inItem": {"itemid": "544492", "key": "net.if.in[ifInOctets.17413]", "valueType": "3", "lastvalue": 248.0}, "outItem": {"itemid": "544528", "key": "net.if.out[ifOutOctets.17413]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "544516", "discardsItem": "544504", "speed": 1000000000, "status": 1}, {"id": "4", "name": "GigabitEthernet0/2(GigabitEthernet0/2 Interface)", "rawName": "Interface GigabitEthernet0/2(GigabitEthernet0/2 Interface): Inbound packets discarded", "inItem": {"itemid": "544484", "key": "net.if.in[ifInOctets.4]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "544520", "key": "net.if.out[ifOutOctets.4]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "544508", "discardsItem": "544496", "speed": 1000000000, "status": 1}, {"id": "5", "name": "GigabitEthernet0/3(GigabitEthernet0/3 Interface)", "rawName": "Interface GigabitEthernet0/3(GigabitEthernet0/3 Interface): Inbound packets discarded", "inItem": {"itemid": "544485", "key": "net.if.in[ifInOctets.5]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "544521", "key": "net.if.out[ifOutOctets.5]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "544509", "discardsItem": "544497", "speed": 1000000000, "status": 1}, {"id": "6", "name": "GigabitEthernet0/4(GigabitEthernet0/4 Interface)", "rawName": "Interface GigabitEthernet0/4(GigabitEthernet0/4 Interface): Inbound packets discarded", "inItem": {"itemid": "544486", "key": "net.if.in[ifInOctets.6]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "544522", "key": "net.if.out[ifOutOctets.6]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "544510", "discardsItem": "544498", "speed": 1000000000, "status": 1}, {"id": "8", "name": "Cellular0/0(Cellular0/0 Interface)", "rawName": "Interface Cellular0/0(Cellular0/0 Interface): Inbound packets discarded", "inItem": {"itemid": "544488", "key": "net.if.in[ifInOctets.8]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "544524", "key": "net.if.out[ifOutOctets.8]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "544512", "discardsItem": "544500", "speed": 1000000000, "status": 1}, {"id": "9", "name": "Cellular0/1(Cellular0/1 Interface)", "rawName": "Interface Cellular0/1(Cellular0/1 Interface): Inbound packets discarded", "inItem": {"itemid": "544489", "key": "net.if.in[ifInOctets.9]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "544525", "key": "net.if.out[ifOutOctets.9]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "544513", "discardsItem": "544501", "speed": 1000000000, "status": 1}, {"id": "17411", "name": "InLoopBack0(InLoopBack0 Interface)", "rawName": "Interface InLoopBack0(InLoopBack0 Interface): Inbound packets discarded", "inItem": {"itemid": "544490", "key": "net.if.in[ifInOctets.17411]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "544526", "key": "net.if.out[ifOutOctets.17411]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "544514", "discardsItem": "544502", "speed": 1000000000, "status": 1}, {"id": "17412", "name": "Register-Tunnel0(Register-Tunnel0 Interface)", "rawName": "Interface Register-Tunnel0(Register-Tunnel0 Interface): Inbound packets discarded", "inItem": {"itemid": "544491", "key": "net.if.in[ifInOctets.17412]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "544527", "key": "net.if.out[ifOutOctets.17412]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "544515", "discardsItem": "544503", "speed": 1000000000, "status": 1}, {"id": "17416", "name": "LoopBack0(GERENCIA VIVO)", "rawName": "Interface LoopBack0(GERENCIA VIVO): Inbound packets discarded", "inItem": {"itemid": "544494", "key": "net.if.in[ifInOctets.17416]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "544530", "key": "net.if.out[ifOutOctets.17416]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "544518", "discardsItem": "544506", "speed": 1000000000, "status": 1}], "pingItem": "544432", "secItem": "544434", "lossItem": "544433", "totalTraffic": 579688.0}, {"hostid": "10659", "name": "[SGS] TRIUNFO - INTERNET VEGANET", "isp": "VEGANET", "ip": "10.242.15.254", "templates": ["Mikrotik by SNMP"], "interfaces": [{"id": "1", "name": "ETH1-WAN-STARLINK()", "rawName": "Interface ETH1-WAN-STARLINK(): Inbound packets discarded", "inItem": {"itemid": "50862", "key": "net.if.in[ifHCInOctets.1]", "valueType": "3", "lastvalue": 9653288.0}, "outItem": {"itemid": "50889", "key": "net.if.out[ifHCOutOctets.1]", "valueType": "3", "lastvalue": 2756944.0}, "errorsItem": "50880", "discardsItem": "50871", "speed": 1000000000, "status": 1}, {"id": "7", "name": "BRIDGE-LAN()", "rawName": "Interface BRIDGE-LAN(): Inbound packets discarded", "inItem": {"itemid": "50861", "key": "net.if.in[ifHCInOctets.7]", "valueType": "3", "lastvalue": 2887432.0}, "outItem": {"itemid": "50888", "key": "net.if.out[ifHCOutOctets.7]", "valueType": "3", "lastvalue": 9250144.0}, "errorsItem": "50879", "discardsItem": "50870", "speed": 1000000000, "status": 1}, {"id": "2", "name": "ETH2-LAN()", "rawName": "Interface ETH2-LAN(): Inbound packets discarded", "inItem": {"itemid": "50855", "key": "net.if.in[ifHCInOctets.2]", "valueType": "3", "lastvalue": 2861120.0}, "outItem": {"itemid": "50882", "key": "net.if.out[ifHCOutOctets.2]", "valueType": "3", "lastvalue": 9259792.0}, "errorsItem": "50873", "discardsItem": "50864", "speed": 1000000000, "status": 1}, {"id": "3", "name": "ETH3-LAN()", "rawName": "Interface ETH3-LAN(): Inbound packets discarded", "inItem": {"itemid": "50860", "key": "net.if.in[ifHCInOctets.3]", "valueType": "3", "lastvalue": 54024.0}, "outItem": {"itemid": "50887", "key": "net.if.out[ifHCOutOctets.3]", "valueType": "3", "lastvalue": 41384.0}, "errorsItem": "50878", "discardsItem": "50869", "speed": 1000000000, "status": 1}, {"id": "4", "name": "ETH4-LAN()", "rawName": "Interface ETH4-LAN(): Inbound packets discarded", "inItem": {"itemid": "50859", "key": "net.if.in[ifHCInOctets.4]", "valueType": "3", "lastvalue": 5360.0}, "outItem": {"itemid": "50886", "key": "net.if.out[ifHCOutOctets.4]", "valueType": "3", "lastvalue": 9944.0}, "errorsItem": "50877", "discardsItem": "50868", "speed": 1000000000, "status": 1}, {"id": "10", "name": "loopback0()", "rawName": "Interface loopback0(): Inbound packets discarded", "inItem": {"itemid": "50858", "key": "net.if.in[ifHCInOctets.10]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "50885", "key": "net.if.out[ifHCOutOctets.10]", "valueType": "3", "lastvalue": 176.0}, "errorsItem": "50876", "discardsItem": "50867", "speed": 1000000000, "status": 1}, {"id": "8", "name": "VID172-WL-GUEST()", "rawName": "Interface VID172-WL-GUEST(): Inbound packets discarded", "inItem": {"itemid": "50857", "key": "net.if.in[ifHCInOctets.8]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "50884", "key": "net.if.out[ifHCOutOctets.8]", "valueType": "3", "lastvalue": 120.0}, "errorsItem": "50875", "discardsItem": "50866", "speed": 1000000000, "status": 1}, {"id": "5", "name": "ETH5-LAN()", "rawName": "Interface ETH5-LAN(): Inbound packets discarded", "inItem": {"itemid": "50856", "key": "net.if.in[ifHCInOctets.5]", "valueType": "3", "lastvalue": 0.0}, "outItem": {"itemid": "50883", "key": "net.if.out[ifHCOutOctets.5]", "valueType": "3", "lastvalue": 0.0}, "errorsItem": "50874", "discardsItem": "50865", "speed": 1000000000, "status": 1}], "pingItem": "50775", "secItem": "50777", "lossItem": "50776", "totalTraffic": 36779728.0}, {"hostid": "11614", "name": "[SGS] VESPASIANO - INTERNET VIVO", "isp": "VIVO", "ip": "177.43.108.49", "templates": ["Network Generic Device by SNMP", "Template Geobase GeoIP API"], "interfaces": [{"id": "11", "name": "eth1(WAN)", "rawName": "Interface eth1(WAN): Duplex status", "inItem": {"itemid": "545078", "key": "net.if.in[ifInOctets.11]", "valueType": "3", "lastvalue": 147600.0}, "outItem": {"itemid": "545087", "key": "net.if.out[ifOutOctets.11]", "valueType": "3", "lastvalue": 114352.0}, "errorsItem": "545084", "discardsItem": "545081", "speed": 1000000000, "status": 1}, {"id": "15", "name": "eth1.1573(CNX_WAN_LP-318380205778394ID-2057783_PE-i-br-mg-bhe-fu-rai-01)", "rawName": "Interface eth1.1573(CNX_WAN_LP-318380205778394ID-2057783_PE-i-br-mg-bhe-fu-rai-01): Inbound packets discarded", "inItem": {"itemid": "545079", "key": "net.if.in[ifInOctets.15]", "valueType": "3", "lastvalue": 140248.0}, "outItem": {"itemid": "545088", "key": "net.if.out[ifOutOctets.15]", "valueType": "3", "lastvalue": 113200.0}, "errorsItem": "545085", "discardsItem": "545082", "speed": 1000000000, "status": 1}, {"id": "10", "name": "eth2(CNX_LAN)", "rawName": "Interface eth2(CNX_LAN): Duplex status", "inItem": {"itemid": "545077", "key": "net.if.in[ifInOctets.10]", "valueType": "3", "lastvalue": 113856.0}, "outItem": {"itemid": "545086", "key": "net.if.out[ifOutOctets.10]", "valueType": "3", "lastvalue": 144160.0}, "errorsItem": "545083", "discardsItem": "545080", "speed": 1000000000, "status": 1}], "pingItem": "544580", "secItem": "544584", "lossItem": "544582", "totalTraffic": 773416.0}];
+
+  function getEl(id) {
+    try {
+      if (typeof element !== 'undefined' && element && element.querySelector) {
+        const found = element.querySelector('#' + id);
+        if (found) return found;
+      }
+      return document.getElementById(id);
+    } catch(e) {
+      return document.getElementById(id);
+    }
+  }
+
+  console.log("[SGS-MODEM-TWIN] Inicializando runtime dinâmico com", CATALOG.length, "hosts...");
+
+  // Singleton de Ciclo de Vida
+  if (window.__SGS_MODEM_TWIN_RUNTIME__) {
+    try { window.__SGS_MODEM_TWIN_RUNTIME__.destroy(); } catch(e){}
+  }
+
+  const state = {
+    hosts: CATALOG,
+    currentHost: CATALOG[0] || null,
+    currentIface: (CATALOG[0] && CATALOG[0].interfaces[0]) || null,
+    timeRangeSec: 21600, // 6h default
+    historyIn: [],
+    historyOut: [],
+    isPolling: false,
+    pollTimer: null,
+    zoomStart: null,
+    zoomEnd: null,
+    isZooming: false,
+    dragStartX: null
+  };
+
+  // Helper formatador de banda
+  function formatBps(bps) {
+    if (bps === null || bps === undefined || isNaN(bps)) return "0 bps";
+    const b = Number(bps);
+    if (b >= 1000000000) return (b / 1000000000).toFixed(2) + " Gb/s";
+    if (b >= 1000000) return (b / 1000000).toFixed(2) + " Mb/s";
+    if (b >= 1000) return (b / 1000).toFixed(1) + " Kb/s";
+    return b.toFixed(0) + " bps";
+  }
+
+  // Cores por ISP
+  const ISP_COLORS = {
+    "VIVO": "#660099",
+    "ALGAR": "#00b04f",
+    "VEGANET": "#0088cc",
+    "DESKTOP": "#ff6600",
+    "HUGHESNET": "#003366",
+    "EMBRATEL": "#d6001c",
+    "CLARO": "#da291c",
+    "OI": "#ffcc00",
+    "NET": "#da291c",
+    "EVOLNET": "#00a86b",
+    "TELECOM": "#2563eb"
+  };
+
+  // Montar Dropdown de Hosts
+  function renderHostSelect() {
+    const sel = getEl("sgs-host-select");
+    if (!sel) return;
+    sel.innerHTML = "";
+    state.hosts.forEach((h, idx) => {
+      const opt = document.createElement("option");
+      opt.value = h.hostid;
+      opt.textContent = `${h.name} (${h.ip})`;
+      if (state.currentHost && state.currentHost.hostid === h.hostid) {
+        opt.selected = true;
+      }
+      sel.appendChild(opt);
+    });
+
+    sel.onchange = function(e) {
+      const hid = e.target.value;
+      const found = state.hosts.find(x => x.hostid === hid);
+      if (found) {
+        selectHost(found);
+      }
+    };
+  }
+
+  // Montar Dropdown de Interfaces
+  function renderIfaceSelect() {
+    const sel = getEl("sgs-iface-select");
+    if (!sel || !state.currentHost) return;
+    sel.innerHTML = "";
+    state.currentHost.interfaces.forEach((iface, idx) => {
+      const opt = document.createElement("option");
+      opt.value = iface.id;
+      opt.textContent = iface.name;
+      if (state.currentIface && state.currentIface.id === iface.id) {
+        opt.selected = true;
+      }
+      sel.appendChild(opt);
+    });
+
+    sel.onchange = function(e) {
+      const ifid = e.target.value;
+      const found = state.currentHost.interfaces.find(x => x.id === ifid);
+      if (found) {
+        selectInterface(found);
+      }
+    };
+  }
+
+  // Selecionar Host
+  function selectHost(host) {
+    state.currentHost = host;
+    state.currentIface = host.interfaces[0] || null;
+    state.zoomStart = null;
+    state.zoomEnd = null;
+    const btnReset = getEl("sgs-btn-reset-zoom");
+    if (btnReset) btnReset.style.display = "none";
+
+    updateChassisUI();
+    renderIfaceSelect();
+    renderInterfacesTable();
+    fetchTelemetry();
+  }
+
+  // Selecionar Interface
+  function selectInterface(iface) {
+    state.currentIface = iface;
+    state.zoomStart = null;
+    state.zoomEnd = null;
+    const btnReset = getEl("sgs-btn-reset-zoom");
+    if (btnReset) btnReset.style.display = "none";
+
+    const sub = getEl("sgs-chart-sub");
+    if (sub) sub.textContent = "Interface: " + iface.name;
+
+    fetchTelemetry();
+  }
+
+  // Atualizar UI do Chassi Físico
+  function updateChassisUI() {
+    if (!state.currentHost) return;
+    const h = state.currentHost;
+    
+    // Nome e IP
+    const elName = getEl("sgs-dev-name");
+    if (elName) elName.textContent = h.name;
+    const elIp = getEl("sgs-dev-ip");
+    if (elIp) elIp.textContent = "IP: " + (h.ip || "N/A");
+
+    // Badge da Operadora
+    const elIsp = getEl("sgs-isp-badge");
+    if (elIsp) {
+      elIsp.textContent = h.isp;
+      const c = ISP_COLORS[h.isp] || "#2563eb";
+      elIsp.style.background = c;
+      elIsp.style.boxShadow = `0 0 8px ${c}`;
+    }
+
+    // Ping / Latência
+    const elPing = getEl("sgs-dev-ping");
+    if (elPing) elPing.textContent = "LATÊNCIA: MEDINDO...";
+
+    // Uptime / Status
+    const elHealth = getEl("sgs-dev-health");
+    if (elHealth) elHealth.textContent = "STATUS: MONITORANDO";
+
+    // Drawer info
+    renderDrawerInfo();
+  }
+
+  // Renderizar Tabela de Interfaces
+  function renderInterfacesTable() {
+    const tbody = getEl("sgs-iface-tbody");
+    const countBadge = getEl("sgs-iface-count");
+    if (!tbody || !state.currentHost) return;
+    
+    const ifaces = state.currentHost.interfaces;
+    if (countBadge) countBadge.textContent = ifaces.length + " interfaces";
+    
+    tbody.innerHTML = "";
+    ifaces.forEach(iface => {
+      const tr = document.createElement("tr");
+      const inVal = iface.inItem ? iface.inItem.lastvalue : 0;
+      const outVal = iface.outItem ? iface.outItem.lastvalue : 0;
+      const isSelected = state.currentIface && state.currentIface.id === iface.id;
+
+      tr.innerHTML = `
+        <td style="font-weight: 600; color: ${isSelected ? '#00b0ff' : '#f1f5f9'};">
+          ${isSelected ? '▶ ' : ''}${iface.name}
+        </td>
+        <td><span class="sgs-badge-status up">UP</span></td>
+        <td style="color: #00e676; font-family: monospace;">${formatBps(inVal)}</td>
+        <td style="color: #38bdf8; font-family: monospace;">${formatBps(outVal)}</td>
+        <td>
+          <button class="sgs-btn-select-if" data-id="${iface.id}">
+            ${isSelected ? 'SELECIONADA' : 'EXIBIR'}
+          </button>
+        </td>
+      `;
+
+      tr.querySelector("button").onclick = function() {
+        selectInterface(iface);
+        renderIfaceSelect();
+        renderInterfacesTable();
+      };
+
+      tbody.appendChild(tr);
+    });
+  }
+
+  // Renderizar Top Links Rápidos
+  function renderTopLinks() {
+    const list = getEl("sgs-top-links-list");
+    if (!list) return;
+    
+    const sorted = [...state.hosts].sort((a,b) => b.totalTraffic - a.totalTraffic).slice(0, 5);
+    list.innerHTML = "";
+
+    sorted.forEach((h, idx) => {
+      const item = document.createElement("div");
+      item.className = "sgs-top-link-item";
+      item.innerHTML = `
+        <div class="sgs-top-link-info">
+          <span class="sgs-top-link-name">#${idx+1} ${h.name}</span>
+          <span class="sgs-top-link-meta">IP: ${h.ip} • ${h.isp}</span>
+        </div>
+        <span class="sgs-top-link-rate">${formatBps(h.totalTraffic)}</span>
+      `;
+      item.onclick = function() {
+        selectHost(h);
+        renderHostSelect();
+      };
+      list.appendChild(item);
+    });
+  }
+
+  // Renderizar Drawer de Inventário
+  function renderDrawerInfo() {
+    const body = getEl("sgs-drawer-body");
+    if (!body || !state.currentHost) return;
+    const h = state.currentHost;
+    
+    body.innerHTML = `
+      <div style="margin-bottom: 12px; padding: 10px; background: #131b2e; border-radius: 6px;">
+        <div style="font-size: 13px; font-weight: 700; color: #fff;">${h.name}</div>
+        <div style="color: #38bdf8; font-size: 11px; margin-top: 2px;">Host ID Zabbix: ${h.hostid}</div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        <div><b>IP de Gerência / WAN:</b> ${h.ip}</div>
+        <div><b>Operadora / ISP:</b> ${h.isp}</div>
+        <div><b>Interfaces Descobertas:</b> ${h.interfaces.length}</div>
+        <div><b>Templates Vinculados:</b><br>
+          <ul style="margin: 4px 0 0 16px; padding: 0;">
+            ${h.templates.map(t => `<li>${t}</li>`).join('')}
+          </ul>
+        </div>
+        <div style="margin-top: 10px;">
+          <a href="${ZABBIX_URL.replace('/api_jsonrpc.php','')}/zabbix.php?action=host.edit&hostid=${h.hostid}" target="_blank" 
+             style="color: #00b0ff; text-decoration: none; font-weight: 600;">
+             ↗ Abrir Host no Zabbix Web Frontend
+          </a>
+        </div>
+      </div>
+    `;
+  }
+
+  // Buscar Telemetria (Últimos Valores e Histórico)
+  async function fetchTelemetry() {
+    if (!state.currentHost || !state.currentIface) return;
+    const h = state.currentHost;
+    const iface = state.currentIface;
+
+    const btnSync = getEl("sgs-sync-btn");
+    if (btnSync) btnSync.classList.add("sgs-spinning");
+
+    async function zabbixCall(method, params, id = 1) {
+      const resp = await fetch(ZABBIX_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          jsonrpc: "2.0",
+          method: method,
+          params: params,
+          auth: ZABBIX_TOKEN,
+          id: id
+        })
+      });
+      return await resp.json();
+    }
+
+    try {
+      const now = Math.floor(Date.now() / 1000);
+      const timeFrom = now - state.timeRangeSec;
+
+      // 1. Buscar Ping se houver item
+      if (h.secItem) {
+        const pingRes = await zabbixCall("history.get", {
+          itemids: [h.secItem],
+          history: 0,
+          time_from: now - 300,
+          limit: 1
+        }, 10);
+        
+        if (pingRes.result && pingRes.result.length > 0) {
+          const sec = parseFloat(pingRes.result[0].value);
+          const ms = (sec * 1000).toFixed(1);
+          const elPing = getEl("sgs-dev-ping");
+          if (elPing) elPing.textContent = `LATÊNCIA: ${ms} ms`;
+        }
+      }
+
+      // 2. Buscar Histórico Inbound
+      let inData = [];
+      if (iface.inItem) {
+        const inRes = await zabbixCall("history.get", {
+          itemids: [iface.inItem.itemid],
+          history: parseInt(iface.inItem.valueType) || 3,
+          time_from: timeFrom,
+          time_till: now,
+          sortfield: "clock",
+          sortorder: "ASC",
+          limit: 500
+        }, 11);
+        inData = inRes.result || [];
+      }
+
+      // 3. Buscar Histórico Outbound
+      let outData = [];
+      if (iface.outItem) {
+        const outRes = await zabbixCall("history.get", {
+          itemids: [iface.outItem.itemid],
+          history: parseInt(iface.outItem.valueType) || 3,
+          time_from: timeFrom,
+          time_till: now,
+          sortfield: "clock",
+          sortorder: "ASC",
+          limit: 500
+        }, 12);
+        outData = outRes.result || [];
+      }
+
+      state.historyIn = inData;
+      state.historyOut = outData;
+
+      // Atualizar KPIs
+      updateKPIs(inData, outData);
+
+      // Renderizar Gráfico Canvas
+      renderCanvas();
+
+    } catch (err) {
+      console.error("[SGS-MODEM-TWIN] Erro ao buscar telemetria:", err);
+    } finally {
+      if (btnSync) btnSync.classList.remove("sgs-spinning");
+    }
+  }
+
+  // Atualizar KPIs
+  function updateKPIs(inData, outData) {
+    const curIn = inData.length > 0 ? parseFloat(inData[inData.length - 1].value) : 0;
+    const curOut = outData.length > 0 ? parseFloat(outData[outData.length - 1].value) : 0;
+
+    // Quick Pill in Chassis
+    const qIn = getEl("sgs-quick-in");
+    if (qIn) qIn.textContent = formatBps(curIn);
+    const qOut = getEl("sgs-quick-out");
+    if (qOut) qOut.textContent = formatBps(curOut);
+
+    // KPI Cards
+    const kIn = getEl("sgs-kpi-in-val");
+    if (kIn) kIn.textContent = formatBps(curIn);
+    const kOut = getEl("sgs-kpi-out-val");
+    if (kOut) kOut.textContent = formatBps(curOut);
+
+    // Peak e Avg
+    let maxIn = 0, sumIn = 0;
+    inData.forEach(p => {
+      const v = parseFloat(p.value);
+      if (v > maxIn) maxIn = v;
+      sumIn += v;
+    });
+    const avgIn = inData.length > 0 ? (sumIn / inData.length) : 0;
+
+    const kPeak = getEl("sgs-kpi-peak-val");
+    if (kPeak) kPeak.textContent = formatBps(maxIn);
+    const kAvg = getEl("sgs-kpi-avg-val");
+    if (kAvg) kAvg.textContent = formatBps(avgIn);
+
+    // Ajustar velocidade da cintilação do LED da WAN conforme o tráfego
+    const ledWan = getEl("sgs-led-wan");
+    if (ledWan) {
+      if (curIn > 20000000) {
+        ledWan.style.animationDuration = "0.18s";
+      } else if (curIn > 5000000) {
+        ledWan.style.animationDuration = "0.32s";
+      } else {
+        ledWan.style.animationDuration = "0.65s";
+      }
+    }
+  }
+
+  // Renderizar Gráfico Canvas
+  function renderCanvas() {
+    const canvas = getEl("sgs-traffic-canvas");
+    const wrap = getEl("sgs-canvas-wrap");
+    if (!canvas || !wrap) return;
+
+    const rect = wrap.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
+    const w = rect.width;
+    const h = rect.height;
+
+    canvas.width = w * dpr;
+    canvas.height = h * dpr;
+    canvas.style.width = w + "px";
+    canvas.style.height = h + "px";
+
+    const ctx = canvas.getContext("2d");
+    ctx.scale(dpr, dpr);
+    ctx.clearRect(0, 0, w, h);
+
+    const inData = state.historyIn;
+    const outData = state.historyOut;
+
+    if (inData.length === 0 && outData.length === 0) {
+      ctx.fillStyle = "#64748b";
+      ctx.font = "12px sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText("Sem histórico de tráfego retornado no período.", w / 2, h / 2);
+      return;
+    }
+
+    // Filtrar zoom se ativo
+    let filteredIn = inData;
+    let filteredOut = outData;
+    if (state.zoomStart !== null && state.zoomEnd !== null) {
+      filteredIn = inData.filter(p => p.clock >= state.zoomStart && p.clock <= state.zoomEnd);
+      filteredOut = outData.filter(p => p.clock >= state.zoomStart && p.clock <= state.zoomEnd);
+    }
+
+    // Encontrar min/max tempo e max valor
+    const allClocks = [...filteredIn.map(p => parseInt(p.clock)), ...filteredOut.map(p => parseInt(p.clock))];
+    const allVals = [...filteredIn.map(p => parseFloat(p.value)), ...filteredOut.map(p => parseFloat(p.value))];
+
+    if (allClocks.length === 0) return;
+
+    const minTime = Math.min(...allClocks);
+    const maxTime = Math.max(...allClocks);
+    const maxVal = Math.max(...allVals, 1000); // no mínimo 1 Kbps
+    const yMax = maxVal * 1.15; // 15% head room
+
+    const padLeft = 65;
+    const padRight = 20;
+    const padTop = 15;
+    const padBottom = 28;
+    const plotW = w - padLeft - padRight;
+    const plotH = h - padTop - padBottom;
+
+    // Desenhar Linhas de Grade Horizontais
+    ctx.strokeStyle = "#162032";
+    ctx.lineWidth = 1;
+    ctx.fillStyle = "#64748b";
+    ctx.font = "10px monospace";
+    ctx.textAlign = "right";
+
+    const gridLines = 4;
+    for (let i = 0; i <= gridLines; i++) {
+      const yVal = (yMax / gridLines) * i;
+      const yPos = padTop + plotH - (yVal / yMax) * plotH;
+      ctx.beginPath();
+      ctx.moveTo(padLeft, yPos);
+      ctx.lineTo(w - padRight, yPos);
+      ctx.stroke();
+
+      ctx.fillText(formatBps(yVal), padLeft - 8, yPos + 3);
+    }
+
+    // Desenhar Linhas de Grade Verticais (Tempo)
+    ctx.textAlign = "center";
+    const timeSteps = 5;
+    const timeSpan = maxTime - minTime || 1;
+    for (let i = 0; i <= timeSteps; i++) {
+      const t = minTime + (timeSpan / timeSteps) * i;
+      const xPos = padLeft + ((t - minTime) / timeSpan) * plotW;
+      
+      const d = new Date(t * 1000);
+      const hours = String(d.getHours()).padStart(2, '0');
+      const mins = String(d.getMinutes()).padStart(2, '0');
+
+      ctx.beginPath();
+      ctx.strokeStyle = "#162032";
+      ctx.moveTo(xPos, padTop);
+      ctx.lineTo(xPos, padTop + plotH);
+      ctx.stroke();
+
+      ctx.fillStyle = "#64748b";
+      ctx.fillText(`${hours}:${mins}`, xPos, h - 8);
+    }
+
+    // Função para desenhar série com gradiente
+    function drawSeries(dataset, strokeColor, fillColor) {
+      if (dataset.length === 0) return;
+      ctx.beginPath();
+      let firstX = 0, lastX = 0;
+
+      dataset.forEach((p, idx) => {
+        const x = padLeft + ((p.clock - minTime) / timeSpan) * plotW;
+        const y = padTop + plotH - (parseFloat(p.value) / yMax) * plotH;
+        if (idx === 0) {
+          ctx.moveTo(x, y);
+          firstX = x;
+        } else {
+          ctx.lineTo(x, y);
+        }
+        lastX = x;
+      });
+
+      // Linha do traçado
+      ctx.strokeStyle = strokeColor;
+      ctx.lineWidth = 2;
+      ctx.lineJoin = "round";
+      ctx.stroke();
+
+      // Fechamento de área com gradiente
+      ctx.lineTo(lastX, padTop + plotH);
+      ctx.lineTo(firstX, padTop + plotH);
+      ctx.closePath();
+
+      const grad = ctx.createLinearGradient(0, padTop, 0, padTop + plotH);
+      grad.addColorStop(0, fillColor);
+      grad.addColorStop(1, "rgba(0,0,0,0)");
+      ctx.fillStyle = grad;
+      ctx.fill();
+    }
+
+    // Desenhar Upload (Roxo/Azul)
+    drawSeries(filteredOut, "#a855f7", "rgba(168, 85, 247, 0.25)");
+
+    // Desenhar Download (Verde Esmeralda)
+    drawSeries(filteredIn, "#00e676", "rgba(0, 230, 118, 0.35)");
+  }
+
+  // Configurar Interatividade de Mouse (Crosshair e Drag-to-Zoom)
+  function setupCanvasEvents() {
+    const wrap = getEl("sgs-canvas-wrap");
+    const tooltip = getEl("sgs-chart-tooltip");
+    const zoomBox = getEl("sgs-zoom-box");
+    const btnReset = getEl("sgs-btn-reset-zoom");
+    if (!wrap || !tooltip || !zoomBox) return;
+
+    wrap.onmousemove = function(e) {
+      const rect = wrap.getBoundingClientRect();
+      const mouseX = e.clientX - rect.left;
+      const padLeft = 65, padRight = 20;
+      const plotW = rect.width - padLeft - padRight;
+
+      // Dragging zoom box
+      if (state.isZooming && state.dragStartX !== null) {
+        const startX = Math.min(state.dragStartX, mouseX);
+        const boxW = Math.abs(mouseX - state.dragStartX);
+        zoomBox.style.display = "block";
+        zoomBox.style.left = startX + "px";
+        zoomBox.style.width = boxW + "px";
+        return;
+      }
+
+      // Crosshair Tooltip
+      if (mouseX < padLeft || mouseX > rect.width - padRight) {
+        tooltip.style.display = "none";
+        return;
+      }
+
+      const inData = state.historyIn;
+      if (inData.length === 0) return;
+      const allClocks = inData.map(p => parseInt(p.clock));
+      const minTime = Math.min(...allClocks);
+      const maxTime = Math.max(...allClocks);
+      const timeSpan = maxTime - minTime || 1;
+
+      const hoveredClock = minTime + ((mouseX - padLeft) / plotW) * timeSpan;
+
+      // Encontrar ponto mais próximo
+      let closestIn = inData[0];
+      let minDiff = Math.abs(inData[0].clock - hoveredClock);
+      for (let p of inData) {
+        const diff = Math.abs(p.clock - hoveredClock);
+        if (diff < minDiff) { minDiff = diff; closestIn = p; }
+      }
+
+      let closestOutVal = 0;
+      if (state.historyOut.length > 0) {
+        let minDiffOut = Infinity;
+        for (let p of state.historyOut) {
+          const diff = Math.abs(p.clock - hoveredClock);
+          if (diff < minDiffOut) { minDiffOut = diff; closestOutVal = parseFloat(p.value); }
+        }
+      }
+
+      const d = new Date(closestIn.clock * 1000);
+      const timeStr = d.toLocaleTimeString("pt-BR", { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+      tooltip.innerHTML = `
+        <div style="color: #94a3b8; margin-bottom: 4px; font-weight: 700;">⏱ ${timeStr}</div>
+        <div style="color: #00e676; font-weight: 700;">⬇ IN: ${formatBps(closestIn.value)}</div>
+        <div style="color: #a855f7; font-weight: 700;">⬆ OUT: ${formatBps(closestOutVal)}</div>
+      `;
+      tooltip.style.display = "block";
+      tooltip.style.left = Math.min(mouseX + 14, rect.width - 150) + "px";
+      tooltip.style.top = "20px";
+    };
+
+    wrap.onmouseleave = function() {
+      tooltip.style.display = "none";
+      if (state.isZooming) {
+        state.isZooming = false;
+        zoomBox.style.display = "none";
+      }
+    };
+
+    wrap.onmousedown = function(e) {
+      if (e.button !== 0) return; // apenas botão esquerdo
+      const rect = wrap.getBoundingClientRect();
+      const mouseX = e.clientX - rect.left;
+      const padLeft = 65, padRight = 20;
+      if (mouseX < padLeft || mouseX > rect.width - padRight) return;
+
+      state.isZooming = true;
+      state.dragStartX = mouseX;
+      zoomBox.style.display = "block";
+      zoomBox.style.left = mouseX + "px";
+      zoomBox.style.width = "0px";
+    };
+
+    wrap.onmouseup = function(e) {
+      if (!state.isZooming || state.dragStartX === null) return;
+      state.isZooming = false;
+      zoomBox.style.display = "none";
+
+      const rect = wrap.getBoundingClientRect();
+      const mouseX = e.clientX - rect.left;
+      const padLeft = 65, padRight = 20;
+      const plotW = rect.width - padLeft - padRight;
+
+      const x1 = Math.min(state.dragStartX, mouseX);
+      const x2 = Math.max(state.dragStartX, mouseX);
+
+      if (x2 - x1 > 15 && state.historyIn.length > 0) {
+        const allClocks = state.historyIn.map(p => parseInt(p.clock));
+        const minTime = Math.min(...allClocks);
+        const maxTime = Math.max(...allClocks);
+        const timeSpan = maxTime - minTime || 1;
+
+        state.zoomStart = Math.floor(minTime + ((x1 - padLeft) / plotW) * timeSpan);
+        state.zoomEnd = Math.ceil(minTime + ((x2 - padLeft) / plotW) * timeSpan);
+
+        if (btnReset) btnReset.style.display = "inline-block";
+        renderCanvas();
+      }
+      state.dragStartX = null;
+    };
+
+    // Reset Zoom
+    if (btnReset) {
+      btnReset.onclick = function() {
+        state.zoomStart = null;
+        state.zoomEnd = null;
+        btnReset.style.display = "none";
+        renderCanvas();
+      };
+    }
+  }
+
+  // Configurar Botões de Período de Tempo
+  function setupTimeButtons() {
+    const btns = document.querySelectorAll(".sgs-time-pill");
+    btns.forEach(btn => {
+      btn.onclick = function() {
+        btns.forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        state.timeRangeSec = parseInt(btn.getAttribute("data-sec")) || 21600;
+        state.zoomStart = null;
+        state.zoomEnd = null;
+        const btnReset = getEl("sgs-btn-reset-zoom");
+        if (btnReset) btnReset.style.display = "none";
+        fetchTelemetry();
+      };
+    });
+  }
+
+  // Configurar Drawer
+  function setupDrawer() {
+    const btnOpen = getEl("sgs-btn-drawer");
+    const btnClose = getEl("sgs-drawer-close");
+    const drawer = getEl("sgs-drawer");
+    if (btnOpen && drawer) {
+      btnOpen.onclick = () => { drawer.style.display = "flex"; };
+    }
+    if (btnClose && drawer) {
+      btnClose.onclick = () => { drawer.style.display = "none"; };
+    }
+  }
+
+  // Inicialização Geral
+  function init() {
+    renderHostSelect();
+    renderIfaceSelect();
+    renderInterfacesTable();
+    renderTopLinks();
+    updateChassisUI();
+    setupCanvasEvents();
+    setupTimeButtons();
+    setupDrawer();
+
+    const btnSync = getEl("sgs-sync-btn");
+    if (btnSync) {
+      btnSync.onclick = () => fetchTelemetry();
+    }
+
+    // Redimensionamento de Janela
+    window.addEventListener("resize", () => renderCanvas());
+
+    // Polling contínuo a cada 15 segundos
+    state.pollTimer = setInterval(() => {
+      if (!document.hidden) fetchTelemetry();
+    }, 15000);
+
+    // Primeira busca
+    fetchTelemetry();
+  }
+
+  // Singleton de runtime para limpeza segura
+  window.__SGS_MODEM_TWIN_RUNTIME__ = {
+    destroy: function() {
+      if (state.pollTimer) clearInterval(state.pollTimer);
+    }
+  };
+
+  // Executar após carga do DOM
+  setTimeout(init, 50);
+
+})();
+</script>

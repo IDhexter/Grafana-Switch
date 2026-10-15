@@ -56,6 +56,14 @@
   - [x] Deploy e padronização multi-switch para 4 switches da rede BAMEX (`SW01` a `SW04`) sob a pasta `POC ALEX` (folderId: 136).
   - [x] Arquitetura de PoE inteligente e adaptativa (exibe métricas quando presentes; mantém layout 100% limpo em switches Non-PoE como JL682A).
   - [x] Documentação técnica completa sincronizada no repositório e na memória.
+- [x] **Gêmeo Digital de Modems & Links WAN (`SGS_LINKS`) - v1:**
+  - [x] Script gerador automatizado `scripts/build_sgs_modem_twin.py` integrando com Zabbix JSON-RPC.
+  - [x] Mapeamento dinâmico de 33 modems/roteadores SNMP no grupo `SGS_LINKS`.
+  - [x] Seletor suspensa no topo com chaveamento instantâneo de ativo, interface e período (1h, 3h, 6h, 12h, 24h).
+  - [x] Chassi de modem com acabamento metálico escovado, LEDs animados de Power, PON/Óptica, WAN (cintilação proporcional ao tráfego), Wi-Fi e 4x portas LAN RJ45.
+  - [x] Osciloscópio Canvas HTML5 de alta precisão com curvas de Download (In) e Upload (Out), escala inteligente e drag-to-zoom.
+  - [x] Tabela de interfaces detectadas e ranking rápido dos Top 5 Links com maior consumo.
+  - [x] Deploy bem-sucedido no Grafana em `POC ALEX` com UID `sgs-modems-wan`.
 
 ## 🔜 Backlog Imediato (Próximos Passos)
 - [ ] Criar estrutura base de pastas do repositório (`docker/`, `zabbix/`, `grafana/`, `scripts/`, `.gitignore`).
