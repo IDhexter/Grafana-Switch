@@ -835,7 +835,7 @@ $null = $sb.AppendLine(@"
     </div>
 
     <!-- Real Historical Traffic Canvas -->
-    <div id="chart-card-container" style="background: #090c12; border: 1px solid #1a2230; border-radius: 6px; padding: 10px 14px; position: relative; flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
+    <div id="chart-card-container" style="background: #090c12; border: 1px solid #1a2230; border-radius: 6px; padding: 10px 14px; position: relative; height: 260px; max-height: 260px; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
         <div style="display: flex; align-items: center; gap: 8px;">
           <span style="font-size: 10px; font-weight: 800; letter-spacing: 0.6px; color: #94a3b8; text-transform: uppercase;">HIST&Oacute;RICO DE TR&Aacute;FEGO (SNMP)</span>
@@ -870,7 +870,7 @@ $null = $sb.AppendLine(@"
         </span>
       </div>
 
-      <canvas id="port-chart-canvas" width="600" height="200" style="width: 100%; height: 200px; min-height: 180px; flex: 1; display: block; cursor: crosshair;"></canvas>
+      <canvas id="port-chart-canvas" width="700" height="190" style="width: 100%; height: 190px; max-height: 190px; display: block; cursor: crosshair;"></canvas>
       
       <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px; font-size: 10.5px;">
         <div style="display: flex; gap: 18px;">
@@ -1248,19 +1248,19 @@ $jsCodeTemplate = @'
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
 
-        // Auto-sync internal resolution with responsive CSS dimensions
+        // Auto-sync internal resolution with responsive CSS dimensions (locked to 190px height)
         const rect = canvas.getBoundingClientRect();
-        if (rect && rect.width > 0 && rect.height > 0) {
+        if (rect && rect.width > 0) {
           const displayW = Math.round(rect.width);
-          const displayH = Math.round(rect.height);
+          const displayH = 190;
           if (canvas.width !== displayW || canvas.height !== displayH) {
             canvas.width = displayW;
             canvas.height = displayH;
           }
         }
 
-        const w = canvas.width || 600;
-        const h = canvas.height || 200;
+        const w = canvas.width || 700;
+        const h = canvas.height || 190;
         ctx.clearRect(0, 0, w, h);
 
         const padLeft = 62;
@@ -2700,7 +2700,7 @@ $panel = @{
     type = "marcusolsson-dynamictext-panel"
     title = ""
     transparent = $true
-    gridPos = @{ x = 0; y = 0; w = 24; h = 36 }
+    gridPos = @{ x = 0; y = 0; w = 24; h = 28 }
     options = @{
         content = $htmlClean
         defaultContent = $htmlClean
