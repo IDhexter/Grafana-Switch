@@ -87,9 +87,9 @@ $probPorts = @{}
 if ($problems) {
     foreach ($pr in $problems) {
         if ($pr["name"] -match '\b(?:Interface|Port|GigabitEthernet|TenGigabitEthernet|SFP\+?)\s+(\d{1,2})(?:\s|\(|:|$|\b)') {
-            $pId = [int]$matches[1]
-            if ($pId -ge 1 -and $pId -le 28) {
-                $probPorts[$pId] = $true
+            $prPortNum = [int]$matches[1]
+            if ($prPortNum -ge 1 -and $prPortNum -le 28) {
+                $probPorts[$prPortNum] = $true
             }
         }
     }
@@ -163,6 +163,8 @@ for ($p = 1; $p -le 28; $p++) {
         Type = if ($isSfp) { "SFP+ 10G" } else { "1GbE RJ45" }
         OperStatus = 2 # 1=UP, 2=DOWN
         AdminStatus = 1 # 1=UP, 2=DOWN
+        PoEStatus = 0 # 0=N/A, 1=disabled, 2=searching, 3=deliveringPower, 4=fault
+        PoEPower = 0.0 # Watts
         Speed = 0
         InBps = 0
         OutBps = 0
@@ -222,7 +224,27 @@ foreach ($it in $items) {
             elseif ($key.StartsWith("net.if.out.discards[")) { $ports[$pNum].OutDiscards = [int64]$val }
         }
     }
+
+    if ($key -match 'poe\.(status|power)\[.*\.(\d+)\]') {
+        $pNum = [string]$matches[2]
+        if ($ports.ContainsKey($pNum)) {
+            if ($matches[1] -eq "status") {
+                $ports[$pNum].PoEStatus = [int]$val
+            } else {
+                $rawP = [double]$val
+                $ports[$pNum].PoEPower = if ($rawP -gt 100) { [Math]::Round($rawP / 1000.0, 1) } else { [Math]::Round($rawP, 1) }
+            }
+        }
+    }
 }
+
+$totalPoEWatts = 0.0
+foreach ($pt in $ports.Values) {
+    if ($pt.PoEStatus -eq 3 -or $pt.PoEPower -gt 0) {
+        $totalPoEWatts += [double]$pt.PoEPower
+    }
+}
+$totalPoEWatts = [Math]::Round($totalPoEWatts, 1)
 
 function Format-Bps ($bps) {
     $b = [double]$bps
@@ -403,6 +425,7 @@ $null = $sb.AppendLine(@"
       <span style="background: rgba(0, 230, 118, 0.12); color: #00e676; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px; border: 1px solid rgba(0, 230, 118, 0.25);">PRODUCAO LIVE</span>
       <span id="zabbix-sync-badge" style="background: rgba(0, 176, 255, 0.12); color: #00b0ff; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px; border: 1px solid rgba(0, 176, 255, 0.25); cursor: pointer;" title="Clique para sincronizar agora com o Zabbix">&#x21bb; ZABBIX SYNC: ATIVO</span>
       <span id="header-cpu-badge" style="background: rgba(168, 85, 247, 0.12); color: #c084fc; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px; border: 1px solid rgba(168, 85, 247, 0.25); $(if (-not $cpuItem) { 'display: none;' })" title="Utilizacao de CPU do Switch">CPU: <span id="header-cpu-val">$cpuDisplay</span></span>
+      <span id="header-poe-badge" style="background: rgba(234, 179, 8, 0.12); color: #facc15; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px; border: 1px solid rgba(234, 179, 8, 0.25); $(if ($totalPoEWatts -le 0) { 'display: none;' })" title="Consumo PoE Total">&#9889; POE: <span id="header-poe-val">$totalPoEWatts W</span></span>
     </div>
   </div>
   <div style="text-align: right;">
@@ -500,7 +523,8 @@ function Get-Rj45PortHtml($pNum, $pt, $hasAlert, $selectedPortNum) {
     $outFmt = Format-Bps $pt.OutBps
     $titleLabel = if ($pt.Alias -and $pt.Alias.Length -gt 0) { "Porta $pNum | $($pt.Alias)" } else { "Porta $pNum | $($pt.Name)" }
     $speedLabel = if (-not $isUp) { '--' } elseif ($normSpd -ge 10000000000) { '10 Gb/s' } elseif ($normSpd -ge 1000000000) { '1 Gb/s' } elseif ($normSpd -ge 100000000) { '100 Mb/s' } elseif ($normSpd -ge 10000000) { '10 Mb/s' } else { '--' }
-    $titleText = "$titleLabel&#10;Status: $statusDesc&#10;Velocidade: $speedLabel&#10;Entrada: $inFmt&#10;Saida: $outFmt"
+    $poeDesc = if ($pt.PoEStatus -eq 3) { "&#10;PoE: Alimentando ($($pt.PoEPower) W)" } else { "" }
+    $titleText = "$titleLabel&#10;Status: $statusDesc$poeDesc&#10;Velocidade: $speedLabel&#10;Entrada: $inFmt&#10;Saida: $outFmt"
     $selectedClass = if ($pNum -eq 24) { " sw-selected" } else { "" }
     $borderStyle = if ($pNum -eq 24) { "2px solid #00b0ff" } elseif ($hasAlert) { "1px solid rgba(239, 68, 68, 0.6)" } else { "1px solid #263346" }
     $boxShadowStyle = if ($pNum -eq 24) { "0 0 14px rgba(0, 176, 255, 0.9)" } else { "none" }
@@ -533,7 +557,10 @@ function Get-Rj45PortHtml($pNum, $pt, $hasAlert, $selectedPortNum) {
                 </div>
               </div>
             </div>
-            <div style="font-size: 10.5px; font-weight: 800; color: #8b949e; line-height: 1; font-family: monospace; margin-bottom: 1px;">$pNum</div>
+            <div style="width: 100%; display: flex; align-items: center; justify-content: center; position: relative;">
+              <div style="font-size: 10.5px; font-weight: 800; color: #8b949e; line-height: 1; font-family: monospace; margin-bottom: 1px;">$pNum</div>
+              <span class="sw-poe-icon" style="display: $(if ($pt.PoEStatus -eq 3) { 'inline-block' } else { 'none' }); position: absolute; right: 2px; font-size: 8px; color: #facc15; font-weight: 800; line-height: 1; text-shadow: 0 0 5px #eab308; pointer-events: none;" title="PoE: $($pt.PoEPower) W">&#9889;</span>
+            </div>
           </div>
 "@
 }
@@ -760,6 +787,7 @@ $null = $sb.AppendLine(@"
       <h2 id="sel-port-title" style="font-size: 25px; font-weight: 800; color: #ffffff; margin: 0; letter-spacing: -0.5px;">Porta 24</h2>
       <span id="sel-port-name" style="font-size: 13px; color: #8b949e; font-weight: 500;">$($initP.Name) &bull; $initSub</span>
       <span id="sel-port-status" style="background: rgba(0, 230, 118, 0.15); color: #00e676; font-size: 10.5px; font-weight: 800; padding: 2px 8px; border-radius: 4px; border: 1px solid rgba(0, 230, 118, 0.3);">UP</span>
+      <span id="sel-port-poe" style="display: $(if ($initP.PoEStatus -eq 3) { 'inline-block' } else { 'none' }); background: rgba(234, 179, 8, 0.15); color: #facc15; font-size: 10.5px; font-weight: 800; padding: 2px 8px; border-radius: 4px; border: 1px solid rgba(234, 179, 8, 0.3);">&#9889; POE: <span id="sel-port-poe-val">$($initP.PoEPower) W</span></span>
     </div>
 
     <!-- 5 Stats Cards -->
@@ -1943,6 +1971,17 @@ $jsCodeTemplate = @'
           }
         }
 
+        const poeBadge = getEl('sel-port-poe');
+        const poeVal = getEl('sel-port-poe-val');
+        if (poeBadge) {
+          if (p.PoEStatus === 3) {
+            poeBadge.style.display = 'inline-block';
+            if (poeVal) poeVal.textContent = (p.PoEPower > 0 ? (p.PoEPower + ' W') : 'Ativo');
+          } else {
+            poeBadge.style.display = 'none';
+          }
+        }
+
         let speedStr = '--';
         if (p.OperStatus !== 1) {
           speedStr = '--';
@@ -2270,6 +2309,18 @@ $jsCodeTemplate = @'
                   else if (k.startsWith('net.if.out.discards[')) ports[pNum].OutDiscards = v;
                 }
               }
+
+              if (k.match(/poe\.(status|power)\[.*\.(\d+)\]/)) {
+                const pNum = parseInt(RegExp.$2, 10);
+                if (ports[pNum]) {
+                  if (RegExp.$1 === 'status') {
+                    ports[pNum].PoEStatus = parseInt(v, 10);
+                  } else {
+                    const rawP = parseFloat(v);
+                    ports[pNum].PoEPower = rawP > 100 ? (rawP / 1000).toFixed(1) : rawP.toFixed(1);
+                  }
+                }
+              }
             } catch (e) {}
           });
 
@@ -2362,10 +2413,37 @@ $jsCodeTemplate = @'
                 const statusDesc = hasAlert ? 'DOWN (ALARME)' : (isUp ? (isDegraded ? 'UP (DEGRADADO)' : 'UP') : 'DOWN');
                 const speedText = (!isUp ? '--' : (normSpd >= 10000000000 ? '10 Gb/s' : (normSpd >= 1000000000 ? '1 Gb/s' : (normSpd >= 100000000 ? '100 Mb/s' : (normSpd >= 10000000 ? '10 Mb/s' : '--')))));
                 const pSub = pt.Alias ? pt.Alias : (p >= 25 ? 'SFP+ 10G' : pt.Name);
-                const portLabel = (p >= 25) ? `SFP+ ${p} | ${pSub}` : `Porta ${p} | ${pSub}`;
-                pEl.title = `${portLabel}\nStatus: ${statusDesc}\nVelocidade: ${speedText}\nEntrada: ${formatTrafficBps(pt.InBps)}\nSaida: ${formatTrafficBps(pt.OutBps)}`;
+                const poeDesc = (pt.PoEStatus === 3) ? `\nPoE: Alimentando (${pt.PoEPower} W)` : '';
+                pEl.title = `${portLabel}\nStatus: ${statusDesc}${poeDesc}\nVelocidade: ${speedText}\nEntrada: ${formatTrafficBps(pt.InBps)}\nSaida: ${formatTrafficBps(pt.OutBps)}`;
+
+                const poeIcon = pEl.querySelector('.sw-poe-icon');
+                if (poeIcon) {
+                  poeIcon.style.display = (pt.PoEStatus === 3) ? 'inline-block' : 'none';
+                  if (pt.PoEPower > 0) poeIcon.title = `PoE: ${pt.PoEPower} W`;
+                }
               }
             } catch (e) {}
+          }
+
+          // Dynamic PoE Power Total
+          let totalPoEPower = 0;
+          let hasActivePoE = false;
+          for (let p = 1; p <= 28; p++) {
+            const pt = ports[p];
+            if (pt && (pt.PoEStatus === 3 || pt.PoEPower > 0)) {
+              hasActivePoE = true;
+              totalPoEPower += parseFloat(pt.PoEPower || 0);
+            }
+          }
+          const hPoe = getEl('header-poe-badge');
+          const hPoeVal = getEl('header-poe-val');
+          if (hPoe) {
+            if (hasActivePoE && totalPoEPower > 0) {
+              hPoe.style.display = 'inline-block';
+              if (hPoeVal) hPoeVal.textContent = totalPoEPower.toFixed(1) + ' W';
+            } else {
+              hPoe.style.display = 'none';
+            }
           }
 
           // Update KPIs safely

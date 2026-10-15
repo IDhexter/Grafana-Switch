@@ -11,12 +11,13 @@ BAMEX &bull; RACK CPD &bull; COLETA SNMP VIA ZABBIX
 <span id="header-switch-ip">24x GbE RJ45 + 4x SFP+ 10G &bull; L2+ Managed &bull; JL682A &bull; IP: 10.50.0.2</span>
 <span style="background: rgba(0, 230, 118, 0.12); color: #00e676; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px; border: 1px solid rgba(0, 230, 118, 0.25);">PRODUCAO LIVE</span>
 <span id="zabbix-sync-badge" style="background: rgba(0, 176, 255, 0.12); color: #00b0ff; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px; border: 1px solid rgba(0, 176, 255, 0.25); cursor: pointer;" title="Clique para sincronizar agora com o Zabbix">&#x21bb; ZABBIX SYNC: ATIVO</span>
-<span id="header-cpu-badge" style="background: rgba(168, 85, 247, 0.12); color: #c084fc; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px; border: 1px solid rgba(168, 85, 247, 0.25); " title="Utilizacao de CPU do Switch">CPU: <span id="header-cpu-val">2.0%</span></span>
+<span id="header-cpu-badge" style="background: rgba(168, 85, 247, 0.12); color: #c084fc; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px; border: 1px solid rgba(168, 85, 247, 0.25); " title="Utilizacao de CPU do Switch">CPU: <span id="header-cpu-val">3.0%</span></span>
+<span id="header-poe-badge" style="background: rgba(234, 179, 8, 0.12); color: #facc15; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px; border: 1px solid rgba(234, 179, 8, 0.25); display: none;" title="Consumo PoE Total">&#9889; POE: <span id="header-poe-val">0 W</span></span>
 </div>
 </div>
 <div style="text-align: right;">
-<div id="live-clock" style="font-size: 24px; font-weight: 700; font-family: monospace; color: #ffffff; letter-spacing: 1px;">11:53:44</div>
-<div style="font-size: 11px; color: #8b949e; margin-top: 4px;">SNMPv2 &bull; Intervalo 15 s &bull; <span id="header-uptime">Uptime 10d 2h 32m</span></div>
+<div id="live-clock" style="font-size: 24px; font-weight: 700; font-family: monospace; color: #ffffff; letter-spacing: 1px;">13:32:56</div>
+<div style="font-size: 11px; color: #8b949e; margin-top: 4px;">SNMPv2 &bull; Intervalo 15 s &bull; <span id="header-uptime">Uptime 10d 3h 11m</span></div>
 </div>
 </div>
 <!-- KPI CARDS ROW -->
@@ -36,12 +37,12 @@ BAMEX &bull; RACK CPD &bull; COLETA SNMP VIA ZABBIX
 </div>
 <div style="flex: 1; border-right: 1px solid rgba(255, 255, 255, 0.08); padding-left: 16px; padding-right: 16px;">
 <div style="font-size: 10.5px; font-weight: 700; letter-spacing: 0.8px; color: #8b949e; text-transform: uppercase; margin-bottom: 6px;">VELOCIDADE DEGRADADA</div>
-<div id="kpi-degraded-ports" style="font-size: 26px; font-weight: 800; color: #f59e0b;">2</div>
+<div id="kpi-degraded-ports" style="font-size: 26px; font-weight: 800; color: #f59e0b;">1</div>
 </div>
 <div style="flex: 1; border-right: 1px solid rgba(255, 255, 255, 0.08); padding-left: 16px; padding-right: 16px;">
 <div style="font-size: 10.5px; font-weight: 700; letter-spacing: 0.8px; color: #8b949e; text-transform: uppercase; margin-bottom: 6px;">TR&Aacute;FEGO TOTAL</div>
 <div id="kpi-total-traffic" style="font-size: 26px; font-weight: 800; color: #ffffff; display: flex; align-items: baseline;">
-5.86 Mb/s
+5.20 Mb/s
 </div>
 </div>
 <div style="flex: 1; padding-left: 16px;">
@@ -90,7 +91,7 @@ BAMEX &bull; RACK CPD &bull; COLETA SNMP VIA ZABBIX
 <div style="display: flex; flex-direction: column; gap: 6px;">
 <div style="font-size: 9px; font-weight: 700; color: #64748b; letter-spacing: 1px; text-align: center; text-transform: uppercase;">PORTAS 1 &ndash; 12 &bull; 10/100/1000M</div>
 <div style="display: flex; gap: 18px;">
-<div class="sw-port" data-port="1" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(1);" title="Porta 1 | GigabitEthernet1&#10;Status: UP&#10;Velocidade: 1 Gb/s&#10;Entrada: 103.4 Kb/s&#10;Saida: 177.1 Kb/s" style="width: 50px; height: 62px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
+<div class="sw-port" data-port="1" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(1);" title="Porta 1 | GigabitEthernet1&#10;Status: UP&#10;Velocidade: 1 Gb/s&#10;Entrada: 33.4 Kb/s&#10;Saida: 50.2 Kb/s" style="width: 50px; height: 62px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
 <div style="width: 100%; display: flex; justify-content: space-between; padding: 0 3px;">
 <span class="sw-led-1" style="width: 6px; height: 4px; border-radius: 1px; background-color: #00e676; box-shadow: 0 0 6px #00e676; display: inline-block;"></span>
 <span class="sw-led-2 sw-led-act" style="width: 6px; height: 4px; border-radius: 1px; background-color: #00e676; opacity: 0.85; box-shadow: 0 0 6px #00e676; display: inline-block;"></span>
@@ -117,9 +118,12 @@ BAMEX &bull; RACK CPD &bull; COLETA SNMP VIA ZABBIX
 </div>
 </div>
 </div>
+<div style="width: 100%; display: flex; align-items: center; justify-content: center; position: relative;">
 <div style="font-size: 10.5px; font-weight: 800; color: #8b949e; line-height: 1; font-family: monospace; margin-bottom: 1px;">1</div>
+<span class="sw-poe-icon" style="display: none; position: absolute; right: 2px; font-size: 8px; color: #facc15; font-weight: 800; line-height: 1; text-shadow: 0 0 5px #eab308; pointer-events: none;" title="PoE: 0 W">&#9889;</span>
 </div>
-<div class="sw-port" data-port="3" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(3);" title="Porta 3 | GigabitEthernet3&#10;Status: UP&#10;Velocidade: 1 Gb/s&#10;Entrada: 11.0 Kb/s&#10;Saida: 28.3 Kb/s" style="width: 50px; height: 62px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
+</div>
+<div class="sw-port" data-port="3" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(3);" title="Porta 3 | GigabitEthernet3&#10;Status: UP&#10;Velocidade: 1 Gb/s&#10;Entrada: 37.5 Kb/s&#10;Saida: 477.0 Kb/s" style="width: 50px; height: 62px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
 <div style="width: 100%; display: flex; justify-content: space-between; padding: 0 3px;">
 <span class="sw-led-1" style="width: 6px; height: 4px; border-radius: 1px; background-color: #00e676; box-shadow: 0 0 6px #00e676; display: inline-block;"></span>
 <span class="sw-led-2 sw-led-act" style="width: 6px; height: 4px; border-radius: 1px; background-color: #00e676; opacity: 0.85; box-shadow: 0 0 6px #00e676; display: inline-block;"></span>
@@ -146,7 +150,10 @@ BAMEX &bull; RACK CPD &bull; COLETA SNMP VIA ZABBIX
 </div>
 </div>
 </div>
+<div style="width: 100%; display: flex; align-items: center; justify-content: center; position: relative;">
 <div style="font-size: 10.5px; font-weight: 800; color: #8b949e; line-height: 1; font-family: monospace; margin-bottom: 1px;">3</div>
+<span class="sw-poe-icon" style="display: none; position: absolute; right: 2px; font-size: 8px; color: #facc15; font-weight: 800; line-height: 1; text-shadow: 0 0 5px #eab308; pointer-events: none;" title="PoE: 0 W">&#9889;</span>
+</div>
 </div>
 <div class="sw-port" data-port="5" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(5);" title="Porta 5 | GigabitEthernet5&#10;Status: DOWN&#10;Velocidade: --&#10;Entrada: 0 bps&#10;Saida: 0 bps" style="width: 50px; height: 62px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
 <div style="width: 100%; display: flex; justify-content: space-between; padding: 0 3px;">
@@ -175,9 +182,12 @@ BAMEX &bull; RACK CPD &bull; COLETA SNMP VIA ZABBIX
 </div>
 </div>
 </div>
+<div style="width: 100%; display: flex; align-items: center; justify-content: center; position: relative;">
 <div style="font-size: 10.5px; font-weight: 800; color: #8b949e; line-height: 1; font-family: monospace; margin-bottom: 1px;">5</div>
+<span class="sw-poe-icon" style="display: none; position: absolute; right: 2px; font-size: 8px; color: #facc15; font-weight: 800; line-height: 1; text-shadow: 0 0 5px #eab308; pointer-events: none;" title="PoE: 0 W">&#9889;</span>
 </div>
-<div class="sw-port" data-port="7" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(7);" title="Porta 7 | GigabitEthernet7&#10;Status: UP&#10;Velocidade: 1 Gb/s&#10;Entrada: 5.9 Kb/s&#10;Saida: 27.2 Kb/s" style="width: 50px; height: 62px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
+</div>
+<div class="sw-port" data-port="7" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(7);" title="Porta 7 | GigabitEthernet7&#10;Status: UP&#10;Velocidade: 1 Gb/s&#10;Entrada: 51.4 Kb/s&#10;Saida: 131.2 Kb/s" style="width: 50px; height: 62px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
 <div style="width: 100%; display: flex; justify-content: space-between; padding: 0 3px;">
 <span class="sw-led-1" style="width: 6px; height: 4px; border-radius: 1px; background-color: #00e676; box-shadow: 0 0 6px #00e676; display: inline-block;"></span>
 <span class="sw-led-2 sw-led-act" style="width: 6px; height: 4px; border-radius: 1px; background-color: #00e676; opacity: 0.85; box-shadow: 0 0 6px #00e676; display: inline-block;"></span>
@@ -204,9 +214,12 @@ BAMEX &bull; RACK CPD &bull; COLETA SNMP VIA ZABBIX
 </div>
 </div>
 </div>
+<div style="width: 100%; display: flex; align-items: center; justify-content: center; position: relative;">
 <div style="font-size: 10.5px; font-weight: 800; color: #8b949e; line-height: 1; font-family: monospace; margin-bottom: 1px;">7</div>
+<span class="sw-poe-icon" style="display: none; position: absolute; right: 2px; font-size: 8px; color: #facc15; font-weight: 800; line-height: 1; text-shadow: 0 0 5px #eab308; pointer-events: none;" title="PoE: 0 W">&#9889;</span>
 </div>
-<div class="sw-port" data-port="9" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(9);" title="Porta 9 | GigabitEthernet9&#10;Status: UP&#10;Velocidade: 1 Gb/s&#10;Entrada: 12.1 Kb/s&#10;Saida: 43.2 Kb/s" style="width: 50px; height: 62px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
+</div>
+<div class="sw-port" data-port="9" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(9);" title="Porta 9 | GigabitEthernet9&#10;Status: UP&#10;Velocidade: 1 Gb/s&#10;Entrada: 2.6 Kb/s&#10;Saida: 39.7 Kb/s" style="width: 50px; height: 62px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
 <div style="width: 100%; display: flex; justify-content: space-between; padding: 0 3px;">
 <span class="sw-led-1" style="width: 6px; height: 4px; border-radius: 1px; background-color: #00e676; box-shadow: 0 0 6px #00e676; display: inline-block;"></span>
 <span class="sw-led-2 sw-led-act" style="width: 6px; height: 4px; border-radius: 1px; background-color: #00e676; opacity: 0.85; box-shadow: 0 0 6px #00e676; display: inline-block;"></span>
@@ -233,7 +246,10 @@ BAMEX &bull; RACK CPD &bull; COLETA SNMP VIA ZABBIX
 </div>
 </div>
 </div>
+<div style="width: 100%; display: flex; align-items: center; justify-content: center; position: relative;">
 <div style="font-size: 10.5px; font-weight: 800; color: #8b949e; line-height: 1; font-family: monospace; margin-bottom: 1px;">9</div>
+<span class="sw-poe-icon" style="display: none; position: absolute; right: 2px; font-size: 8px; color: #facc15; font-weight: 800; line-height: 1; text-shadow: 0 0 5px #eab308; pointer-events: none;" title="PoE: 0 W">&#9889;</span>
+</div>
 </div>
 <div class="sw-port" data-port="11" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(11);" title="Porta 11 | GigabitEthernet11&#10;Status: DOWN&#10;Velocidade: --&#10;Entrada: 0 bps&#10;Saida: 0 bps" style="width: 50px; height: 62px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
 <div style="width: 100%; display: flex; justify-content: space-between; padding: 0 3px;">
@@ -262,11 +278,14 @@ BAMEX &bull; RACK CPD &bull; COLETA SNMP VIA ZABBIX
 </div>
 </div>
 </div>
+<div style="width: 100%; display: flex; align-items: center; justify-content: center; position: relative;">
 <div style="font-size: 10.5px; font-weight: 800; color: #8b949e; line-height: 1; font-family: monospace; margin-bottom: 1px;">11</div>
+<span class="sw-poe-icon" style="display: none; position: absolute; right: 2px; font-size: 8px; color: #facc15; font-weight: 800; line-height: 1; text-shadow: 0 0 5px #eab308; pointer-events: none;" title="PoE: 0 W">&#9889;</span>
+</div>
 </div>
 </div>
 <div style="display: flex; gap: 18px;">
-<div class="sw-port" data-port="2" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(2);" title="Porta 2 | GigabitEthernet2&#10;Status: UP&#10;Velocidade: 1 Gb/s&#10;Entrada: 107.8 Kb/s&#10;Saida: 146.0 Kb/s" style="width: 50px; height: 62px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
+<div class="sw-port" data-port="2" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(2);" title="Porta 2 | GigabitEthernet2&#10;Status: UP&#10;Velocidade: 1 Gb/s&#10;Entrada: 17.3 Kb/s&#10;Saida: 103.1 Kb/s" style="width: 50px; height: 62px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
 <div style="width: 100%; display: flex; justify-content: space-between; padding: 0 3px;">
 <span class="sw-led-1" style="width: 6px; height: 4px; border-radius: 1px; background-color: #00e676; box-shadow: 0 0 6px #00e676; display: inline-block;"></span>
 <span class="sw-led-2 sw-led-act" style="width: 6px; height: 4px; border-radius: 1px; background-color: #00e676; opacity: 0.85; box-shadow: 0 0 6px #00e676; display: inline-block;"></span>
@@ -293,7 +312,10 @@ BAMEX &bull; RACK CPD &bull; COLETA SNMP VIA ZABBIX
 </div>
 </div>
 </div>
+<div style="width: 100%; display: flex; align-items: center; justify-content: center; position: relative;">
 <div style="font-size: 10.5px; font-weight: 800; color: #8b949e; line-height: 1; font-family: monospace; margin-bottom: 1px;">2</div>
+<span class="sw-poe-icon" style="display: none; position: absolute; right: 2px; font-size: 8px; color: #facc15; font-weight: 800; line-height: 1; text-shadow: 0 0 5px #eab308; pointer-events: none;" title="PoE: 0 W">&#9889;</span>
+</div>
 </div>
 <div class="sw-port" data-port="4" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(4);" title="Porta 4 | GigabitEthernet4&#10;Status: DOWN&#10;Velocidade: --&#10;Entrada: 0 bps&#10;Saida: 0 bps" style="width: 50px; height: 62px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
 <div style="width: 100%; display: flex; justify-content: space-between; padding: 0 3px;">
@@ -322,7 +344,10 @@ BAMEX &bull; RACK CPD &bull; COLETA SNMP VIA ZABBIX
 </div>
 </div>
 </div>
+<div style="width: 100%; display: flex; align-items: center; justify-content: center; position: relative;">
 <div style="font-size: 10.5px; font-weight: 800; color: #8b949e; line-height: 1; font-family: monospace; margin-bottom: 1px;">4</div>
+<span class="sw-poe-icon" style="display: none; position: absolute; right: 2px; font-size: 8px; color: #facc15; font-weight: 800; line-height: 1; text-shadow: 0 0 5px #eab308; pointer-events: none;" title="PoE: 0 W">&#9889;</span>
+</div>
 </div>
 <div class="sw-port" data-port="6" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(6);" title="Porta 6 | GigabitEthernet6&#10;Status: DOWN&#10;Velocidade: --&#10;Entrada: 0 bps&#10;Saida: 0 bps" style="width: 50px; height: 62px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
 <div style="width: 100%; display: flex; justify-content: space-between; padding: 0 3px;">
@@ -351,7 +376,10 @@ BAMEX &bull; RACK CPD &bull; COLETA SNMP VIA ZABBIX
 </div>
 </div>
 </div>
+<div style="width: 100%; display: flex; align-items: center; justify-content: center; position: relative;">
 <div style="font-size: 10.5px; font-weight: 800; color: #8b949e; line-height: 1; font-family: monospace; margin-bottom: 1px;">6</div>
+<span class="sw-poe-icon" style="display: none; position: absolute; right: 2px; font-size: 8px; color: #facc15; font-weight: 800; line-height: 1; text-shadow: 0 0 5px #eab308; pointer-events: none;" title="PoE: 0 W">&#9889;</span>
+</div>
 </div>
 <div class="sw-port" data-port="8" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(8);" title="Porta 8 | GigabitEthernet8&#10;Status: DOWN&#10;Velocidade: --&#10;Entrada: 0 bps&#10;Saida: 0 bps" style="width: 50px; height: 62px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
 <div style="width: 100%; display: flex; justify-content: space-between; padding: 0 3px;">
@@ -380,7 +408,10 @@ BAMEX &bull; RACK CPD &bull; COLETA SNMP VIA ZABBIX
 </div>
 </div>
 </div>
+<div style="width: 100%; display: flex; align-items: center; justify-content: center; position: relative;">
 <div style="font-size: 10.5px; font-weight: 800; color: #8b949e; line-height: 1; font-family: monospace; margin-bottom: 1px;">8</div>
+<span class="sw-poe-icon" style="display: none; position: absolute; right: 2px; font-size: 8px; color: #facc15; font-weight: 800; line-height: 1; text-shadow: 0 0 5px #eab308; pointer-events: none;" title="PoE: 0 W">&#9889;</span>
+</div>
 </div>
 <div class="sw-port" data-port="10" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(10);" title="Porta 10 | GigabitEthernet10&#10;Status: DOWN&#10;Velocidade: --&#10;Entrada: 0 bps&#10;Saida: 0 bps" style="width: 50px; height: 62px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
 <div style="width: 100%; display: flex; justify-content: space-between; padding: 0 3px;">
@@ -409,9 +440,12 @@ BAMEX &bull; RACK CPD &bull; COLETA SNMP VIA ZABBIX
 </div>
 </div>
 </div>
+<div style="width: 100%; display: flex; align-items: center; justify-content: center; position: relative;">
 <div style="font-size: 10.5px; font-weight: 800; color: #8b949e; line-height: 1; font-family: monospace; margin-bottom: 1px;">10</div>
+<span class="sw-poe-icon" style="display: none; position: absolute; right: 2px; font-size: 8px; color: #facc15; font-weight: 800; line-height: 1; text-shadow: 0 0 5px #eab308; pointer-events: none;" title="PoE: 0 W">&#9889;</span>
 </div>
-<div class="sw-port" data-port="12" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(12);" title="Porta 12 | GigabitEthernet12&#10;Status: UP (DEGRADADO)&#10;Velocidade: 100 Mb/s&#10;Entrada: 59.8 Kb/s&#10;Saida: 2.08 Mb/s" style="width: 50px; height: 62px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
+</div>
+<div class="sw-port" data-port="12" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(12);" title="Porta 12 | GigabitEthernet12&#10;Status: UP (DEGRADADO)&#10;Velocidade: 100 Mb/s&#10;Entrada: 13.3 Kb/s&#10;Saida: 58.3 Kb/s" style="width: 50px; height: 62px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
 <div style="width: 100%; display: flex; justify-content: space-between; padding: 0 3px;">
 <span class="sw-led-1" style="width: 6px; height: 4px; border-radius: 1px; background-color: #f59e0b; box-shadow: 0 0 6px #f59e0b; display: inline-block;"></span>
 <span class="sw-led-2 sw-led-act" style="width: 6px; height: 4px; border-radius: 1px; background-color: #f59e0b; opacity: 0.85; box-shadow: 0 0 6px #f59e0b; display: inline-block;"></span>
@@ -438,7 +472,10 @@ BAMEX &bull; RACK CPD &bull; COLETA SNMP VIA ZABBIX
 </div>
 </div>
 </div>
+<div style="width: 100%; display: flex; align-items: center; justify-content: center; position: relative;">
 <div style="font-size: 10.5px; font-weight: 800; color: #8b949e; line-height: 1; font-family: monospace; margin-bottom: 1px;">12</div>
+<span class="sw-poe-icon" style="display: none; position: absolute; right: 2px; font-size: 8px; color: #facc15; font-weight: 800; line-height: 1; text-shadow: 0 0 5px #eab308; pointer-events: none;" title="PoE: 0 W">&#9889;</span>
+</div>
 </div>
 </div>
 </div>
@@ -475,7 +512,10 @@ BAMEX &bull; RACK CPD &bull; COLETA SNMP VIA ZABBIX
 </div>
 </div>
 </div>
+<div style="width: 100%; display: flex; align-items: center; justify-content: center; position: relative;">
 <div style="font-size: 10.5px; font-weight: 800; color: #8b949e; line-height: 1; font-family: monospace; margin-bottom: 1px;">13</div>
+<span class="sw-poe-icon" style="display: none; position: absolute; right: 2px; font-size: 8px; color: #facc15; font-weight: 800; line-height: 1; text-shadow: 0 0 5px #eab308; pointer-events: none;" title="PoE: 0 W">&#9889;</span>
+</div>
 </div>
 <div class="sw-port" data-port="15" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(15);" title="Porta 15 | GigabitEthernet15&#10;Status: DOWN&#10;Velocidade: --&#10;Entrada: 0 bps&#10;Saida: 0 bps" style="width: 50px; height: 62px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
 <div style="width: 100%; display: flex; justify-content: space-between; padding: 0 3px;">
@@ -504,7 +544,10 @@ BAMEX &bull; RACK CPD &bull; COLETA SNMP VIA ZABBIX
 </div>
 </div>
 </div>
+<div style="width: 100%; display: flex; align-items: center; justify-content: center; position: relative;">
 <div style="font-size: 10.5px; font-weight: 800; color: #8b949e; line-height: 1; font-family: monospace; margin-bottom: 1px;">15</div>
+<span class="sw-poe-icon" style="display: none; position: absolute; right: 2px; font-size: 8px; color: #facc15; font-weight: 800; line-height: 1; text-shadow: 0 0 5px #eab308; pointer-events: none;" title="PoE: 0 W">&#9889;</span>
+</div>
 </div>
 <div class="sw-port" data-port="17" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(17);" title="Porta 17 | GigabitEthernet17&#10;Status: DOWN&#10;Velocidade: --&#10;Entrada: 0 bps&#10;Saida: 0 bps" style="width: 50px; height: 62px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
 <div style="width: 100%; display: flex; justify-content: space-between; padding: 0 3px;">
@@ -533,7 +576,10 @@ BAMEX &bull; RACK CPD &bull; COLETA SNMP VIA ZABBIX
 </div>
 </div>
 </div>
+<div style="width: 100%; display: flex; align-items: center; justify-content: center; position: relative;">
 <div style="font-size: 10.5px; font-weight: 800; color: #8b949e; line-height: 1; font-family: monospace; margin-bottom: 1px;">17</div>
+<span class="sw-poe-icon" style="display: none; position: absolute; right: 2px; font-size: 8px; color: #facc15; font-weight: 800; line-height: 1; text-shadow: 0 0 5px #eab308; pointer-events: none;" title="PoE: 0 W">&#9889;</span>
+</div>
 </div>
 <div class="sw-port" data-port="19" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(19);" title="Porta 19 | GigabitEthernet19&#10;Status: DOWN&#10;Velocidade: --&#10;Entrada: 0 bps&#10;Saida: 0 bps" style="width: 50px; height: 62px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
 <div style="width: 100%; display: flex; justify-content: space-between; padding: 0 3px;">
@@ -562,7 +608,10 @@ BAMEX &bull; RACK CPD &bull; COLETA SNMP VIA ZABBIX
 </div>
 </div>
 </div>
+<div style="width: 100%; display: flex; align-items: center; justify-content: center; position: relative;">
 <div style="font-size: 10.5px; font-weight: 800; color: #8b949e; line-height: 1; font-family: monospace; margin-bottom: 1px;">19</div>
+<span class="sw-poe-icon" style="display: none; position: absolute; right: 2px; font-size: 8px; color: #facc15; font-weight: 800; line-height: 1; text-shadow: 0 0 5px #eab308; pointer-events: none;" title="PoE: 0 W">&#9889;</span>
+</div>
 </div>
 <div class="sw-port" data-port="21" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(21);" title="Porta 21 | GigabitEthernet21&#10;Status: DOWN&#10;Velocidade: --&#10;Entrada: 0 bps&#10;Saida: 0 bps" style="width: 50px; height: 62px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
 <div style="width: 100%; display: flex; justify-content: space-between; padding: 0 3px;">
@@ -591,9 +640,12 @@ BAMEX &bull; RACK CPD &bull; COLETA SNMP VIA ZABBIX
 </div>
 </div>
 </div>
+<div style="width: 100%; display: flex; align-items: center; justify-content: center; position: relative;">
 <div style="font-size: 10.5px; font-weight: 800; color: #8b949e; line-height: 1; font-family: monospace; margin-bottom: 1px;">21</div>
+<span class="sw-poe-icon" style="display: none; position: absolute; right: 2px; font-size: 8px; color: #facc15; font-weight: 800; line-height: 1; text-shadow: 0 0 5px #eab308; pointer-events: none;" title="PoE: 0 W">&#9889;</span>
 </div>
-<div class="sw-port" data-port="23" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(23);" title="Porta 23 | GigabitEthernet23&#10;Status: UP&#10;Velocidade: 1 Gb/s&#10;Entrada: 31.0 Kb/s&#10;Saida: 147.0 Kb/s" style="width: 50px; height: 62px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
+</div>
+<div class="sw-port" data-port="23" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(23);" title="Porta 23 | GigabitEthernet23&#10;Status: UP&#10;Velocidade: 1 Gb/s&#10;Entrada: 161.0 Kb/s&#10;Saida: 550.7 Kb/s" style="width: 50px; height: 62px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
 <div style="width: 100%; display: flex; justify-content: space-between; padding: 0 3px;">
 <span class="sw-led-1" style="width: 6px; height: 4px; border-radius: 1px; background-color: #00e676; box-shadow: 0 0 6px #00e676; display: inline-block;"></span>
 <span class="sw-led-2 sw-led-act" style="width: 6px; height: 4px; border-radius: 1px; background-color: #00e676; opacity: 0.85; box-shadow: 0 0 6px #00e676; display: inline-block;"></span>
@@ -620,7 +672,10 @@ BAMEX &bull; RACK CPD &bull; COLETA SNMP VIA ZABBIX
 </div>
 </div>
 </div>
+<div style="width: 100%; display: flex; align-items: center; justify-content: center; position: relative;">
 <div style="font-size: 10.5px; font-weight: 800; color: #8b949e; line-height: 1; font-family: monospace; margin-bottom: 1px;">23</div>
+<span class="sw-poe-icon" style="display: none; position: absolute; right: 2px; font-size: 8px; color: #facc15; font-weight: 800; line-height: 1; text-shadow: 0 0 5px #eab308; pointer-events: none;" title="PoE: 0 W">&#9889;</span>
+</div>
 </div>
 </div>
 <div style="display: flex; gap: 18px;">
@@ -651,12 +706,15 @@ BAMEX &bull; RACK CPD &bull; COLETA SNMP VIA ZABBIX
 </div>
 </div>
 </div>
+<div style="width: 100%; display: flex; align-items: center; justify-content: center; position: relative;">
 <div style="font-size: 10.5px; font-weight: 800; color: #8b949e; line-height: 1; font-family: monospace; margin-bottom: 1px;">14</div>
+<span class="sw-poe-icon" style="display: none; position: absolute; right: 2px; font-size: 8px; color: #facc15; font-weight: 800; line-height: 1; text-shadow: 0 0 5px #eab308; pointer-events: none;" title="PoE: 0 W">&#9889;</span>
 </div>
-<div class="sw-port" data-port="16" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(16);" title="Porta 16 | GigabitEthernet16&#10;Status: UP (DEGRADADO)&#10;Velocidade: 100 Mb/s&#10;Entrada: 0 bps&#10;Saida: 19.8 Kb/s" style="width: 50px; height: 62px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
+</div>
+<div class="sw-port" data-port="16" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(16);" title="Porta 16 | GigabitEthernet16&#10;Status: UP&#10;Velocidade: 1 Gb/s&#10;Entrada: 98.7 Kb/s&#10;Saida: 849.2 Kb/s" style="width: 50px; height: 62px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
 <div style="width: 100%; display: flex; justify-content: space-between; padding: 0 3px;">
-<span class="sw-led-1" style="width: 6px; height: 4px; border-radius: 1px; background-color: #f59e0b; box-shadow: 0 0 6px #f59e0b; display: inline-block;"></span>
-<span class="sw-led-2 sw-led-act" style="width: 6px; height: 4px; border-radius: 1px; background-color: #f59e0b; opacity: 0.85; box-shadow: 0 0 6px #f59e0b; display: inline-block;"></span>
+<span class="sw-led-1" style="width: 6px; height: 4px; border-radius: 1px; background-color: #00e676; box-shadow: 0 0 6px #00e676; display: inline-block;"></span>
+<span class="sw-led-2 sw-led-act" style="width: 6px; height: 4px; border-radius: 1px; background-color: #00e676; opacity: 0.85; box-shadow: 0 0 6px #00e676; display: inline-block;"></span>
 </div>
 <!-- Authentic Shielded RJ45 Jack Receptacle -->
 <div class="sw-rj45-jack" style="width: 36px; height: 30px; background: linear-gradient(180deg, #1c2433 0%, #101622 100%); border: 1.5px solid #2b384e; border-radius: 3px; position: relative; box-shadow: inset 0 1px 2px rgba(255,255,255,0.12), 0 2px 5px rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; box-sizing: border-box;">
@@ -680,7 +738,10 @@ BAMEX &bull; RACK CPD &bull; COLETA SNMP VIA ZABBIX
 </div>
 </div>
 </div>
+<div style="width: 100%; display: flex; align-items: center; justify-content: center; position: relative;">
 <div style="font-size: 10.5px; font-weight: 800; color: #8b949e; line-height: 1; font-family: monospace; margin-bottom: 1px;">16</div>
+<span class="sw-poe-icon" style="display: none; position: absolute; right: 2px; font-size: 8px; color: #facc15; font-weight: 800; line-height: 1; text-shadow: 0 0 5px #eab308; pointer-events: none;" title="PoE: 0 W">&#9889;</span>
+</div>
 </div>
 <div class="sw-port" data-port="18" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(18);" title="Porta 18 | GigabitEthernet18&#10;Status: DOWN&#10;Velocidade: --&#10;Entrada: 0 bps&#10;Saida: 0 bps" style="width: 50px; height: 62px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
 <div style="width: 100%; display: flex; justify-content: space-between; padding: 0 3px;">
@@ -709,7 +770,10 @@ BAMEX &bull; RACK CPD &bull; COLETA SNMP VIA ZABBIX
 </div>
 </div>
 </div>
+<div style="width: 100%; display: flex; align-items: center; justify-content: center; position: relative;">
 <div style="font-size: 10.5px; font-weight: 800; color: #8b949e; line-height: 1; font-family: monospace; margin-bottom: 1px;">18</div>
+<span class="sw-poe-icon" style="display: none; position: absolute; right: 2px; font-size: 8px; color: #facc15; font-weight: 800; line-height: 1; text-shadow: 0 0 5px #eab308; pointer-events: none;" title="PoE: 0 W">&#9889;</span>
+</div>
 </div>
 <div class="sw-port" data-port="20" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(20);" title="Porta 20 | GigabitEthernet20&#10;Status: DOWN&#10;Velocidade: --&#10;Entrada: 0 bps&#10;Saida: 0 bps" style="width: 50px; height: 62px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
 <div style="width: 100%; display: flex; justify-content: space-between; padding: 0 3px;">
@@ -738,7 +802,10 @@ BAMEX &bull; RACK CPD &bull; COLETA SNMP VIA ZABBIX
 </div>
 </div>
 </div>
+<div style="width: 100%; display: flex; align-items: center; justify-content: center; position: relative;">
 <div style="font-size: 10.5px; font-weight: 800; color: #8b949e; line-height: 1; font-family: monospace; margin-bottom: 1px;">20</div>
+<span class="sw-poe-icon" style="display: none; position: absolute; right: 2px; font-size: 8px; color: #facc15; font-weight: 800; line-height: 1; text-shadow: 0 0 5px #eab308; pointer-events: none;" title="PoE: 0 W">&#9889;</span>
+</div>
 </div>
 <div class="sw-port" data-port="22" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(22);" title="Porta 22 | GigabitEthernet22&#10;Status: DOWN&#10;Velocidade: --&#10;Entrada: 0 bps&#10;Saida: 0 bps" style="width: 50px; height: 62px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 1px solid #263346; box-shadow: none; box-sizing: border-box;">
 <div style="width: 100%; display: flex; justify-content: space-between; padding: 0 3px;">
@@ -767,9 +834,12 @@ BAMEX &bull; RACK CPD &bull; COLETA SNMP VIA ZABBIX
 </div>
 </div>
 </div>
+<div style="width: 100%; display: flex; align-items: center; justify-content: center; position: relative;">
 <div style="font-size: 10.5px; font-weight: 800; color: #8b949e; line-height: 1; font-family: monospace; margin-bottom: 1px;">22</div>
+<span class="sw-poe-icon" style="display: none; position: absolute; right: 2px; font-size: 8px; color: #facc15; font-weight: 800; line-height: 1; text-shadow: 0 0 5px #eab308; pointer-events: none;" title="PoE: 0 W">&#9889;</span>
 </div>
-<div class="sw-port sw-selected" data-port="24" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(24);" title="Porta 24 | GigabitEthernet24&#10;Status: UP&#10;Velocidade: 1 Gb/s&#10;Entrada: 2.52 Mb/s&#10;Saida: 331.3 Kb/s" style="width: 50px; height: 62px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 2px solid #00b0ff; box-shadow: 0 0 14px rgba(0, 176, 255, 0.9); box-sizing: border-box;">
+</div>
+<div class="sw-port sw-selected" data-port="24" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(24);" title="Porta 24 | GigabitEthernet24&#10;Status: UP&#10;Velocidade: 1 Gb/s&#10;Entrada: 2.11 Mb/s&#10;Saida: 413.6 Kb/s" style="width: 50px; height: 62px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: 2px solid #00b0ff; box-shadow: 0 0 14px rgba(0, 176, 255, 0.9); box-sizing: border-box;">
 <div style="width: 100%; display: flex; justify-content: space-between; padding: 0 3px;">
 <span class="sw-led-1" style="width: 6px; height: 4px; border-radius: 1px; background-color: #00e676; box-shadow: 0 0 6px #00e676; display: inline-block;"></span>
 <span class="sw-led-2 sw-led-act" style="width: 6px; height: 4px; border-radius: 1px; background-color: #00e676; opacity: 0.85; box-shadow: 0 0 6px #00e676; display: inline-block;"></span>
@@ -796,7 +866,10 @@ BAMEX &bull; RACK CPD &bull; COLETA SNMP VIA ZABBIX
 </div>
 </div>
 </div>
+<div style="width: 100%; display: flex; align-items: center; justify-content: center; position: relative;">
 <div style="font-size: 10.5px; font-weight: 800; color: #8b949e; line-height: 1; font-family: monospace; margin-bottom: 1px;">24</div>
+<span class="sw-poe-icon" style="display: none; position: absolute; right: 2px; font-size: 8px; color: #facc15; font-weight: 800; line-height: 1; text-shadow: 0 0 5px #eab308; pointer-events: none;" title="PoE: 0 W">&#9889;</span>
+</div>
 </div>
 </div>
 </div>
@@ -896,7 +969,7 @@ Aruba Instant On 1930 24G 4SFP/SFP+ Switch JL682A, InstantOn_1930_2.8.0.0 (17), 
 <span>Template: SNMP Network Device</span>
 <span>&bull;</span>
 <span>Host ID Zabbix: 10682</span>
-<span id="drawer-cpu-wrap" style="">&bull; CPU: <span id="drawer-cpu" style="color: #c084fc; font-weight: 700;">2.0%</span></span>
+<span id="drawer-cpu-wrap" style="">&bull; CPU: <span id="drawer-cpu" style="color: #c084fc; font-weight: 700;">3.0%</span></span>
 </div>
 </div>
 </div>
@@ -936,6 +1009,7 @@ Aruba Instant On 1930 24G 4SFP/SFP+ Switch JL682A, InstantOn_1930_2.8.0.0 (17), 
 <h2 id="sel-port-title" style="font-size: 25px; font-weight: 800; color: #ffffff; margin: 0; letter-spacing: -0.5px;">Porta 24</h2>
 <span id="sel-port-name" style="font-size: 13px; color: #8b949e; font-weight: 500;">GigabitEthernet24 &bull; 1GbE RJ45</span>
 <span id="sel-port-status" style="background: rgba(0, 230, 118, 0.15); color: #00e676; font-size: 10.5px; font-weight: 800; padding: 2px 8px; border-radius: 4px; border: 1px solid rgba(0, 230, 118, 0.3);">UP</span>
+<span id="sel-port-poe" style="display: none; background: rgba(234, 179, 8, 0.15); color: #facc15; font-size: 10.5px; font-weight: 800; padding: 2px 8px; border-radius: 4px; border: 1px solid rgba(234, 179, 8, 0.3);">&#9889; POE: <span id="sel-port-poe-val">0 W</span></span>
 </div>
 <!-- 5 Stats Cards -->
 <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 14px;">
@@ -945,15 +1019,15 @@ Aruba Instant On 1930 24G 4SFP/SFP+ Switch JL682A, InstantOn_1930_2.8.0.0 (17), 
 </div>
 <div>
 <div style="font-size: 9px; font-weight: 700; color: #8b949e; text-transform: uppercase; margin-bottom: 3px;">ENTRADA</div>
-<div id="sel-port-in" style="font-size: 16px; font-weight: 800; color: #ffffff;">2.52 Mb/s</div>
+<div id="sel-port-in" style="font-size: 16px; font-weight: 800; color: #ffffff;">2.11 Mb/s</div>
 </div>
 <div>
 <div style="font-size: 9px; font-weight: 700; color: #8b949e; text-transform: uppercase; margin-bottom: 3px;">SA&Iacute;DA</div>
-<div id="sel-port-out" style="font-size: 16px; font-weight: 800; color: #ffffff;">331.3 Kb/s</div>
+<div id="sel-port-out" style="font-size: 16px; font-weight: 800; color: #ffffff;">413.6 Kb/s</div>
 </div>
 <div>
 <div style="font-size: 9px; font-weight: 700; color: #8b949e; text-transform: uppercase; margin-bottom: 3px;">UTILIZA&Ccedil;&Atilde;O</div>
-<div id="sel-port-util" style="font-size: 16px; font-weight: 800; color: #ffffff;">0.29%</div>
+<div id="sel-port-util" style="font-size: 16px; font-weight: 800; color: #ffffff;">0.25%</div>
 </div>
 <div>
 <div style="font-size: 9px; font-weight: 700; color: #8b949e; text-transform: uppercase; margin-bottom: 3px;">ERROS / DESC</div>
@@ -1027,15 +1101,15 @@ Total: <span id="tt-total" style="white-space: nowrap;">0 bps</span>
 <span style="font-size: 10px; color: #8b949e; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">GigabitEthernet16</span>
 </div>
 <div style="display: flex; align-items: center; gap: 6px;">
-<span style="font-size: 9px; font-weight: 700; background: rgba(56, 189, 248, 0.12); color: #38bdf8; padding: 1px 4px; border-radius: 3px;">0.0%</span>
-<span style="font-size: 11px; font-weight: 800; color: #38bdf8; font-family: monospace; white-space: nowrap;">19.8 Kb/s</span>
+<span style="font-size: 9px; font-weight: 700; background: rgba(56, 189, 248, 0.12); color: #38bdf8; padding: 1px 4px; border-radius: 3px;">0.1%</span>
+<span style="font-size: 11px; font-weight: 800; color: #38bdf8; font-family: monospace; white-space: nowrap;">947.9 Kb/s</span>
 </div>
 </div>
 <div style="display: flex; align-items: center; gap: 8px;">
 <div style="flex: 1; height: 3px; background: #1c2230; border-radius: 2px; overflow: hidden;">
 <div style="width: 100%; height: 100%; background: #00b0ff; border-radius: 2px;"></div>
 </div>
-<span style="font-size: 8.5px; color: #64748b; font-family: monospace; white-space: nowrap;">In: 0 bps &bull; Out: 19.8 Kb/s</span>
+<span style="font-size: 8.5px; color: #64748b; font-family: monospace; white-space: nowrap;">In: 98.7 Kb/s &bull; Out: 849.2 Kb/s</span>
 </div>
 </div>
 <div class="sw-top-talker" data-tt-port="12" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(12);" style="background: #0d121c; border-radius: 4px; padding: 6px 10px; cursor: pointer; border: 1px solid #1e293b; transition: all 0.2s ease;">
@@ -1046,15 +1120,15 @@ Total: <span id="tt-total" style="white-space: nowrap;">0 bps</span>
 <span style="font-size: 10px; color: #8b949e; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">GigabitEthernet12</span>
 </div>
 <div style="display: flex; align-items: center; gap: 6px;">
-<span style="font-size: 9px; font-weight: 700; background: rgba(56, 189, 248, 0.12); color: #38bdf8; padding: 1px 4px; border-radius: 3px;">2.1%</span>
-<span style="font-size: 11px; font-weight: 800; color: #38bdf8; font-family: monospace; white-space: nowrap;">2.14 Mb/s</span>
+<span style="font-size: 9px; font-weight: 700; background: rgba(56, 189, 248, 0.12); color: #38bdf8; padding: 1px 4px; border-radius: 3px;">0.1%</span>
+<span style="font-size: 11px; font-weight: 800; color: #38bdf8; font-family: monospace; white-space: nowrap;">71.5 Kb/s</span>
 </div>
 </div>
 <div style="display: flex; align-items: center; gap: 8px;">
 <div style="flex: 1; height: 3px; background: #1c2230; border-radius: 2px; overflow: hidden;">
-<div style="width: 100%; height: 100%; background: #00b0ff; border-radius: 2px;"></div>
+<div style="width: 8%; height: 100%; background: #00b0ff; border-radius: 2px;"></div>
 </div>
-<span style="font-size: 8.5px; color: #64748b; font-family: monospace; white-space: nowrap;">In: 59.8 Kb/s &bull; Out: 2.08 Mb/s</span>
+<span style="font-size: 8.5px; color: #64748b; font-family: monospace; white-space: nowrap;">In: 13.3 Kb/s &bull; Out: 58.3 Kb/s</span>
 </div>
 </div>
 <div class="sw-top-talker" data-tt-port="24" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(24);" style="background: #0d121c; border-radius: 4px; padding: 6px 10px; cursor: pointer; border: 1px solid #00b0ff; box-shadow: 0 0 8px rgba(0, 176, 255, 0.3); transition: all 0.2s ease;">
@@ -1065,15 +1139,15 @@ Total: <span id="tt-total" style="white-space: nowrap;">0 bps</span>
 <span style="font-size: 10px; color: #8b949e; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">GigabitEthernet24</span>
 </div>
 <div style="display: flex; align-items: center; gap: 6px;">
-<span style="font-size: 9px; font-weight: 700; background: rgba(56, 189, 248, 0.12); color: #38bdf8; padding: 1px 4px; border-radius: 3px;">0.3%</span>
-<span style="font-size: 11px; font-weight: 800; color: #38bdf8; font-family: monospace; white-space: nowrap;">2.86 Mb/s</span>
+<span style="font-size: 9px; font-weight: 700; background: rgba(56, 189, 248, 0.12); color: #38bdf8; padding: 1px 4px; border-radius: 3px;">0.2%</span>
+<span style="font-size: 11px; font-weight: 800; color: #38bdf8; font-family: monospace; white-space: nowrap;">2.53 Mb/s</span>
 </div>
 </div>
 <div style="display: flex; align-items: center; gap: 8px;">
 <div style="flex: 1; height: 3px; background: #1c2230; border-radius: 2px; overflow: hidden;">
 <div style="width: 100%; height: 100%; background: #00b0ff; border-radius: 2px;"></div>
 </div>
-<span style="font-size: 8.5px; color: #64748b; font-family: monospace; white-space: nowrap;">In: 2.52 Mb/s &bull; Out: 331.3 Kb/s</span>
+<span style="font-size: 8.5px; color: #64748b; font-family: monospace; white-space: nowrap;">In: 2.11 Mb/s &bull; Out: 413.6 Kb/s</span>
 </div>
 </div>
 </div>
@@ -1085,6 +1159,22 @@ Total: <span id="tt-total" style="white-space: nowrap;">0 bps</span>
 <div style="font-size: 10px; font-weight: 700; color: #64748b; text-transform: uppercase;">ZABBIX EVENT.GET</div>
 </div>
 <div id="event-list-container" style="display: flex; flex-direction: column; gap: 6px; flex: 1;">
+<div style="display: flex; align-items: center; justify-content: space-between; font-size: 11.5px; color: #e2e8f0; background: #0d121c; padding: 6px 10px; border-radius: 4px; border-left: 3px solid #00e676;">
+<div style="display: flex; align-items: center; gap: 8px;">
+<span style="color: #8b949e; font-family: monospace; min-width: 54px; font-size: 10.5px;">13:11:07</span>
+<span style="width: 6px; height: 6px; border-radius: 50%; background: #00e676; box-shadow: 0 0 6px #00e676; display: inline-block;"></span>
+<span style="font-weight: 500;">Interface 7(): Ethernet has changed to lower speed than it was before</span>
+</div>
+<span style="background: rgba(0, 230, 118, 0.12); color: #00e676; font-size: 9px; font-weight: 700; padding: 2px 5px; border-radius: 3px; font-family: monospace;">RESOLVIDO</span>
+</div>
+<div style="display: flex; align-items: center; justify-content: space-between; font-size: 11.5px; color: #e2e8f0; background: #0d121c; padding: 6px 10px; border-radius: 4px; border-left: 3px solid #f59e0b;">
+<div style="display: flex; align-items: center; gap: 8px;">
+<span style="color: #8b949e; font-family: monospace; min-width: 54px; font-size: 10.5px;">12:31:09</span>
+<span style="width: 6px; height: 6px; border-radius: 50%; background: #f59e0b; box-shadow: 0 0 6px #f59e0b; display: inline-block;"></span>
+<span style="font-weight: 500;">Interface 7(): Ethernet has changed to lower speed than it was before</span>
+</div>
+<span style="background: rgba(239, 68, 68, 0.12); color: #ef4444; font-size: 9px; font-weight: 700; padding: 2px 5px; border-radius: 3px; font-family: monospace;">PROBLEMA</span>
+</div>
 <div style="display: flex; align-items: center; justify-content: space-between; font-size: 11.5px; color: #e2e8f0; background: #0d121c; padding: 6px 10px; border-radius: 4px; border-left: 3px solid #00e676;">
 <div style="display: flex; align-items: center; gap: 8px;">
 <span style="color: #8b949e; font-family: monospace; min-width: 54px; font-size: 10.5px;">11:40:08</span>
