@@ -15,17 +15,23 @@ Implantar, automatizar e manter uma infraestrutura completa de observabilidade, 
   - Credenciais e segredos isolados em variáveis de ambiente, nunca versionados em repositório.
 
 ## Estado Atual do Projeto
-- **Fase:** Produção / Gêmeos Digitais Multi-Switch em Massa (v57 - Revisão 60).
+- **Fase:** Produção / Gêmeos Digitais Multi-Switch em Massa (v57 - Revisão 62).
 - **Ambientes Conectados (Ativos):**
   - **Zabbix API:** `http://10.10.1.26/api_jsonrpc.php` (Proxy 1, SNMP Community `vegasnmp`).
   - **Switches Monitorados:**
-    - `[BAMEX] - SW01` (Host ID: `10682`, IP: `10.50.0.2`): Dashboard Grafana `alpt2p5` (v57 implantada)
+    - `[BAMEX] - SW01` (Host ID: `10682`, IP: `10.50.0.2`): Dashboard Grafana `alpt2p5` (v57 Revisão 62 implantada)
     - `[BAMEX] - SW02` (Host ID: `10683`, IP: `10.50.0.3`): Dashboard Grafana `bamex-sw02`
     - `[BAMEX] - SW03` (Host ID: `11125`, IP: `10.50.0.4`): Dashboard Grafana `bamex-sw03`
     - `[BAMEX] - SW04` (Host ID: `11126`, IP: `10.50.0.5`): Dashboard Grafana `bamex-sw04`
   - **Grafana:** `http://10.10.1.25:3000` (Pasta `POC ALEX`, Folder ID: 136).
   - **Repositório GitHub:** `https://github.com/IDhexter/Grafana-Switch` (branch `main`).
 - **Arquitetura e Resiliência v57 (NOC 24/7):**
+  - **Novo Design Realista do Receptáculo RJ45 (8P8C):** Chassi metálico blindado em degradê com abas de aterramento, cavidade interna profunda com silhueta em degrau autêntica (ombros plásticos laterais e sulco central inferior para trava do cabo de rede) e 8 pinos de contato dourados individuais (`.sw-pin`).
+  - **LEDs Duplos de Hardware (Modelo 1 - Padrão da Indústria):**
+    - LED Esquerdo: Fixa sólida indicando link/velocidade (Verde para 1G, Âmbar para 100M, Apagado para Down).
+    - LED Direito: Animação realista de cintilação de atividade de rede (*flicker* TX/RX com `@keyframes swActFlicker`) com cadências orgânicas e desfasadas entre portas (`animation-delay`).
+    - Portas com alarme no Zabbix piscam em vermelho neon (`sw-port-fault-pulse`).
+  - **Enquadramento Geométrico Sem Rolagem (1080p Fit):** Altura do canvas travada em 190px (`displayH = 190`) e container em 260px; painel Grafana calibrado em `gridPos.h = 28` eliminando estiramento vertical e barras de rolagem.
   - **Singleton de Ciclo de Vida (`window.__ARUBA_TWIN_RUNTIME__`):** Destruição segura e cancelamento atômico de timers (`setInterval`) e requisições HTTP antes de nova execução pelo hook do Business Text.
   - **Prevenção de Request Pile-up:** Lock `isPollingInFlight` impedindo acúmulo de requisições concorrentes.
   - **Controle de Timeout com `AbortController`:** Requisições à API do Zabbix limitadas a 8000ms.

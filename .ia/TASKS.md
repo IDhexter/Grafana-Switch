@@ -47,6 +47,9 @@
   - [x] **Monitoramento de Pacotes Descartados (Discards):** Coleta e exibição de descartes de buffer (`net.if.in.discards` / `net.if.out.discards`) no card `ERROS / DESC`.
   - [x] **Saturação Relativa de Link (% Uso):** Cálculo da taxa de ocupação percentual `((Max(In,Out) / Speed) * 100)` com badge visual no Top 3 Talkers.
   - [x] **Uptime Real do Chassi:** Coleta de `system.net.uptime[sysUpTime.0]` (em segundos) e exibição formatada no cabeçalho e na gaveta de inventário.
+  - [x] **Design Físico do Conector RJ45 (8P8C):** Receptáculo blindado metálico com degradê, abas de aterramento, cavidade interna com silhueta em degrau (ombros plásticos laterais e trava central) e 8 pinos de contato dourados individuais (`.sw-pin`).
+  - [x] **LEDs Duplos de Hardware (Modelo 1 - Indústria):** LED esquerdo fixo (Link/Velocidade) e LED direito com cintilação de atividade de rede (*flicker* TX/RX com `@keyframes swActFlicker`) e cadências desfasadas entre portas.
+  - [x] **Enquadramento Geométrico 1080p Sem Rolagem:** Trava de altura do Canvas em 190px, container em 260px e painel Grafana calibrado em `gridPos.h = 28` eliminando estiramento vertical e barras de rolagem.
 
 ## 🔜 Backlog Imediato (Próximos Passos)
 - [ ] Criar estrutura base de pastas do repositório (`docker/`, `zabbix/`, `grafana/`, `scripts/`, `.gitignore`).
