@@ -15,16 +15,30 @@ Implantar, automatizar e manter uma infraestrutura completa de observabilidade, 
   - Credenciais e segredos isolados em variáveis de ambiente, nunca versionados em repositório.
 
 ## Estado Atual do Projeto
-- **Fase:** Produção / Gêmeos Digitais Multi-Switch em Massa (v56).
+- **Fase:** Produção / Gêmeos Digitais Multi-Switch em Massa (v57 - Revisão 60).
 - **Ambientes Conectados (Ativos):**
   - **Zabbix API:** `http://10.10.1.26/api_jsonrpc.php` (Proxy 1, SNMP Community `vegasnmp`).
   - **Switches Monitorados:**
-    - `[BAMEX] - SW01` (Host ID: `10682`, IP: `10.50.0.2`): Dashboard Grafana `alpt2p5`
+    - `[BAMEX] - SW01` (Host ID: `10682`, IP: `10.50.0.2`): Dashboard Grafana `alpt2p5` (v57 implantada)
     - `[BAMEX] - SW02` (Host ID: `10683`, IP: `10.50.0.3`): Dashboard Grafana `bamex-sw02`
     - `[BAMEX] - SW03` (Host ID: `11125`, IP: `10.50.0.4`): Dashboard Grafana `bamex-sw03`
     - `[BAMEX] - SW04` (Host ID: `11126`, IP: `10.50.0.5`): Dashboard Grafana `bamex-sw04`
   - **Grafana:** `http://10.10.1.25:3000` (Pasta `POC ALEX`, Folder ID: 136).
   - **Repositório GitHub:** `https://github.com/IDhexter/Grafana-Switch` (branch `main`).
+- **Arquitetura e Resiliência v57 (NOC 24/7):**
+  - **Singleton de Ciclo de Vida (`window.__ARUBA_TWIN_RUNTIME__`):** Destruição segura e cancelamento atômico de timers (`setInterval`) e requisições HTTP antes de nova execução pelo hook do Business Text.
+  - **Prevenção de Request Pile-up:** Lock `isPollingInFlight` impedindo acúmulo de requisições concorrentes.
+  - **Controle de Timeout com `AbortController`:** Requisições à API do Zabbix limitadas a 8000ms.
+  - **Page Visibility API:** Polling e canvas congelam automaticamente em background (`document.hidden`) e retomam ao focar a aba.
+  - **History Cache LRU com TTL:** Cache dinâmico com TTL de 60s e descarte LRU limitado a 12 entradas.
+  - **Normalização de Velocidade SNMP:** Suporte a 32-bit gauge limit 10G (`4294967295` -> `10 Gb/s`) e MIBs raw em Mbps.
+  - **Detecção Estrita de Links Degradados:** Apenas portas ativas `OperStatus === 1` e `Speed < 1 Gbps` (sem falsos positivos em portas DOWN ou SFP+ 1G).
+  - **Dynamic `value_type` em `history.get`:** Tipagem dinâmica respeitando a definição do item no Zabbix.
+  - **Regex Delimitado em `problem.get`:** Delimitadores de palavra `\b` evitando casamento acidental de números.
+  - **Renderização Canvas Otimizada:** Traçados fiéis sem distorção artificial de Bézier e downsampling de pontos quando dataset > 150.
+  - **KPI de Descartes (Discards):** Coleta e exibição de descarte de buffer (`in.discards` / `out.discards`) no card `ERROS / DESC`.
+  - **Taxa de Ocupação (% Uso):** Cálculo da saturação relativa do link no widget Top 3 Talkers.
+  - **Uptime Dinâmico:** Leitura real de `system.net.uptime[sysUpTime.0]` e exibição no topo e na gaveta.
 - **O que está 100% funcionando:**
   - **Script de Automação e Deploy Multi-Switch Parametrizado (`scripts/build_aruba_interactive_twin.ps1`):**
     - Permite gerar e publicar dashboards individuais para qualquer switch da rede informando apenas `-TargetHostId`, `-TargetDashboardUid`, `-TargetDashboardTitle`, `-TargetSwitchShortName`, `-TargetSwitchIp`.

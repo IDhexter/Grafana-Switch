@@ -34,6 +34,19 @@
   - `[BAMEX] - SW03` (IP: `10.50.0.4`, Host ID: `11125`, UID: `bamex-sw03`)
 - [x] Exportação e sanitização de dados no repositório local e atualização da memória do projeto.
 - [x] Elaboração do documento técnico completo de arquitetura, telemetria Zabbix e engenharia do dashboard (`docs/ARUBA_DIGITAL_TWIN_TECHNICAL_SPEC.md`).
+- [x] Refatoração e Estabilização Arquitetural **v57** (Revisão 60 no Grafana):
+  - [x] **Singleton de Runtime (`window.__ARUBA_TWIN_RUNTIME__`):** Destruição atômica e cancelamento de timers antigos e requisições pendentes antes de cada instanciação.
+  - [x] **Controle de Concorrência & Timeout:** Flag `isPollingInFlight` e `AbortController` com timeout de 8000ms para chamadas à API do Zabbix.
+  - [x] **Page Visibility API:** Pausa do polling de 15s e renderização quando a aba do navegador estiver oculta (`document.hidden`), retomando no evento `visibilitychange`.
+  - [x] **LRU History Cache com TTL:** Cache em memória indexado por porta e intervalo com TTL de 60s e descarte LRU limitado a 12 entradas.
+  - [x] **Normalização de Velocidade SNMP (`ifHighSpeed` / `ifSpeed`):** Suporte ao valor 32-bit gauge de 10G (`4294967295` -> `10000000000`) e MIBs raw em Mbps (< 20000 -> bps).
+  - [x] **Detecção Estrita de Links Degradados:** Apenas portas com `OperStatus === 1` e `Speed < 1000000000` (excluindo falsos positivos em portas DOWN ou SFP+ 1G GBIC).
+  - [x] **Tipagem Dinâmica em `history.get`:** Uso dinâmico de `value_type` retornado pelo Zabbix (`ports[p].InValueType`/`OutValueType`).
+  - [x] **Regex Delimitado em `problem.get`:** Padrão estrito `\b(?:Interface|Port|GigabitEthernet|TenGigabitEthernet|SFP\+?)\s+(\d{1,2})(?:\s|\(|:|$|\b)` com validação `1 <= p <= 28`.
+  - [x] **Otimização de Renderização Canvas:** Eliminação de distorção de curvas, inclusão de `ctx.lineJoin = 'round'`, `ctx.lineCap = 'round'` e downsampling de pontos individuais quando dataset > 150 pontos.
+  - [x] **Monitoramento de Pacotes Descartados (Discards):** Coleta e exibição de descartes de buffer (`net.if.in.discards` / `net.if.out.discards`) no card `ERROS / DESC`.
+  - [x] **Saturação Relativa de Link (% Uso):** Cálculo da taxa de ocupação percentual `((Max(In,Out) / Speed) * 100)` com badge visual no Top 3 Talkers.
+  - [x] **Uptime Real do Chassi:** Coleta de `system.net.uptime[sysUpTime.0]` (em segundos) e exibição formatada no cabeçalho e na gaveta de inventário.
 
 ## 🔜 Backlog Imediato (Próximos Passos)
 - [ ] Criar estrutura base de pastas do repositório (`docker/`, `zabbix/`, `grafana/`, `scripts/`, `.gitignore`).

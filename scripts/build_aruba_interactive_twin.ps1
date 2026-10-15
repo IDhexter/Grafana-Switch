@@ -74,19 +74,23 @@ try {
 
 $items = Invoke-Zabbix "item.get" @{
     hostids = @($hostId)
-    output = @("itemid", "name", "key_", "lastvalue", "units", "lastclock")
+    output = @("itemid", "name", "key_", "lastvalue", "units", "lastclock", "value_type")
 }
 
 $problems = Invoke-Zabbix "problem.get" @{
     hostids = @($hostId)
+    recent = $false
 }
 $problemCount = if ($problems) { $problems.Count } else { 0 }
 
 $probPorts = @{}
 if ($problems) {
     foreach ($pr in $problems) {
-        if ($pr["name"] -match '(?:Interface|Port|GigabitEthernet|SFP\+?)\s*(\d+)') {
-            $probPorts[[int]$matches[1]] = $true
+        if ($pr["name"] -match '\b(?:Interface|Port|GigabitEthernet|TenGigabitEthernet|SFP\+?)\s+(\d{1,2})(?:\s|\(|:|$|\b)') {
+            $pId = [int]$matches[1]
+            if ($pId -ge 1 -and $pId -le 28) {
+                $probPorts[$pId] = $true
+            }
         }
     }
 }
@@ -116,6 +120,24 @@ if (-not $sysName) { $sysName = $switchShortName }
 $sysObjectId = ($items | Where-Object { $_["key_"] -like "system.objectid*" }).lastvalue
 if (-not $sysObjectId) { $sysObjectId = "SNMPv2-SMI::enterprises.11.2.3.7.11.196" }
 
+# Dynamic Switch Uptime formatting
+$uptimeItem = $items | Where-Object { 
+    ($_["key_"] -like "system.net.uptime*" -or $_["key_"] -like "system.hw.uptime*" -or $_["key_"] -like "system.uptime*") -and [double]($_["lastvalue"]) -gt 0 
+} | Select-Object -First 1
+
+$uptimeStr = "Uptime N/A"
+if ($uptimeItem -and $uptimeItem["lastvalue"]) {
+    $totalSec = [int][double]$uptimeItem["lastvalue"]
+    $days = [int]($totalSec / 86400)
+    $hours = [int](($totalSec % 86400) / 3600)
+    $mins = [int](($totalSec % 3600) / 60)
+    if ($days -gt 0) {
+        $uptimeStr = "Uptime ${days}d ${hours}h ${mins}m"
+    } else {
+        $uptimeStr = "Uptime ${hours}h ${mins}m"
+    }
+}
+
 $pingItem = $items | Where-Object { $_["key_"] -eq "icmpping" }
 $isPingUp = ($pingItem -and [int]$pingItem["lastvalue"] -eq 1)
 $powerColor = if ($isPingUp) { "#00e676" } else { "#ef4444" }
@@ -126,7 +148,7 @@ $faultColor = if ($problemCount -gt 0) { "#ef4444" } else { "#374151" }
 $faultShadow = if ($problemCount -gt 0) { "box-shadow: 0 0 7px #ef4444;" } else { "" }
 $faultTitle = if ($problemCount -gt 0) { "Fault: $problemCount alarme(s) ativo(s) no Zabbix" } else { "Fault: Saudavel | Sem alarmes ativos no Zabbix" }
 
-Write-Output "Retrieved $($items.Count) items, $problemCount active problems, and $($rawEvents.Count) events from Zabbix"
+Write-Output "Retrieved $($items.Count) items, $problemCount active problems, and $($rawEvents.Count) events from Zabbix (Uptime: $uptimeStr)"
 
 $ports = @{}
 for ($p = 1; $p -le 28; $p++) {
@@ -137,13 +159,18 @@ for ($p = 1; $p -le 28; $p++) {
         Alias = ""
         Type = if ($isSfp) { "SFP+ 10G" } else { "1GbE RJ45" }
         OperStatus = 2 # 1=UP, 2=DOWN
+        AdminStatus = 1 # 1=UP, 2=DOWN
         Speed = 0
         InBps = 0
         OutBps = 0
         InErrors = 0
         OutErrors = 0
+        InDiscards = 0
+        OutDiscards = 0
         InItemId = ""
         OutItemId = ""
+        InValueType = 3
+        OutValueType = 3
     }
 }
 
@@ -152,6 +179,7 @@ foreach ($it in $items) {
     $val = $it["lastvalue"]
     $name = $it["name"]
     $id = $it["itemid"]
+    $vt = if ($it["value_type"]) { [int]$it["value_type"] } else { 3 }
 
     if ($name -match 'Interface (\d+)\(([^)]*)\)') {
         $pNum = [string]$matches[1]
@@ -164,17 +192,31 @@ foreach ($it in $items) {
                 $ports[$pNum].Alias = $extractedAlias
             }
             if ($key.StartsWith("net.if.status[")) { $ports[$pNum].OperStatus = [int]$val }
-            elseif ($key.StartsWith("net.if.speed[")) { $ports[$pNum].Speed = [int64]$val }
+            elseif ($key.StartsWith("net.if.adminstatus[") -or $key.Contains("ifAdminStatus")) { $ports[$pNum].AdminStatus = [int]$val }
+            elseif ($key.StartsWith("net.if.speed[")) { 
+                $rawSpeed = [int64]$val
+                if ([int]$pNum -ge 25 -and $rawSpeed -ge 4294967295) {
+                    $ports[$pNum].Speed = 10000000000
+                } elseif ($rawSpeed -gt 0 -and $rawSpeed -lt 20000) {
+                    $ports[$pNum].Speed = $rawSpeed * 1000000
+                } else {
+                    $ports[$pNum].Speed = $rawSpeed
+                }
+            }
             elseif ($key.StartsWith("net.if.in[")) { 
                 $ports[$pNum].InBps = [int64]$val 
                 $ports[$pNum].InItemId = $id
+                $ports[$pNum].InValueType = $vt
             }
             elseif ($key.StartsWith("net.if.out[")) { 
                 $ports[$pNum].OutBps = [int64]$val 
                 $ports[$pNum].OutItemId = $id
+                $ports[$pNum].OutValueType = $vt
             }
             elseif ($key.StartsWith("net.if.in.errors[")) { $ports[$pNum].InErrors = [int64]$val }
             elseif ($key.StartsWith("net.if.out.errors[")) { $ports[$pNum].OutErrors = [int64]$val }
+            elseif ($key.StartsWith("net.if.in.discards[")) { $ports[$pNum].InDiscards = [int64]$val }
+            elseif ($key.StartsWith("net.if.out.discards[")) { $ports[$pNum].OutDiscards = [int64]$val }
         }
     }
 }
@@ -265,7 +307,9 @@ $initSpeedStr = if ($initP -and $initP.OperStatus -eq 1) {
 $initUtilStr = if ($initP -and $initP.OperStatus -eq 1 -and $initP.Speed -gt 0) {
     [string]::Format([System.Globalization.CultureInfo]::InvariantCulture, "{0:N2}%", ((($initP.InBps + $initP.OutBps) / [double]$initP.Speed) * 100))
 } else { "0,00%" }
-$initErrorsStr = if ($initP -and $initP.InErrors -ne $null) { "$($initP.InErrors)" } else { "0" }
+$initErrors = if ($initP -and $initP.InErrors -ne $null) { "$($initP.InErrors)" } else { "0" }
+$initDiscards = if ($initP -and $initP.InDiscards -ne $null) { "$($initP.InDiscards)" } else { "0" }
+$initErrorsStr = "${initErrors}e / ${initDiscards}d"
 $initSub = if ($initP -and $initP.Alias) { $initP.Alias } elseif ($initP) { $initP.Type } else { "1GbE RJ45" }
 
 # Generate initial Top Talkers HTML (Top 3 active consumers)
@@ -305,6 +349,10 @@ foreach ($item in ($topSorted | Select-Object -First 3)) {
     $isSelected = ($item.Port -eq 24)
     $borderStyle = if ($isSelected) { "border: 1px solid #00b0ff; box-shadow: 0 0 8px rgba(0, 176, 255, 0.3);" } else { "border: 1px solid #1e293b;" }
     $subLabel = if ($item.Alias) { $item.Alias } else { $item.Name }
+    $ptItem = $ports["$($item.Port)"]
+    $utilPct = if ($ptItem -and $ptItem.Speed -gt 0) {
+        [string]::Format([System.Globalization.CultureInfo]::InvariantCulture, "{0:N1}%", (([Math]::Max($item.InBps, $item.OutBps) / [double]$ptItem.Speed) * 100))
+    } else { "0%" }
     
     $null = $topTalkersSb.AppendLine(@"
       <div class="sw-top-talker" data-tt-port="$($item.Port)" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort($($item.Port));" style="background: #0d121c; border-radius: 4px; padding: 6px 10px; cursor: pointer; $borderStyle transition: all 0.2s ease;">
@@ -314,7 +362,10 @@ foreach ($item in ($topSorted | Select-Object -First 3)) {
             <span style="font-size: 11px; font-weight: 700; color: #ffffff;">Porta $($item.Port)</span>
             <span style="font-size: 10px; color: #8b949e; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">$subLabel</span>
           </div>
-          <div style="font-size: 11px; font-weight: 800; color: #38bdf8; font-family: monospace; white-space: nowrap; margin-left: 8px;">$totFmt</div>
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <span style="font-size: 9px; font-weight: 700; background: rgba(56, 189, 248, 0.12); color: #38bdf8; padding: 1px 4px; border-radius: 3px;">$utilPct</span>
+            <span style="font-size: 11px; font-weight: 800; color: #38bdf8; font-family: monospace; white-space: nowrap;">$totFmt</span>
+          </div>
         </div>
         <div style="display: flex; align-items: center; gap: 8px;">
           <div style="flex: 1; height: 3px; background: #1c2230; border-radius: 2px; overflow: hidden;">
@@ -352,7 +403,7 @@ $null = $sb.AppendLine(@"
   </div>
   <div style="text-align: right;">
     <div id="live-clock" style="font-size: 24px; font-weight: 700; font-family: monospace; color: #ffffff; letter-spacing: 1px;">$([DateTime]::Now.ToString("HH:mm:ss"))</div>
-    <div style="font-size: 11px; color: #8b949e; margin-top: 4px;">SNMPv2 &bull; Intervalo 15 s &bull; Uptime 41d 08h</div>
+    <div style="font-size: 11px; color: #8b949e; margin-top: 4px;">SNMPv2 &bull; Intervalo 15 s &bull; <span id="header-uptime">$uptimeStr</span></div>
   </div>
 </div>
 
@@ -778,8 +829,8 @@ $null = $sb.AppendLine(@"
         <div id="sel-port-util" style="font-size: 16px; font-weight: 800; color: #ffffff;">$initUtilStr</div>
       </div>
       <div>
-        <div style="font-size: 9px; font-weight: 700; color: #8b949e; text-transform: uppercase; margin-bottom: 3px;">ERROS RX</div>
-        <div id="sel-port-errors" style="font-size: 16px; font-weight: 800; color: #ffffff;">$initErrorsStr</div>
+        <div style="font-size: 9px; font-weight: 700; color: #8b949e; text-transform: uppercase; margin-bottom: 3px;">ERROS / DESC</div>
+        <div id="sel-port-errors" style="font-size: 16px; font-weight: 800; color: #ffffff;" title="Erros e Descartes de Buffer">$initErrorsStr</div>
       </div>
     </div>
 
@@ -891,9 +942,89 @@ if (-not $TargetDashboardUid -or $TargetDashboardUid -eq "alpt2p5") {
 $jsCodeTemplate = @'
 (function() {
   try {
+    // 1. Singleton Runtime & Cleanup of previous timers/listeners
+    if (window.__ARUBA_TWIN_RUNTIME__) {
+      try { window.__ARUBA_TWIN_RUNTIME__.cleanup(); } catch (e) { console.warn('Aruba cleanup error:', e); }
+    }
+    const runtime = {
+      timers: [],
+      abortControllers: new Set(),
+      isPollingInFlight: false,
+      visibilityListener: null,
+      cleanup() {
+        this.timers.forEach(t => clearInterval(t));
+        this.timers = [];
+        this.abortControllers.forEach(c => {
+          try { c.abort(); } catch (e) {}
+        });
+        this.abortControllers.clear();
+        this.isPollingInFlight = false;
+        if (this.visibilityListener) {
+          document.removeEventListener('visibilitychange', this.visibilityListener);
+          this.visibilityListener = null;
+        }
+      }
+    };
+    window.__ARUBA_TWIN_RUNTIME__ = runtime;
+
+    function addTimer(fn, ms) {
+      const id = setInterval(fn, ms);
+      runtime.timers.push(id);
+      return id;
+    }
+
+    function fetchWithTimeout(url, options, timeoutMs = 8000) {
+      const controller = new AbortController();
+      runtime.abortControllers.add(controller);
+      const timeoutId = setTimeout(() => {
+        controller.abort();
+        runtime.abortControllers.delete(controller);
+      }, timeoutMs);
+      const mergedOptions = Object.assign({}, options, { signal: controller.signal });
+      return fetch(url, mergedOptions).finally(() => {
+        clearTimeout(timeoutId);
+        runtime.abortControllers.delete(controller);
+      });
+    }
+
     const ports = __PORTS_JSON_PLACEHOLDER__;
     let selectedPortNum = 24;
-    const historyCache = {};
+
+    // 2. LRU History Cache with 60s TTL
+    const CACHE_TTL_MS = 60000;
+    const MAX_CACHE_ENTRIES = 12;
+    const historyCache = new Map();
+
+    function getCachedHistory(key) {
+      const entry = historyCache.get(key);
+      if (!entry) return null;
+      if (Date.now() - entry.timestamp > CACHE_TTL_MS) {
+        historyCache.delete(key);
+        return null;
+      }
+      historyCache.delete(key);
+      historyCache.set(key, entry);
+      return entry;
+    }
+
+    function setCachedHistory(key, inPts, outPts) {
+      if (historyCache.has(key)) {
+        historyCache.delete(key);
+      } else if (historyCache.size >= MAX_CACHE_ENTRIES) {
+        const oldestKey = historyCache.keys().next().value;
+        if (oldestKey) historyCache.delete(oldestKey);
+      }
+      historyCache.set(key, { inPts, outPts, timestamp: Date.now() });
+    }
+
+    function normalizeSpeedBps(speed, pNum) {
+      let s = parseFloat(speed) || 0;
+      if (s === 4294967295) return 10000000000; // 32-bit SNMP gauge limit for 10G
+      if (s > 0 && s <= 20000) return s * 1000000; // raw Mbps MIB value -> bps
+      if (s === 0 && pNum >= 25) return 10000000000; // SFP+ default
+      return s;
+    }
+
     let selectedTimeRangeHours = 3;
     let activeAlertPorts = new Set(__INITIAL_ALERT_PORTS_PLACEHOLDER__);
     window.__arubaSelectedTimeRange = selectedTimeRangeHours;
@@ -926,9 +1057,7 @@ $jsCodeTemplate = @'
           }
         });
 
-        for (const k in historyCache) {
-          delete historyCache[k];
-        }
+        historyCache.clear();
 
         safeSetText('canvas-hint-label', 'Carregando ' + hrs + 'h...');
         fetchPortHistory(selectedPortNum);
@@ -1246,6 +1375,9 @@ $jsCodeTemplate = @'
         function drawSeries(coords, colorHex, r, g, b, isVisible) {
           if (!isVisible || !coords || coords.length === 0) return;
 
+          ctx.lineJoin = 'round';
+          ctx.lineCap = 'round';
+
           // Gradient Fill
           const grad = ctx.createLinearGradient(0, padTop, 0, bottomY);
           grad.addColorStop(0, `rgba(${r}, ${g}, ${b}, 0.35)`);
@@ -1259,7 +1391,7 @@ $jsCodeTemplate = @'
           ctx.closePath();
           ctx.fill();
 
-          // Stroke Line
+          // Stroke Line (direct line segments, no artificial Bezier distortion)
           ctx.strokeStyle = colorHex;
           ctx.lineWidth = 2.5;
           ctx.beginPath();
@@ -1269,22 +1401,38 @@ $jsCodeTemplate = @'
           });
           ctx.stroke();
 
-          // Dots
-          coords.forEach((pt, idx) => {
-            const isLast = (idx === coords.length - 1);
+          // Dots (downsample if large point count to prevent GPU/CPU bottleneck)
+          if (coords.length <= 150) {
+            coords.forEach((pt, idx) => {
+              const isLast = (idx === coords.length - 1);
+              ctx.fillStyle = colorHex;
+              ctx.beginPath();
+              ctx.arc(pt.x, pt.y, isLast ? 4 : 2.5, 0, Math.PI * 2);
+              ctx.fill();
+
+              if (isLast && chartState.hoveredIdx == null) {
+                ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, 0.5)`;
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(pt.x, pt.y, 7, 0, Math.PI * 2);
+                ctx.stroke();
+              }
+            });
+          } else {
+            const lastPt = coords[coords.length - 1];
             ctx.fillStyle = colorHex;
             ctx.beginPath();
-            ctx.arc(pt.x, pt.y, isLast ? 4 : 2.5, 0, Math.PI * 2);
+            ctx.arc(lastPt.x, lastPt.y, 4, 0, Math.PI * 2);
             ctx.fill();
 
-            if (isLast && chartState.hoveredIdx == null) {
+            if (chartState.hoveredIdx == null) {
               ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, 0.5)`;
               ctx.lineWidth = 2;
               ctx.beginPath();
-              ctx.arc(pt.x, pt.y, 7, 0, Math.PI * 2);
+              ctx.arc(lastPt.x, lastPt.y, 7, 0, Math.PI * 2);
               ctx.stroke();
             }
-          });
+          }
         }
 
         drawSeries(inCoords, '#00b0ff', 0, 176, 255, chartState.showIn);
@@ -1609,9 +1757,10 @@ $jsCodeTemplate = @'
       }
 
       const cacheKey = pNum + '_' + selectedTimeRangeHours;
-      if (historyCache[cacheKey]) {
+      const cached = getCachedHistory(cacheKey);
+      if (cached) {
         if (selectedPortNum === pNum) {
-          drawRealChart(historyCache[cacheKey].inPts, historyCache[cacheKey].outPts, p.InBps || 0, p.OutBps || 0, preserveZoom);
+          drawRealChart(cached.inPts, cached.outPts, p.InBps || 0, p.OutBps || 0, preserveZoom);
         }
         return;
       }
@@ -1620,9 +1769,11 @@ $jsCodeTemplate = @'
         const nowSec = Math.floor(Date.now() / 1000);
         const timeFrom = nowSec - (selectedTimeRangeHours * 3600);
         const maxLimit = Math.min(1000, selectedTimeRangeHours * 35);
+        const inVt = (p.InValueType != null) ? p.InValueType : 3;
+        const outVt = (p.OutValueType != null) ? p.OutValueType : 3;
 
         const [inResp, outResp] = await Promise.all([
-          fetch('__ZABBIX_URL_PLACEHOLDER__', {
+          fetchWithTimeout('__ZABBIX_URL_PLACEHOLDER__', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -1630,7 +1781,7 @@ $jsCodeTemplate = @'
               method: 'history.get',
               params: {
                 itemids: [p.InItemId],
-                history: 3,
+                history: inVt,
                 time_from: timeFrom,
                 sortfield: 'clock',
                 sortorder: 'DESC',
@@ -1640,7 +1791,7 @@ $jsCodeTemplate = @'
               id: Date.now()
             })
           }),
-          fetch('__ZABBIX_URL_PLACEHOLDER__', {
+          fetchWithTimeout('__ZABBIX_URL_PLACEHOLDER__', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -1648,7 +1799,7 @@ $jsCodeTemplate = @'
               method: 'history.get',
               params: {
                 itemids: [p.OutItemId],
-                history: 3,
+                history: outVt,
                 time_from: timeFrom,
                 sortfield: 'clock',
                 sortorder: 'DESC',
@@ -1665,7 +1816,7 @@ $jsCodeTemplate = @'
         const inPts = (inData && inData.result) ? inData.result.slice().reverse() : [];
         const outPts = (outData && outData.result) ? outData.result.slice().reverse() : [];
 
-        historyCache[cacheKey] = { inPts, outPts };
+        setCachedHistory(cacheKey, inPts, outPts);
         if (selectedPortNum === pNum) {
           drawRealChart(inPts, outPts, p.InBps || 0, p.OutBps || 0, preserveZoom);
         }
@@ -1692,13 +1843,17 @@ $jsCodeTemplate = @'
           if (pt && pt.OperStatus === 1) {
             const tot = (pt.InBps || 0) + (pt.OutBps || 0);
             const alias = (pt && pt.Alias) ? pt.Alias : (pt.Name || ('Porta ' + p));
+            const spd = normalizeSpeedBps(pt.Speed, p);
+            const maxTraffic = Math.max(pt.InBps || 0, pt.OutBps || 0);
+            const utilPct = (spd > 0) ? ((maxTraffic / spd) * 100).toFixed(1) + '%' : '--';
             list.push({
               port: p,
               name: pt.Name,
               alias: alias,
               inBps: pt.InBps || 0,
               outBps: pt.OutBps || 0,
-              total: tot
+              total: tot,
+              utilPct: utilPct
             });
           }
         }
@@ -1730,7 +1885,10 @@ $jsCodeTemplate = @'
                   <span style="font-size: 11px; font-weight: 700; color: #ffffff;">Porta ${item.port}</span>
                   <span style="font-size: 10px; color: #8b949e; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${item.alias}</span>
                 </div>
-                <div style="font-size: 11px; font-weight: 800; color: #38bdf8; font-family: monospace; white-space: nowrap; margin-left: 8px;">${formatTrafficBps(item.total)}</div>
+                <div style="display: flex; align-items: center; gap: 6px;">
+                  <span style="font-size: 9px; font-weight: 700; color: #a78bfa; background: rgba(167, 139, 250, 0.12); padding: 1px 5px; border-radius: 3px; font-family: monospace;">${item.utilPct} uso</span>
+                  <div style="font-size: 11px; font-weight: 800; color: #38bdf8; font-family: monospace; white-space: nowrap; margin-left: 4px;">${formatTrafficBps(item.total)}</div>
+                </div>
               </div>
               <div style="display: flex; align-items: center; gap: 8px;">
                 <div style="flex: 1; height: 3px; background: #1c2230; border-radius: 2px; overflow: hidden;">
@@ -1804,6 +1962,7 @@ $jsCodeTemplate = @'
         const pSub = p.Alias ? p.Alias : (p.Type || (isSfp ? 'SFP+ 10G' : '1GbE RJ45'));
         safeSetHtml('sel-port-name', `${p.Name || ('Porta ' + pNum)} &bull; ${pSub}`);
 
+        const normSpeed = normalizeSpeedBps(p.Speed, pNum);
         const badge = getEl('sel-port-status');
         if (badge) {
           const hasAlert = (activeAlertPorts && activeAlertPorts.has(pNum));
@@ -1813,7 +1972,7 @@ $jsCodeTemplate = @'
             badge.style.background = 'rgba(239, 68, 68, 0.2)';
             badge.style.borderColor = 'rgba(239, 68, 68, 0.4)';
           } else if (p.OperStatus === 1) {
-            if (p.Speed < 1000000000 && p.Speed > 0) {
+            if (normSpeed < 1000000000 && normSpeed > 0) {
               badge.innerText = 'UP (DEGRADADO)';
               badge.style.color = '#f59e0b';
               badge.style.background = 'rgba(245, 158, 11, 0.15)';
@@ -1835,27 +1994,31 @@ $jsCodeTemplate = @'
         let speedStr = '--';
         if (p.OperStatus !== 1) {
           speedStr = '--';
-        } else if (p.Speed >= 10000000000) speedStr = '10 Gb/s';
-        else if (p.Speed >= 1000000000) speedStr = '1 Gb/s';
-        else if (p.Speed >= 100000000) speedStr = '100 Mb/s';
-        else if (p.Speed >= 10000000) speedStr = '10 Mb/s';
+        } else if (normSpeed >= 10000000000) speedStr = '10 Gb/s';
+        else if (normSpeed >= 1000000000) speedStr = '1 Gb/s';
+        else if (normSpeed >= 100000000) speedStr = '100 Mb/s';
+        else if (normSpeed >= 10000000) speedStr = '10 Mb/s';
         safeSetText('sel-port-speed', speedStr);
 
         safeSetText('sel-port-in', formatTrafficBps(p.InBps));
         safeSetText('sel-port-out', formatTrafficBps(p.OutBps));
 
         let util = '0,00%';
-        if (p.Speed > 0 && p.OperStatus === 1) {
-          util = ((((p.InBps || 0) + (p.OutBps || 0)) / p.Speed) * 100).toFixed(2) + '%';
+        if (normSpeed > 0 && p.OperStatus === 1) {
+          util = ((((p.InBps || 0) + (p.OutBps || 0)) / normSpeed) * 100).toFixed(2) + '%';
         }
         safeSetText('sel-port-util', util);
-        safeSetText('sel-port-errors', (p.InErrors != null ? p.InErrors : '0') + '');
+
+        const errVal = (p.InErrors != null) ? p.InErrors : 0;
+        const discVal = (p.InDiscards != null) ? p.InDiscards : 0;
+        safeSetText('sel-port-errors', `${errVal}e / ${discVal}d`);
 
         // Check if we have cached history for this range, else fetch fresh
         const portCacheKey = pNum + '_' + selectedTimeRangeHours;
         const shouldPreserveZoom = (isSamePort && isBackgroundPoll && chartState.isZoomed);
-        if (historyCache[portCacheKey]) {
-          drawRealChart(historyCache[portCacheKey].inPts, historyCache[portCacheKey].outPts, p.InBps || 0, p.OutBps || 0, shouldPreserveZoom);
+        const cachedPortHistory = getCachedHistory(portCacheKey);
+        if (cachedPortHistory) {
+          drawRealChart(cachedPortHistory.inPts, cachedPortHistory.outPts, p.InBps || 0, p.OutBps || 0, shouldPreserveZoom);
         } else if (!shouldPreserveZoom) {
           drawRealChart([], [], p.InBps || 0, p.OutBps || 0, false);
         }
@@ -1885,8 +2048,12 @@ $jsCodeTemplate = @'
       } catch (e) {}
     }
 
-    // Live polling directly from Zabbix (every 15s)
+    // Live polling directly from Zabbix (every 15s) with concurrency lock and AbortController
     async function fetchZabbixTelemetry() {
+      if (document.hidden) return;
+      if (runtime.isPollingInFlight) return;
+      runtime.isPollingInFlight = true;
+
       const cloudLed = getEl('led-cloud');
       const cloudWrap = getEl('led-cloud-wrap');
       const badge = getEl('zabbix-sync-badge');
@@ -1905,9 +2072,8 @@ $jsCodeTemplate = @'
       }
 
       try {
-        // Parallel requests for items, problems, events, and host interfaces (using body auth to avoid CORS header restrictions)
         const [itemsResp, probsResp, eventsResp, hostResp] = await Promise.all([
-          fetch('__ZABBIX_URL_PLACEHOLDER__', {
+          fetchWithTimeout('__ZABBIX_URL_PLACEHOLDER__', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -1915,13 +2081,13 @@ $jsCodeTemplate = @'
               method: 'item.get',
               params: {
                 hostids: ['__ZABBIX_HOSTID_PLACEHOLDER__'],
-                output: ['itemid', 'name', 'key_', 'lastvalue']
+                output: ['itemid', 'name', 'key_', 'lastvalue', 'value_type']
               },
               auth: '__ZABBIX_TOKEN_PLACEHOLDER__',
               id: Date.now()
             })
           }),
-          fetch('__ZABBIX_URL_PLACEHOLDER__', {
+          fetchWithTimeout('__ZABBIX_URL_PLACEHOLDER__', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -1934,7 +2100,7 @@ $jsCodeTemplate = @'
               id: Date.now() + 1
             })
           }),
-          fetch('__ZABBIX_URL_PLACEHOLDER__', {
+          fetchWithTimeout('__ZABBIX_URL_PLACEHOLDER__', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -1951,7 +2117,7 @@ $jsCodeTemplate = @'
               id: Date.now() + 2
             })
           }),
-          fetch('__ZABBIX_URL_PLACEHOLDER__', {
+          fetchWithTimeout('__ZABBIX_URL_PLACEHOLDER__', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -2011,13 +2177,17 @@ $jsCodeTemplate = @'
           }, 1500);
         }
 
-        // 2. Process Problems & Fault LED
+        // 2. Process Problems & Fault LED with Strict Regex Boundary
         let problems = (probRes && probRes.result) ? probRes.result : [];
         activeAlertPorts.clear();
         problems.forEach(pr => {
-          const m = pr.name && pr.name.match(/(?:Interface|Port|GigabitEthernet|SFP\+?)\s*(\d+)/i);
+          if (!pr.name) return;
+          const m = pr.name.match(/\b(?:Interface|Port|GigabitEthernet|TenGigabitEthernet|SFP\+?)\s+(\d{1,2})(?:\s|\(|:|$|\b)/i);
           if (m) {
-            activeAlertPorts.add(parseInt(m[1], 10));
+            const pId = parseInt(m[1], 10);
+            if (pId >= 1 && pId <= 28) {
+              activeAlertPorts.add(pId);
+            }
           }
         });
         const faultLed = getEl('led-fault');
@@ -2088,9 +2258,23 @@ $jsCodeTemplate = @'
             try {
               const k = it.key_ || '';
               const v = parseFloat(it.lastvalue);
+              const vt = parseInt(it.value_type != null ? it.value_type : '3', 10);
 
               if (k === 'icmpping') {
                 pingStatus = parseInt(it.lastvalue);
+              }
+
+              // Dynamic Uptime from Zabbix
+              if (k.startsWith('system.net.uptime') || k.startsWith('system.hw.uptime') || k === 'system.uptime') {
+                const upSec = parseInt(it.lastvalue, 10);
+                if (!isNaN(upSec) && upSec > 0) {
+                  const d = Math.floor(upSec / 86400);
+                  const h = Math.floor((upSec % 86400) / 3600);
+                  const m = Math.floor((upSec % 3600) / 60);
+                  const upFmt = `Uptime: ${d}d ${h}h ${m}m`;
+                  safeSetText('header-uptime', upFmt);
+                  safeSetText('drawer-uptime', upFmt);
+                }
               }
 
               const m = it.name.match(/Interface (\d+)\(([^)]*)\)/);
@@ -2103,16 +2287,20 @@ $jsCodeTemplate = @'
                     ports[pNum].Alias = liveAlias;
                   }
                   if (k.startsWith('net.if.status[')) ports[pNum].OperStatus = v;
-                  else if (k.startsWith('net.if.speed[')) ports[pNum].Speed = v;
+                  else if (k.startsWith('net.if.speed[')) ports[pNum].Speed = normalizeSpeedBps(v, pNum);
                   else if (k.startsWith('net.if.in[')) {
                     ports[pNum].InBps = v;
                     ports[pNum].InItemId = it.itemid;
+                    ports[pNum].InValueType = vt;
                   }
                   else if (k.startsWith('net.if.out[')) {
                     ports[pNum].OutBps = v;
                     ports[pNum].OutItemId = it.itemid;
+                    ports[pNum].OutValueType = vt;
                   }
                   else if (k.startsWith('net.if.in.errors[')) ports[pNum].InErrors = v;
+                  else if (k.startsWith('net.if.in.discards[')) ports[pNum].InDiscards = v;
+                  else if (k.startsWith('net.if.out.discards[')) ports[pNum].OutDiscards = v;
                 }
               }
             } catch (e) {}
@@ -2139,9 +2327,12 @@ $jsCodeTemplate = @'
               const pt = ports[p];
               const isUp = (pt.OperStatus === 1);
               const hasAlert = activeAlertPorts && activeAlertPorts.has(p);
+              const normSpd = normalizeSpeedBps(pt.Speed, p);
+              const isDegraded = isUp && normSpd > 0 && normSpd < 1000000000;
+
               if (isUp) {
                 activeTotal++;
-                if (pt.Speed < 1000000000 && pt.Speed > 0) degradedTotal++;
+                if (isDegraded) degradedTotal++;
               }
               trafficTotal += ((pt.InBps || 0) + (pt.OutBps || 0));
 
@@ -2149,14 +2340,14 @@ $jsCodeTemplate = @'
               let ledShadow = 'none';
 
               if (hasAlert) {
-                ledColor = '#ef4444'; // Red: fallen monitored port / active alarm
+                ledColor = '#ef4444';
                 ledShadow = '0 0 8px #ef4444';
               } else if (isUp) {
-                if (pt.Speed < 1000000000 && pt.Speed > 0) {
-                  ledColor = '#f59e0b'; // Amber: degraded
+                if (isDegraded) {
+                  ledColor = '#f59e0b';
                   ledShadow = '0 0 6px #f59e0b';
                 } else {
-                  ledColor = '#00e676'; // Green: normal
+                  ledColor = '#00e676';
                   ledShadow = '0 0 6px #00e676';
                 }
               }
@@ -2175,8 +2366,8 @@ $jsCodeTemplate = @'
                 if (hasAlert) {
                   pEl.style.border = (p === selectedPortNum) ? '2px solid #00b0ff' : '1px solid rgba(239, 68, 68, 0.6)';
                 }
-                const statusDesc = hasAlert ? 'DOWN (ALARME)' : (isUp ? (pt.Speed < 1000000000 && pt.Speed > 0 ? 'UP (DEGRADADO)' : 'UP') : 'DOWN');
-                const speedText = (!isUp ? '--' : (pt.Speed >= 10000000000 ? '10 Gb/s' : (pt.Speed >= 1000000000 ? '1 Gb/s' : (pt.Speed >= 100000000 ? '100 Mb/s' : (pt.Speed >= 10000000 ? '10 Mb/s' : '--')))));
+                const statusDesc = hasAlert ? 'DOWN (ALARME)' : (isUp ? (isDegraded ? 'UP (DEGRADADO)' : 'UP') : 'DOWN');
+                const speedText = (!isUp ? '--' : (normSpd >= 10000000000 ? '10 Gb/s' : (normSpd >= 1000000000 ? '1 Gb/s' : (normSpd >= 100000000 ? '100 Mb/s' : (normSpd >= 10000000 ? '10 Mb/s' : '--')))));
                 const pSub = pt.Alias ? pt.Alias : (p >= 25 ? 'SFP+ 10G' : pt.Name);
                 const portLabel = (p >= 25) ? `SFP+ ${p} | ${pSub}` : `Porta ${p} | ${pSub}`;
                 pEl.title = `${portLabel}\nStatus: ${statusDesc}\nVelocidade: ${speedText}\nEntrada: ${formatTrafficBps(pt.InBps)}\nSaida: ${formatTrafficBps(pt.OutBps)}`;
@@ -2212,15 +2403,9 @@ $jsCodeTemplate = @'
           badge.style.color = '#f59e0b';
           badge.style.borderColor = 'rgba(245, 158, 11, 0.4)';
         }
+      } finally {
+        runtime.isPollingInFlight = false;
       }
-    }
-
-    // Clear existing intervals
-    if (window.__aruba_zabbix_timer) {
-      clearInterval(window.__aruba_zabbix_timer);
-    }
-    if (window.__aruba_clock_timer) {
-      clearInterval(window.__aruba_clock_timer);
     }
 
     // Expose functions globally for element clicks
@@ -2240,11 +2425,19 @@ $jsCodeTemplate = @'
       locWrap.onclick = window.__arubaToggleLoc;
     }
 
-    // Poll Zabbix every 15 seconds
-    window.__aruba_zabbix_timer = setInterval(fetchZabbixTelemetry, 15000);
+    // Page Visibility listener (pause polling when backgrounded, resume on focus)
+    runtime.visibilityListener = () => {
+      if (!document.hidden) {
+        fetchZabbixTelemetry();
+      }
+    };
+    document.addEventListener('visibilitychange', runtime.visibilityListener);
 
-    // Clock
-    window.__aruba_clock_timer = setInterval(() => {
+    // Poll Zabbix every 15 seconds
+    addTimer(fetchZabbixTelemetry, 15000);
+
+    // Live Clock (1s)
+    addTimer(() => {
       safeSetText('live-clock', new Date().toTimeString().split(' ')[0]);
     }, 1000);
 
