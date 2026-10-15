@@ -178,6 +178,17 @@ Altura Total da Grade: gridPos = { x: 0, y: 0, w: 24, h: 28 } (~840px úteis)
 └──────────────────────────────────────────────────┴─────────────────────┘
 ```
 
+### 5.3. Design Físico do Conector RJ45 e LEDs de Atividade (Modelo 1 - Padrão de Hardware)
+O layout das 24 portas RJ45 foi refinado para atingir fidelidade estética de nível fotorealista:
+1. **Receptáculo Modular RJ45 Blindado (8P8C):**
+   - Substituição de caixas quadradas genéricas por conectores blindados completos com chassi metálico em degradê (`#1c2433` → `#101622`) e abas superiores de aterramento (`#475569`).
+   - Cavidade interna profunda com silhueta em degrau autêntica: ombros plásticos laterais de guia e slot central de retenção da lingueta de trava do cabo de rede RJ45.
+   - 8 pinos de contato dourados individuais (`.sw-pin`) no topo da cavidade com reflexo metálico (`#ffd700` → `#b8860b`).
+2. **Arquitetura de LEDs Duplos (Padrão de Hardware Enterprise):**
+   - **LED da Esquerda (Link / Velocidade):** Luz fixa indicando a integridade física do link (Verde para 1 Gbps, Âmbar para 10/100 Mbps, Apagado para Down).
+   - **LED da Direita (Activity / Atividade TX/RX):** Cintilação contínua (*flicker*) através de `@keyframes swActFlicker` com cadências orgânicas e desfasadas entre portas (`animation-delay`), reproduzindo o piscar independente de um switch real sob carga.
+   - **LEDs em Alarme:** Pulso de alerta vermelho neon sincronizado (`.sw-port-fault-pulse`).
+
 ---
 
 ## 6. Implementação de Código: Inovações e Blindagens da v57
