@@ -32,8 +32,8 @@
 - [x] Criação e deploy no Grafana de +3 dashboards para os switches da rede Bamex:
   - `[BAMEX] - SW02` (IP: `10.50.0.3`, Host ID: `10683`, UID: `bamex-sw02`)
   - `[BAMEX] - SW03` (IP: `10.50.0.4`, Host ID: `11125`, UID: `bamex-sw03`)
-  - `[BAMEX] - SW04` (IP: `10.50.0.5`, Host ID: `11126`, UID: `bamex-sw04`)
 - [x] Exportação e sanitização de dados no repositório local e atualização da memória do projeto.
+- [x] Elaboração do documento técnico completo de arquitetura, telemetria Zabbix e engenharia do dashboard (`docs/ARUBA_DIGITAL_TWIN_TECHNICAL_SPEC.md`).
 
 ## 🔜 Backlog Imediato (Próximos Passos)
 - [ ] Criar estrutura base de pastas do repositório (`docker/`, `zabbix/`, `grafana/`, `scripts/`, `.gitignore`).
