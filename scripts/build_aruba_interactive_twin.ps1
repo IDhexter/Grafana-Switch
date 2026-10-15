@@ -2704,11 +2704,15 @@ $baseDashObj = $serializer.DeserializeObject($baseGetRes)
 $dash = $baseDashObj["dashboard"]
 
 # Check if target dashboard exists in Grafana to preserve its internal ID
+$targetFolderId = 136
 try {
     $existingRes = $gClient.GetStringAsync("$grafanaUrl/api/dashboards/uid/$dashboardUid").Result
     $existingObj = $serializer.DeserializeObject($existingRes)
     $dash["id"] = $existingObj["dashboard"]["id"]
     $dash["version"] = $existingObj["dashboard"]["version"]
+    if ($existingObj.ContainsKey("meta") -and $existingObj["meta"].ContainsKey("folderId")) {
+        $targetFolderId = $existingObj["meta"]["folderId"]
+    }
 } catch {
     $dash["id"] = $null
     $dash["version"] = 1
@@ -2736,7 +2740,7 @@ $dash["panels"] = @($panel)
 
 $payloadObj = @{
     dashboard = $dash
-    folderId = 136
+    folderId = $targetFolderId
     overwrite = $true
     message = "Deploy Interactive Aruba Twin with Real Traffic Chart, Live Events, and Asset Info Drawer"
 }
