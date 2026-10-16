@@ -14,52 +14,51 @@ Desenvolvido para operar em ambientes de missão crítica (NOCs, Datacenters, Pr
 
 ## 📸 Demonstração Visual
 
-### Painel Principal do Switch com Gráfico Responsivo e Botões Segmentados (v46)
-![Aruba Switch Digital Twin](assets/aruba_switch_dashboard.png)
+### Painel Principal do Switch com Motor v12 Precision & Chassi 1U Zero-Clipping
+![Aruba Switch Digital Twin v12](assets/bamex_sw01_dashboard.png)
 
 ---
 
 ## 🌟 Principais Recursos
 
-1. **Modelagem Fiel de Hardware 1U (HTML5 + CSS3 Puro)**:
+1. **Modelagem Fiel de Hardware 1U (100% Zero-Clipping)**:
    * Chassi metálico usinado com orelhas de rack laterais e parafusos sextavados de fixação.
    * Disposição espacial modular em bancos (*PORTAS 1 - 12* e *PORTAS 13 - 24*) com ranhura divisória central.
-   * 24 portas RJ45 GbE generosas (50x60px) com pinos dourados, travas RJ45 e LEDs duplos de status/atividade por porta.
+   * 24 portas RJ45 GbE generosas com pinos dourados, travas RJ45 e LEDs duplos de status/atividade por porta.
    * 4 gaiolas metálicas para módulos SFP+ 10GbE em grade 2x2.
+   * **Layout Responsivo Perfeito**: Proporções recalibradas para que 100% das 28 portas e fixações permaneçam visíveis sem qualquer corte horizontal, mesmo com a barra lateral do Grafana aberta em monitores padrão.
 
-2. **LEDs de Sistema Inteligentes Conectados à Telemetria Real**:
-   * ☁️ **Cloud**: Pulsa em ciano durante as chamadas da API do Zabbix. Fica verde esmeralda contínuo em caso de sucesso (com tooltip do timestamp da última sincronização) e âmbar em caso de falha de conexão. Permite clique direto para forçar sincronização imediata.
+2. **Barra de Comutação Rápida entre Switches da Frota (Multi-Switch Selector)**:
+   * Navegação direta entre múltiplos switches do mesmo rack/site (`SW01`, `SW02`, `SW03`, `SW04`) no topo do painel.
+   * **LEDs de Saúde em Tempo Real**: Rotina `pollBamexFleetStatus()` consulta os switches em background, exibindo status verde/âmbar e contagem de portas ativas.
+   * Atalhos com 1 clique para copiar o IP do switch (`IP: 10.50.0.X ❐`), abrir a **Web GUI nativa do equipamento** e abrir a **Gaveta de Inventário Técnico SNMP**.
+
+3. **LEDs de Sistema Inteligentes Conectados à Telemetria Real**:
+   * ☁️ **Cloud**: Pulsa em ciano durante chamadas da API do Zabbix. Fica verde esmeralda contínuo em caso de sucesso (com tooltip do timestamp da sincronização) e âmbar em caso de erro. Permite clique direto para forçar sincronização imediata.
    * ⚡ **Power**: Monitora a disponibilidade operacional do switch via `icmpping`. Fica verde quando o switch está online e vermelho caso o ping falhe.
-   * 🚨 **Fault**: Integrado à chamada `problem.get` do Zabbix. Fica apagado/cinza neutro (`#374151`) quando o switch está 100% saudável. Caso haja alarmes ativos, acende em vermelho pulsante (`@keyframes swFaultPulse`) e sincroniza o card "ALERTAS DE PORTA".
-   * 🔍 **Loc (Informações e Inventário do Ativo)**: Ao clicar no LED `Loc`, acende em ciano e abre uma **Gaveta Técnica de Inventário do Ativo** contendo dados cadastrais oficiais do Zabbix via SNMP MIB-2: `sysDescr`, `sysLocation`, `sysContact`, `sysName`, `sysObjectID`, firmware, Linux kernel, U-Boot e link direto para a Web GUI de gerenciamento do equipamento.
+   * 🚨 **Fault**: Integrado à chamada `problem.get` do Zabbix. Acende em vermelho pulsante em caso de alarmes e sincroniza o card interativo de alertas.
+   * 🔍 **Loc (Inventário Técnico do Ativo)**: Abre uma gaveta lateral com dados cadastrais oficiais do Zabbix via SNMP MIB-2 (`sysDescr`, `sysLocation`, `sysContact`, serial, firmware, Linux kernel, U-Boot e consumo PoE).
 
-3. **Detecção e Destaque de Portas Degradadas**:
+4. **Detecção e Destaque de Portas Degradadas**:
    * Identifica automaticamente portas operacionais (`OperStatus == UP`), mas com velocidade auto-negociada rebaixada para **100 Mb/s (Fast Ethernet)** ou **10 Mb/s** (em vez do 1 Gb/s nativo).
-   * Destaca essas portas em **Âmbar (`#f59e0b`)** no painel frontal e no contador de KPI, permitindo ao time de infraestrutura localizar instantaneamente cabos rompidos, crimpagens defeituosas ou dispositivos legados.
+   * Destaca essas portas em **Âmbar (`#f59e0b`)** no painel frontal e cria chips clicáveis de atalho (ex: `⚠ Porta 12 (100M)`), que selecionam imediatamente a porta no gráfico.
 
-4. **Gráfico Histórico Auto-Redimensionável (HTML5 Canvas + ResizeObserver)**:
-   * Motor gráfico vetorial desenvolvido em Canvas 2D sem dependência de bibliotecas externas pesadas.
-   * **Aspect-Ratio Adaptativo**: Utiliza `clamp(170px, 18vw, 260px)` e `ResizeObserver`. Em janelas normais ele mantém altura compacta (~170px), e ao entrar em **tela cheia ou monitores ultrawide (1080p/4K)**, a altura se expande automaticamente para até **260px**, eliminando o visual achatado.
-   * **Régua Dinâmica no Eixo Y**: Valores numéricos calculados dinamicamente com base no pico máximo (ex: `34.6 Kb/s`, `17.3 Kb/s`, `0 bps`) com linhas de grade de referência.
-   * **Eixo X Inteligente**: Marcas de tempo proporcionais adaptativas ao período selecionado.
+5. **Osciloscópio v12 Precision Canvas (HTML5 Canvas + ResizeObserver)**:
+   * **Linha de Referência Percentil 95 (`P95`)**: Renderizada em linha amarela tracejada com mini-card dourado de KPI indicando a taxa sustentada.
+   * **Pico com Carimbo de Data/Hora**: Mini-card exibindo o pico máximo na janela e o minuto exato em que ocorreu (`ÀS HH:MM`).
+   * **Janelas Temporais Expandidas (`1h | 3h | 6h | 12h | 24h | 7d`)**: Chaveamento automático de granularidade; para 7 dias, utiliza transparentemente a API `trend.get` do Zabbix para evitar payloads pesados e lentidão.
+   * **Inspeção no Hover Avançada**: Linha guia tracejada, bolinhas amostrais nas curvas, auréolas luminosas (*target halos*) e cápsula flutuante (*HUD Pill*) no topo exibindo `[ HH:MM:SS | ● In | ● Out | Total ]`.
+   * **Zero Corte no Eixo Y**: `padLeft = 84` no Canvas garantindo margem perfeita para valores de tráfego.
 
-5. **Barra de Botões Segmentados de Janela Temporal (`[ 3h ] [ 6h ] [ 12h ] [ 24h ]`)**:
-   * Permite ao operador alternar instantaneamente entre janelas de **3 Horas**, **6 Horas**, **12 Horas** e **24 Horas** com um único clique.
-   * O botão ativo fica destacado em **ciano neon brilhante (`#00b0ff`)**.
-   * Dispara consulta em tempo real à API do Zabbix (`history.get` com `time_from`), redesenhando o gráfico e as marcas de tempo imediatamente sem recarregar a página.
-
-6. **Interatividade Avançada de Inspeção (Hover HUD Tooltip)**:
-   * Linha de mira vertical tracejada (*crosshair*) que acompanha o cursor e trava no ponto amostral mais próximo.
-   * Destaque com anéis concêntricos brilhantes nas curvas de Entrada e Saída.
-   * **Ancoragem Inteligente em 3 Zonas**: O cartão flutuante possui `white-space: nowrap; width: max-content;` e se ancora automaticamente nas margens esquerda e direita, **nunca colidindo com as bordas nem quebrando linhas de texto**.
+6. **Ranking de Portas Completo e Filtrável**:
+   * Substituição do antigo "TOP 3" estático por um catálogo navegável completo com abas: `ATIVAS UP`, `DEGRADADAS` e `TODAS 28`.
+   * Medalhas visuais (1º Ouro, 2º Prata, 3º Bronze), badges de velocidade (`1G` verde, `100M` âmbar) e mini barras de ocupação.
 
 7. **Painel de Eventos de Porta em Tempo Real (Zabbix `event.get`)**:
-   * Linha do tempo cronológica com os últimos eventos de link das interfaces do switch.
-   * Exibe horário exato (`HH:mm:ss`), porta, descrição do evento e selo de gravidade (`RESOLVIDO` em verde ou `PROBLEMA` em vermelho).
+   * Linha do tempo cronológica com os últimos eventos de link das interfaces do switch com selo de gravidade (`RESOLVIDO` / `PROBLEMA`) e clique direto para abrir a porta no osciloscópio.
 
 8. **Filtro Crítico de Interfaces Virtuais SNMP**:
-   * Switches gerenciados modernos criam interfaces virtuais internas (`propVirtual` com `ifIndex >= 100000`).
-   * O pipeline possui filtros estritos tanto no PowerShell quanto no JavaScript do navegador para ignorar `ifIndex >= 100000`, impedindo que interfaces lógicas sobrescrevam a velocidade real da porta física (como a Porta 1 em 1 Gb/s).
+   * Pipeline possui filtros estritos tanto no PowerShell quanto no JavaScript do navegador para ignorar `ifIndex >= 100000`, impedindo que interfaces lógicas sobrescrevam a velocidade real da porta física.
 
 ---
 
@@ -144,7 +143,16 @@ flowchart TD
 
 3. **Execute o script de compilação e deploy**:
    ```powershell
+   # Deploy padrão (utiliza variáveis do .env):
    powershell -ExecutionPolicy Bypass -File scripts\build_aruba_interactive_twin.ps1
+
+   # Ou deploy parametrizado para qualquer switch específico:
+   powershell -ExecutionPolicy Bypass -File scripts\build_aruba_interactive_twin.ps1 `
+     -TargetHostId "10682" `
+     -TargetDashboardUid "alpt2p5" `
+     -TargetDashboardTitle "[BAMEX] - SW01 - Aruba Instant On 1930 (10.50.0.2)" `
+     -TargetSwitchShortName "SW01" `
+     -TargetSwitchIp "10.50.0.2"
    ```
    O script irá:
    * Conectar à API do Zabbix e coletar a telemetria inicial de todas as 28 portas.
@@ -154,6 +162,8 @@ flowchart TD
 
 4. **Abra o Grafana**:
    Acesse a URL informada pelo terminal e visualize o switch operando ao vivo!
+
+> 📘 Para detalhes completos da arquitetura e comparativo técnico, consulte o [Manual Técnico do Gêmeo Digital (SW01 BAMEX)](docs/BAMEX_SW01_DIGITAL_TWIN.md).
 
 ---
 
