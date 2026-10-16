@@ -270,24 +270,38 @@ function Format-Bps ($bps) {
 
 $activeCount = 0
 $degradedCount = 0
+$sfpActiveCount = 0
+$totalInBps = 0
+$totalOutBps = 0
 $totalTrafficBps = 0
+$degradedPortsList = @()
 
 for ($p = 1; $p -le 28; $p++) {
     $pt = $ports["$p"]
     if ($pt.OperStatus -eq 1) {
         $activeCount++
-        if ($pt.Speed -lt 1000000000 -and $pt.Speed -gt 0) { $degradedCount++ }
+        if ($p -ge 25) { $sfpActiveCount++ }
+        if ($pt.Speed -lt 1000000000 -and $pt.Speed -gt 0) {
+            $degradedCount++
+            $spdMb = [Math]::Round($pt.Speed / 1000000)
+            $degradedPortsList += @{ Port = $p; SpeedLabel = "${spdMb}M" }
+        }
     }
+    $totalInBps += $pt.InBps
+    $totalOutBps += $pt.OutBps
     $totalTrafficBps += ($pt.InBps + $pt.OutBps)
 }
 
 $totalTrafficFmt = Format-Bps $totalTrafficBps
-Write-Output "Active Ports: $activeCount / 28 | Degraded Links: $degradedCount | Total Traffic: $totalTrafficFmt"
+$totalInFmt = Format-Bps $totalInBps
+$totalOutFmt = Format-Bps $totalOutBps
+$activePct = [Math]::Round(($activeCount / 28.0) * 100)
+Write-Output "Active Ports: $activeCount / 28 | Degraded Links: $degradedCount | SFP+ Active: $sfpActiveCount / 4 | Total Traffic: $totalTrafficFmt"
 
 # Convert ports hash to JSON for client-side JavaScript
 $portsJson = $serializer.Serialize($ports)
 
-# Render initial Events HTML (Top 5 events for perfect height balance)
+# Render initial Events HTML (Top 5 events, clickable to select port)
 $eventsSb = New-Object System.Text.StringBuilder
 if ($rawEvents -and $rawEvents.Count -gt 0) {
     foreach ($ev in ($rawEvents | Select-Object -First 5)) {
@@ -299,15 +313,22 @@ if ($rawEvents -and $rawEvents.Count -gt 0) {
         $badgeColor = if ($isResolved) { "#00e676" } else { "#ef4444" }
         $badgeText = if ($isResolved) { "RESOLVIDO" } else { "PROBLEMA" }
         $eventName = $ev["name"] -replace "<", "&lt;" -replace ">", "&gt;"
+        $evPortClick = ""
+        if ($ev["name"] -match '\b(?:Interface|Port|GigabitEthernet|TenGigabitEthernet|SFP\+?)\s+(\d{1,2})(?:\s|\(|:|$|\b)') {
+            $evPortNum = [int]$matches[1]
+            if ($evPortNum -ge 1 -and $evPortNum -le 28) {
+                $evPortClick = "onclick=`"if(window.__arubaSelectPort)window.__arubaSelectPort($evPortNum);`" title=`"Clique para inspecionar a Porta $evPortNum`""
+            }
+        }
         
         $null = $eventsSb.AppendLine(@"
-      <div style="display: flex; align-items: center; justify-content: space-between; font-size: 11.5px; color: #e2e8f0; background: #0d121c; padding: 6px 10px; border-radius: 4px; border-left: 3px solid $dotColor;">
-        <div style="display: flex; align-items: center; gap: 8px;">
-          <span style="color: #8b949e; font-family: monospace; min-width: 54px; font-size: 10.5px;">$dt</span>
-          <span style="width: 6px; height: 6px; border-radius: 50%; background: $dotColor; $shadow display: inline-block;"></span>
-          <span style="font-weight: 500;">$eventName</span>
+      <div class="sw-event-row" $evPortClick style="display: flex; align-items: center; justify-content: space-between; font-size: 11px; color: #e2e8f0; background: #0d121c; padding: 5px 9px; border-radius: 4px; border-left: 3px solid $dotColor; cursor: pointer; transition: background 0.15s ease;">
+        <div style="display: flex; align-items: center; gap: 7px; overflow: hidden;">
+          <span style="color: #8b949e; font-family: monospace; min-width: 52px; font-size: 10px;">$dt</span>
+          <span style="width: 6px; height: 6px; border-radius: 50%; background: $dotColor; $shadow display: inline-block; flex-shrink: 0;"></span>
+          <span style="font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">$eventName</span>
         </div>
-        <span style="background: $badgeBg; color: $badgeColor; font-size: 9px; font-weight: 700; padding: 2px 5px; border-radius: 3px; font-family: monospace;">$badgeText</span>
+        <span style="background: $badgeBg; color: $badgeColor; font-size: 8.5px; font-weight: 700; padding: 2px 5px; border-radius: 3px; font-family: monospace; flex-shrink: 0; margin-left: 6px;">$badgeText</span>
       </div>
 "@)
     }
@@ -337,7 +358,7 @@ $initDiscards = if ($initP -and $initP.InDiscards -ne $null) { "$($initP.InDisca
 $initErrorsStr = "${initErrors}e / ${initDiscards}d"
 $initSub = if ($initP -and $initP.Alias) { $initP.Alias } elseif ($initP) { $initP.Type } else { "1GbE RJ45" }
 
-# Generate initial Top Talkers HTML (Top 3 active consumers)
+# Generate initial All Active Ports HTML (sorted by live traffic)
 $topActiveList = New-Object System.Collections.ArrayList
 for ($p = 1; $p -le 28; $p++) {
     $pt = $ports["$p"]
@@ -349,6 +370,7 @@ for ($p = 1; $p -le 28; $p++) {
             Alias = $pt.Alias
             InBps = $pt.InBps
             OutBps = $pt.OutBps
+            Speed = $pt.Speed
             Total = $tot
         })
     }
@@ -365,9 +387,9 @@ $medals = @(
 )
 
 $tIdx = 0
-foreach ($item in ($topSorted | Select-Object -First 3)) {
-    $m = if ($tIdx -lt $medals.Count) { $medals[$tIdx] } else { $medals[2] }
-    $pct = [Math]::Max(5, [Math]::Min(100, [Math]::Round(($item.Total / [double]$topMaxTraffic) * 100)))
+foreach ($item in $topSorted) {
+    $m = if ($tIdx -lt $medals.Count) { $medals[$tIdx] } else { @{ Badge = "#$($tIdx + 1)"; Color = "#94a3b8"; Bg = "rgba(148, 163, 184, 0.12)" } }
+    $pct = [Math]::Max(4, [Math]::Min(100, [Math]::Round(($item.Total / [double]$topMaxTraffic) * 100)))
     $totFmt = Format-Bps $item.Total
     $inFmt = Format-Bps $item.InBps
     $outFmt = Format-Bps $item.OutBps
@@ -378,23 +400,28 @@ foreach ($item in ($topSorted | Select-Object -First 3)) {
     $utilPct = if ($ptItem -and $ptItem.Speed -gt 0) {
         [string]::Format([System.Globalization.CultureInfo]::InvariantCulture, "{0:N1}%", (([Math]::Max($item.InBps, $item.OutBps) / [double]$ptItem.Speed) * 100))
     } else { "0%" }
+    $isDeg = ($item.Speed -gt 0 -and $item.Speed -lt 1000000000)
+    $spdShort = if ($item.Speed -ge 10000000000) { "10G" } elseif ($item.Speed -ge 1000000000) { "1G" } elseif ($item.Speed -ge 100000000) { "100M" } elseif ($item.Speed -ge 10000000) { "10M" } else { "UP" }
+    $spdBadgeColor = if ($isDeg) { "#f59e0b" } else { "#00e676" }
+    $spdBadgeBg = if ($isDeg) { "rgba(245, 158, 11, 0.15)" } else { "rgba(0, 230, 118, 0.12)" }
     
     $null = $topTalkersSb.AppendLine(@"
-      <div class="sw-top-talker" data-tt-port="$($item.Port)" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort($($item.Port));" style="background: #0d121c; border-radius: 4px; padding: 6px 10px; cursor: pointer; $borderStyle transition: all 0.2s ease;">
+      <div class="sw-top-talker" data-tt-port="$($item.Port)" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort($($item.Port));" style="background: #0d121c; border-radius: 4px; padding: 5px 9px; cursor: pointer; $borderStyle transition: all 0.15s ease;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 3px;">
-          <div style="display: flex; align-items: center; gap: 7px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+          <div style="display: flex; align-items: center; gap: 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
             <span style="font-size: 9px; font-weight: 800; color: $($m.Color); background: $($m.Bg); padding: 1px 5px; border-radius: 3px; font-family: monospace;">$($m.Badge)</span>
             <span style="font-size: 11px; font-weight: 700; color: #ffffff;">Porta $($item.Port)</span>
+            <span style="font-size: 8.5px; font-weight: 800; color: $spdBadgeColor; background: $spdBadgeBg; padding: 1px 4px; border-radius: 3px; font-family: monospace;">$spdShort</span>
             <span style="font-size: 10px; color: #8b949e; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">$subLabel</span>
           </div>
-          <div style="display: flex; align-items: center; gap: 6px;">
-            <span style="font-size: 9px; font-weight: 700; background: rgba(56, 189, 248, 0.12); color: #38bdf8; padding: 1px 4px; border-radius: 3px;">$utilPct</span>
+          <div style="display: flex; align-items: center; gap: 6px; flex-shrink: 0;">
+            <span style="font-size: 8.5px; font-weight: 700; background: rgba(167, 139, 250, 0.12); color: #a78bfa; padding: 1px 4px; border-radius: 3px; font-family: monospace;">$utilPct uso</span>
             <span style="font-size: 11px; font-weight: 800; color: #38bdf8; font-family: monospace; white-space: nowrap;">$totFmt</span>
           </div>
         </div>
         <div style="display: flex; align-items: center; gap: 8px;">
           <div style="flex: 1; height: 3px; background: #1c2230; border-radius: 2px; overflow: hidden;">
-            <div style="width: $pct%; height: 100%; background: #00b0ff; border-radius: 2px;"></div>
+            <div style="width: $pct%; height: 100%; background: $(if ($isDeg) { '#f59e0b' } else { '#00b0ff' }); border-radius: 2px;"></div>
           </div>
           <span style="font-size: 8.5px; color: #64748b; font-family: monospace; white-space: nowrap;">In: $inFmt &bull; Out: $outFmt</span>
         </div>
@@ -404,115 +431,211 @@ foreach ($item in ($topSorted | Select-Object -First 3)) {
 }
 $topTalkersInitialHtml = $topTalkersSb.ToString()
 
+# Degraded initial chip HTML
+$degradedChipsSb = New-Object System.Text.StringBuilder
+if ($degradedPortsList.Count -gt 0) {
+    foreach ($dp in $degradedPortsList) {
+        $null = $degradedChipsSb.AppendLine("<span onclick=`"event.stopPropagation();if(window.__arubaSelectPort)window.__arubaSelectPort($($dp.Port));`" style=`"background: rgba(245, 158, 11, 0.16); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.38); font-size: 9.5px; font-weight: 800; padding: 1px 6px; border-radius: 4px; cursor: pointer; font-family: monospace;`" title=`"Clique para inspecionar a Porta $($dp.Port)`">&#9888; Porta $($dp.Port) ($($dp.SpeedLabel))</span>")
+    }
+} else {
+    $null = $degradedChipsSb.AppendLine("<span style=`"background: rgba(0, 230, 118, 0.12); color: #00e676; font-size: 9px; font-weight: 700; padding: 1px 6px; border-radius: 4px; font-family: monospace;`">&#10003; TODAS 1G/10G</span>")
+}
+$initialDegradedChipsHtml = $degradedChipsSb.ToString()
+
+# Alert initial chip HTML
+$initialAlertChipsHtml = if ($probPorts.Keys.Count -gt 0) {
+    ($probPorts.Keys | ForEach-Object { "<span onclick=`"event.stopPropagation();if(window.__arubaSelectPort)window.__arubaSelectPort($_);`" style=`"background: rgba(239, 68, 68, 0.18); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.4); font-size: 9.5px; font-weight: 800; padding: 1px 6px; border-radius: 4px; cursor: pointer; font-family: monospace;`">&#9888; Porta $_</span>" }) -join " "
+} else {
+    "<span style=`"background: rgba(0, 230, 118, 0.12); color: #00e676; font-size: 9px; font-weight: 700; padding: 1px 6px; border-radius: 4px; font-family: monospace;`">&#10003; SAUD&Aacute;VEL</span>"
+}
+
+# Build Switch Selector Bar HTML (SW01..SW04)
+$bamexFleet = @(
+    @{ Short = "SW01"; Ip = "10.50.0.2"; Uid = "alpt2p5"; HostId = "10682" },
+    @{ Short = "SW02"; Ip = "10.50.0.4"; Uid = "bamex-sw02"; HostId = "10772" },
+    @{ Short = "SW03"; Ip = "10.50.0.5"; Uid = "bamex-sw03"; HostId = "10773" },
+    @{ Short = "SW04"; Ip = "10.50.0.6"; Uid = "bamex-sw04"; HostId = "10774" }
+)
+$fleetNavSb = New-Object System.Text.StringBuilder
+foreach ($sw in $bamexFleet) {
+    $isCurrent = ($sw.Short -eq $switchShortName)
+    $pillBg = if ($isCurrent) { "linear-gradient(135deg, rgba(0, 176, 255, 0.22) 0%, rgba(0, 176, 255, 0.08) 100%)" } else { "#111622" }
+    $pillBorder = if ($isCurrent) { "1.5px solid #00b0ff" } else { "1px solid #1e293b" }
+    $pillShadow = if ($isCurrent) { "box-shadow: 0 0 12px rgba(0, 176, 255, 0.28);" } else { "" }
+    $nameColor = if ($isCurrent) { "#ffffff" } else { "#cbd5e1" }
+    $ipColor = if ($isCurrent) { "#38bdf8" } else { "#64748b" }
+    $activeTag = if ($isCurrent) { "<span style=`"background: #00b0ff; color: #050b14; font-size: 8px; font-weight: 900; padding: 1px 4px; border-radius: 3px; letter-spacing: 0.4px;`">ATUAL</span>" } else { "<span id=`"sw-nav-meta-$($sw.Short)`" style=`"font-size: 8.5px; font-family: monospace; color: #64748b; font-weight: 700;`">ABRIR &#8599;</span>" }
+
+    $null = $fleetNavSb.AppendLine(@"
+      <a class="sw-fleet-pill" href="/d/$($sw.Uid)" title="Alternar para [BAMEX] - $($sw.Short) ($($sw.Ip))" style="text-decoration: none; background: $pillBg; border: $pillBorder; $pillShadow border-radius: 6px; padding: 5px 11px; display: flex; align-items: center; gap: 8px; transition: all 0.18s ease;">
+        <span id="sw-nav-dot-$($sw.Short)" style="width: 7px; height: 7px; border-radius: 50%; background: #00e676; box-shadow: 0 0 6px #00e676; display: inline-block; flex-shrink: 0;"></span>
+        <span style="font-size: 11px; font-weight: 800; color: $nameColor; letter-spacing: 0.3px;">$($sw.Short)</span>
+        <span style="font-size: 10px; font-family: monospace; color: $ipColor; font-weight: 600;">$($sw.Ip)</span>
+        $activeTag
+      </a>
+"@)
+}
+$fleetNavHtml = $fleetNavSb.ToString()
+
 # ========================================================
 # 2. BUILD HTML STRUCTURE
 # ========================================================
 $sb = New-Object System.Text.StringBuilder
 
 $null = $sb.AppendLine(@"
-<div class="aruba-switch-view" style="background-color: #0c0f17; color: #f1f5f9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; padding: 20px 24px; border-radius: 8px; width: 100%; box-sizing: border-box; user-select: none;">
+<div class="aruba-switch-view" style="background-color: #0c0f17; color: #f1f5f9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; padding: 14px 18px; border-radius: 8px; width: 100%; box-sizing: border-box; user-select: none;">
+
+<!-- BAMEX MULTI-SWITCH QUICK NAVIGATION BAR -->
+<div style="display: flex; justify-content: space-between; align-items: center; background: #080b11; border: 1px solid #1a2333; border-radius: 7px; padding: 6px 12px; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+  <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+    <span style="font-size: 9.5px; font-weight: 800; letter-spacing: 0.9px; color: #ff8300; text-transform: uppercase; margin-right: 4px; display: flex; align-items: center; gap: 5px;">
+      <span style="width: 6px; height: 6px; border-radius: 2px; background: #ff8300; display: inline-block;"></span>
+      COMUTA&Ccedil;&Atilde;O R&Aacute;PIDA RACK BAMEX:
+    </span>
+$fleetNavHtml
+  </div>
+  <div style="display: flex; align-items: center; gap: 8px;">
+    <button id="btn-header-loc" type="button" onclick="if(window.__arubaToggleLoc)window.__arubaToggleLoc();" style="background: rgba(0, 176, 255, 0.12); color: #38bdf8; border: 1px solid rgba(0, 176, 255, 0.35); border-radius: 5px; padding: 4px 10px; font-size: 10px; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 5px; transition: all 0.2s ease;" title="Abrir gaveta de Invent&aacute;rio SNMP (sysDescr, Local, Contato) e link da Web GUI Aruba">
+      <span>&#9432; INVENT&Aacute;RIO SNMP &amp; WEB GUI</span>
+    </button>
+    <a href="http://$switchIp" target="_blank" rel="noopener noreferrer" style="background: rgba(255, 131, 0, 0.14); color: #ff8300; border: 1px solid rgba(255, 131, 0, 0.35); border-radius: 5px; padding: 4px 10px; font-size: 10px; font-weight: 800; text-decoration: none; display: flex; align-items: center; gap: 4px; transition: all 0.2s ease;" title="Abrir interface Web do Switch Aruba ($switchIp)">
+      <span>WEB GUI ($switchIp) &#8599;</span>
+    </a>
+  </div>
+</div>
 
 <!-- TOP HEADER -->
-<div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
+<div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; flex-wrap: wrap; gap: 10px;">
   <div>
-    <div style="font-size: 11px; font-weight: 700; letter-spacing: 1.2px; color: #ff8300; margin-bottom: 5px; display: flex; align-items: center;">
+    <div style="font-size: 10.5px; font-weight: 700; letter-spacing: 1.2px; color: #ff8300; margin-bottom: 4px; display: flex; align-items: center;">
       <span style="width: 7px; height: 7px; border-radius: 50%; background-color: #00e676; box-shadow: 0 0 8px #00e676; display: inline-block; margin-right: 6px;"></span>
-      BAMEX &bull; RACK CPD &bull; COLETA SNMP VIA ZABBIX
+      BAMEX &bull; RACK CPD &bull; COLETA SNMP 64-BIT HC VIA ZABBIX
     </div>
-    <h1 style="font-size: 28px; font-weight: 800; margin: 0 0 6px 0; color: #ffffff; letter-spacing: -0.5px;">$switchShortName-BAMEX &bull; Aruba Instant On 1930 24G 4SFP+</h1>
-    <div style="font-size: 12px; color: #8b949e; display: flex; align-items: center; gap: 8px;">
-      <span id="header-switch-ip">24x GbE RJ45 + 4x SFP+ 10G &bull; L2+ Managed &bull; JL682A &bull; IP: $switchIp</span>
-      <span style="background: rgba(0, 230, 118, 0.12); color: #00e676; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px; border: 1px solid rgba(0, 230, 118, 0.25);">PRODUCAO LIVE</span>
-      <span id="zabbix-sync-badge" style="background: rgba(0, 176, 255, 0.12); color: #00b0ff; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px; border: 1px solid rgba(0, 176, 255, 0.25); cursor: pointer;" title="Clique para sincronizar agora com o Zabbix">&#x21bb; ZABBIX SYNC: ATIVO</span>
-      <span id="header-cpu-badge" style="background: rgba(168, 85, 247, 0.12); color: #c084fc; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px; border: 1px solid rgba(168, 85, 247, 0.25); $(if (-not $cpuItem) { 'display: none;' })" title="Utilizacao de CPU do Switch">CPU: <span id="header-cpu-val">$cpuDisplay</span></span>
-      <span id="header-poe-badge" style="background: rgba(234, 179, 8, 0.12); color: #facc15; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px; border: 1px solid rgba(234, 179, 8, 0.25); $(if ($totalPoEWatts -le 0) { 'display: none;' })" title="Consumo PoE Total">&#9889; POE: <span id="header-poe-val">$totalPoEWatts W</span></span>
+    <h1 style="font-size: 25px; font-weight: 800; margin: 0 0 6px 0; color: #ffffff; letter-spacing: -0.5px;">$switchShortName-BAMEX &bull; Aruba Instant On 1930 24G 4SFP+</h1>
+    <div style="font-size: 11.5px; color: #8b949e; display: flex; align-items: center; gap: 7px; flex-wrap: wrap;">
+      <span id="header-switch-ip">24x GbE RJ45 + 4x SFP+ 10G &bull; L2+ Managed &bull; JL682A</span>
+      <span id="header-ip-copy" onclick="if(window.__arubaCopyIp)window.__arubaCopyIp();" style="background: rgba(56, 189, 248, 0.12); color: #38bdf8; font-size: 10px; font-weight: 800; font-family: monospace; padding: 2px 7px; border-radius: 4px; border: 1px solid rgba(56, 189, 248, 0.3); cursor: pointer;" title="Clique para copiar o IP do Switch">IP: <span id="header-ip-text">$switchIp</span> &#10064;</span>
+      <span style="background: rgba(0, 230, 118, 0.12); color: #00e676; font-size: 9.5px; font-weight: 700; padding: 2px 7px; border-radius: 4px; border: 1px solid rgba(0, 230, 118, 0.25);">PRODU&Ccedil;&Atilde;O LIVE</span>
+      <span id="zabbix-sync-badge" style="background: rgba(0, 176, 255, 0.12); color: #00b0ff; font-size: 9.5px; font-weight: 700; padding: 2px 7px; border-radius: 4px; border: 1px solid rgba(0, 176, 255, 0.25); cursor: pointer;" title="Clique para sincronizar agora com o Zabbix">&#x21bb; ZABBIX SYNC: ATIVO</span>
+      <span id="header-cpu-badge" style="background: rgba(168, 85, 247, 0.12); color: #c084fc; font-size: 9.5px; font-weight: 700; padding: 2px 7px; border-radius: 4px; border: 1px solid rgba(168, 85, 247, 0.25); $(if (-not $cpuItem) { 'display: none;' })" title="Utiliza&ccedil;&atilde;o de CPU do Switch">CPU: <span id="header-cpu-val">$cpuDisplay</span></span>
+      <span id="header-poe-badge" style="background: rgba(234, 179, 8, 0.12); color: #facc15; font-size: 9.5px; font-weight: 700; padding: 2px 7px; border-radius: 4px; border: 1px solid rgba(234, 179, 8, 0.25); $(if ($totalPoEWatts -le 0) { 'display: none;' })" title="Consumo PoE Total">&#9889; POE: <span id="header-poe-val">$totalPoEWatts W</span></span>
     </div>
   </div>
   <div style="text-align: right;">
-    <div id="live-clock" style="font-size: 24px; font-weight: 700; font-family: monospace; color: #ffffff; letter-spacing: 1px;">$([DateTime]::Now.ToString("HH:mm:ss"))</div>
-    <div style="font-size: 11px; color: #8b949e; margin-top: 4px;">SNMPv2 &bull; Intervalo 15 s &bull; <span id="header-uptime">$uptimeStr</span></div>
+    <div id="live-clock" style="font-size: 23px; font-weight: 700; font-family: monospace; color: #ffffff; letter-spacing: 1px;">$([DateTime]::Now.ToString("HH:mm:ss"))</div>
+    <div style="font-size: 11px; color: #8b949e; margin-top: 3px;">SNMPv2 &bull; Intervalo 15 s &bull; <span id="header-uptime">$uptimeStr</span></div>
   </div>
 </div>
 
-<!-- KPI CARDS ROW -->
-<div style="display: flex; background: #121620; border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 8px; padding: 14px 20px; margin-bottom: 22px;">
-  <div style="flex: 1; border-right: 1px solid rgba(255, 255, 255, 0.08); padding-right: 16px;">
-    <div style="font-size: 10.5px; font-weight: 700; letter-spacing: 0.8px; color: #8b949e; text-transform: uppercase; margin-bottom: 6px;">PORTAS ATIVAS</div>
-    <div style="font-size: 26px; font-weight: 800; color: #00e676; display: flex; align-items: baseline;">
-      <span id="kpi-active-ports">$activeCount</span> <span style="font-size: 14px; font-weight: 500; color: #8b949e; margin-left: 4px;">/ 28</span>
+<!-- KPI CARDS ROW (CLICKABLE FILTERS & SHORTCUTS) -->
+<div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 14px;">
+  <!-- KPI 1: Portas Ativas -->
+  <div onclick="if(window.__arubaSetPortFilter)window.__arubaSetPortFilter('up');" title="Clique para filtrar todas as portas UP na tabela lateral" style="background: #121620; border: 1px solid rgba(255, 255, 255, 0.07); border-radius: 8px; padding: 11px 14px; cursor: pointer; transition: border-color 0.2s ease;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+      <span style="font-size: 10px; font-weight: 700; letter-spacing: 0.7px; color: #8b949e; text-transform: uppercase;">PORTAS ATIVAS</span>
+      <span id="kpi-active-pct" style="font-size: 9px; font-weight: 800; color: #00e676; background: rgba(0, 230, 118, 0.12); padding: 1px 5px; border-radius: 3px; font-family: monospace;">${activePct}% USO</span>
     </div>
-    <div style="width: 100%; height: 4px; background: #1c2230; border-radius: 2px; margin-top: 8px; overflow: hidden;">
-      <div id="kpi-active-bar" style="height: 100%; background: #00e676; border-radius: 2px; box-shadow: 0 0 10px #00e676; width: $([Math]::Round(($activeCount/28.0)*100))%;"></div>
+    <div style="font-size: 24px; font-weight: 800; color: #00e676; display: flex; align-items: baseline;">
+      <span id="kpi-active-ports">$activeCount</span> <span style="font-size: 13px; font-weight: 500; color: #8b949e; margin-left: 4px;">/ 28</span>
+    </div>
+    <div style="width: 100%; height: 4px; background: #1c2230; border-radius: 2px; margin-top: 7px; overflow: hidden;">
+      <div id="kpi-active-bar" style="height: 100%; background: #00e676; border-radius: 2px; box-shadow: 0 0 10px #00e676; width: ${activePct}%;"></div>
     </div>
   </div>
-  <div style="flex: 1; border-right: 1px solid rgba(255, 255, 255, 0.08); padding-left: 16px; padding-right: 16px;">
-    <div style="font-size: 10.5px; font-weight: 700; letter-spacing: 0.8px; color: #8b949e; text-transform: uppercase; margin-bottom: 6px;">ALERTAS DE PORTA</div>
-    <div id="kpi-alert-count" style="font-size: 26px; font-weight: 800; color: $(if ($problemCount -gt 0) { '#ef4444' } else { '#00e676' });">$problemCount</div>
+
+  <!-- KPI 2: Alertas de Porta -->
+  <div onclick="if(window.__arubaInspectFirstAlert)window.__arubaInspectFirstAlert();" title="Clique para inspecionar portas em alerta" style="background: #121620; border: 1px solid rgba(255, 255, 255, 0.07); border-radius: 8px; padding: 11px 14px; cursor: pointer; transition: border-color 0.2s ease;">
+    <div style="font-size: 10px; font-weight: 700; letter-spacing: 0.7px; color: #8b949e; text-transform: uppercase; margin-bottom: 4px;">ALERTAS DE PORTA</div>
+    <div style="display: flex; align-items: center; justify-content: space-between; gap: 6px;">
+      <div id="kpi-alert-count" style="font-size: 24px; font-weight: 800; color: $(if ($problemCount -gt 0) { '#ef4444' } else { '#00e676' });">$problemCount</div>
+      <div id="kpi-alert-chips" style="display: flex; flex-wrap: wrap; gap: 4px; justify-content: flex-end;">$initialAlertChipsHtml</div>
+    </div>
+    <div style="font-size: 9.5px; color: #64748b; margin-top: 5px;">Triggers Zabbix em tempo real</div>
   </div>
-  <div style="flex: 1; border-right: 1px solid rgba(255, 255, 255, 0.08); padding-left: 16px; padding-right: 16px;">
-    <div style="font-size: 10.5px; font-weight: 700; letter-spacing: 0.8px; color: #8b949e; text-transform: uppercase; margin-bottom: 6px;">VELOCIDADE DEGRADADA</div>
-    <div id="kpi-degraded-ports" style="font-size: 26px; font-weight: 800; color: #f59e0b;">$degradedCount</div>
+
+  <!-- KPI 3: Velocidade Degradada -->
+  <div onclick="if(window.__arubaInspectFirstDegraded)window.__arubaInspectFirstDegraded();" title="Clique para selecionar imediatamente a porta com velocidade degradada (10/100 Mbps)" style="background: #121620; border: 1px solid $(if ($degradedCount -gt 0) { 'rgba(245, 158, 11, 0.35)' } else { 'rgba(255, 255, 255, 0.07)' }); border-radius: 8px; padding: 11px 14px; cursor: pointer; transition: border-color 0.2s ease;">
+    <div style="font-size: 10px; font-weight: 700; letter-spacing: 0.7px; color: #8b949e; text-transform: uppercase; margin-bottom: 4px;">VELOCIDADE DEGRADADA</div>
+    <div style="display: flex; align-items: center; justify-content: space-between; gap: 6px;">
+      <div id="kpi-degraded-ports" style="font-size: 24px; font-weight: 800; color: $(if ($degradedCount -gt 0) { '#f59e0b' } else { '#00e676' });">$degradedCount</div>
+      <div id="kpi-degraded-chips" style="display: flex; flex-wrap: wrap; gap: 4px; justify-content: flex-end;">$initialDegradedChipsHtml</div>
+    </div>
+    <div style="font-size: 9.5px; color: #64748b; margin-top: 5px;">Negocia&ccedil;&atilde;o Fast Ethernet (10/100M)</div>
   </div>
-  <div style="flex: 1; border-right: 1px solid rgba(255, 255, 255, 0.08); padding-left: 16px; padding-right: 16px;">
-    <div style="font-size: 10.5px; font-weight: 700; letter-spacing: 0.8px; color: #8b949e; text-transform: uppercase; margin-bottom: 6px;">TR&Aacute;FEGO TOTAL</div>
-    <div id="kpi-total-traffic" style="font-size: 26px; font-weight: 800; color: #ffffff; display: flex; align-items: baseline;">
+
+  <!-- KPI 4: Tráfego Total -->
+  <div style="background: #121620; border: 1px solid rgba(255, 255, 255, 0.07); border-radius: 8px; padding: 11px 14px;">
+    <div style="font-size: 10px; font-weight: 700; letter-spacing: 0.7px; color: #8b949e; text-transform: uppercase; margin-bottom: 4px;">TR&Aacute;FEGO AGREGADO</div>
+    <div id="kpi-total-traffic" style="font-size: 24px; font-weight: 800; color: #ffffff; display: flex; align-items: baseline;">
       $totalTrafficFmt
     </div>
+    <div id="kpi-traffic-sub" style="font-size: 9.5px; font-family: monospace; color: #94a3b8; margin-top: 5px;">&#8595; In: $totalInFmt &bull; &#8593; Out: $totalOutFmt</div>
   </div>
-  <div style="flex: 1; padding-left: 16px;">
-    <div style="font-size: 10.5px; font-weight: 700; letter-spacing: 0.8px; color: #8b949e; text-transform: uppercase; margin-bottom: 6px;">UPLINKS SFP+ 10G</div>
-    <div style="font-size: 26px; font-weight: 800; color: #ffffff; display: flex; align-items: baseline;">
-      0 <span style="font-size: 14px; font-weight: 500; color: #8b949e; margin-left: 4px;">/ 4 em uso</span>
+
+  <!-- KPI 5: Uplinks SFP+ 10G -->
+  <div style="background: #121620; border: 1px solid rgba(255, 255, 255, 0.07); border-radius: 8px; padding: 11px 14px;">
+    <div style="font-size: 10px; font-weight: 700; letter-spacing: 0.7px; color: #8b949e; text-transform: uppercase; margin-bottom: 4px;">UPLINKS SFP+ 10G</div>
+    <div style="display: flex; align-items: center; justify-content: space-between;">
+      <div style="font-size: 24px; font-weight: 800; color: #ffffff; display: flex; align-items: baseline;">
+        <span id="kpi-sfp-active">$sfpActiveCount</span> <span style="font-size: 13px; font-weight: 500; color: #8b949e; margin-left: 4px;">/ 4</span>
+      </div>
+      <div style="display: flex; gap: 4px;">
+        <span id="kpi-sfp-pill-25" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(25);" style="font-size: 9px; font-family: monospace; font-weight: 800; padding: 2px 5px; border-radius: 3px; cursor: pointer; background: $(if ($ports['25'].OperStatus -eq 1) { 'rgba(0, 230, 118, 0.18)' } else { '#1c2230' }); color: $(if ($ports['25'].OperStatus -eq 1) { '#00e676' } else { '#64748b' });" title="Inspecionar SFP+ 25">25</span>
+        <span id="kpi-sfp-pill-26" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(26);" style="font-size: 9px; font-family: monospace; font-weight: 800; padding: 2px 5px; border-radius: 3px; cursor: pointer; background: $(if ($ports['26'].OperStatus -eq 1) { 'rgba(0, 230, 118, 0.18)' } else { '#1c2230' }); color: $(if ($ports['26'].OperStatus -eq 1) { '#00e676' } else { '#64748b' });" title="Inspecionar SFP+ 26">26</span>
+        <span id="kpi-sfp-pill-27" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(27);" style="font-size: 9px; font-family: monospace; font-weight: 800; padding: 2px 5px; border-radius: 3px; cursor: pointer; background: $(if ($ports['27'].OperStatus -eq 1) { 'rgba(0, 230, 118, 0.18)' } else { '#1c2230' }); color: $(if ($ports['27'].OperStatus -eq 1) { '#00e676' } else { '#64748b' });" title="Inspecionar SFP+ 27">27</span>
+        <span id="kpi-sfp-pill-28" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(28);" style="font-size: 9px; font-family: monospace; font-weight: 800; padding: 2px 5px; border-radius: 3px; cursor: pointer; background: $(if ($ports['28'].OperStatus -eq 1) { 'rgba(0, 230, 118, 0.18)' } else { '#1c2230' }); color: $(if ($ports['28'].OperStatus -eq 1) { '#00e676' } else { '#64748b' });" title="Inspecionar SFP+ 28">28</span>
+      </div>
     </div>
+    <div style="font-size: 9.5px; color: #64748b; margin-top: 5px;">Fibra / DAC 10GbE (Portas 25&ndash;28)</div>
   </div>
 </div>
 
-<!-- ARUBA CHASSIS -->
-<div style="background: linear-gradient(180deg, #181d26 0%, #10141b 100%); border: 2px solid #2d3848; border-radius: 8px; padding: 16px 22px; box-shadow: 0 12px 36px rgba(0, 0, 0, 0.75); display: flex; align-items: center; justify-content: space-between; gap: 18px; margin-bottom: 16px; position: relative;">
+<!-- ARUBA CHASSIS (100% RESPONSIVE ZERO-CLIPPING 1U LAYOUT) -->
+<div style="background: linear-gradient(180deg, #181d26 0%, #10141b 100%); border: 2px solid #2d3848; border-radius: 8px; padding: 14px 14px; box-shadow: 0 12px 36px rgba(0, 0, 0, 0.75); display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 14px; position: relative; width: 100%; box-sizing: border-box;">
 
   <!-- Left Rack Ear -->
-  <div style="width: 18px; height: 118px; background: #1c222e; border: 1px solid #333f52; border-radius: 4px; display: flex; flex-direction: column; justify-content: space-around; align-items: center; box-shadow: inset 0 0 6px rgba(0,0,0,0.6); flex-shrink: 0;">
-    <div style="width: 10px; height: 10px; border-radius: 50%; background: radial-gradient(circle, #5b6980 20%, #202733 90%); border: 1px solid #111;"></div>
-    <div style="width: 10px; height: 10px; border-radius: 50%; background: radial-gradient(circle, #5b6980 20%, #202733 90%); border: 1px solid #111;"></div>
+  <div style="width: 14px; height: 116px; background: #1c222e; border: 1px solid #333f52; border-radius: 4px; display: flex; flex-direction: column; justify-content: space-around; align-items: center; box-shadow: inset 0 0 6px rgba(0,0,0,0.6); flex-shrink: 0;">
+    <div style="width: 8px; height: 8px; border-radius: 50%; background: radial-gradient(circle, #5b6980 20%, #202733 90%); border: 1px solid #111;"></div>
+    <div style="width: 8px; height: 8px; border-radius: 50%; background: radial-gradient(circle, #5b6980 20%, #202733 90%); border: 1px solid #111;"></div>
   </div>
 
   <!-- Aruba Branding & System LEDs -->
-  <div style="min-width: 195px; flex-shrink: 0;">
-    <div style="display: flex; align-items: center; gap: 8px;">
-      <span style="font-size: 21px; font-weight: 900; color: #ff8300; letter-spacing: -0.5px;">aruba</span>
-      <span style="font-size: 13px; font-weight: 700; color: #ffffff;">Instant On</span>
+  <div style="width: 158px; min-width: 158px; flex-shrink: 0;">
+    <div style="display: flex; align-items: center; gap: 6px;">
+      <span style="font-size: 20px; font-weight: 900; color: #ff8300; letter-spacing: -0.5px;">aruba</span>
+      <span style="font-size: 12.5px; font-weight: 700; color: #ffffff;">Instant On</span>
     </div>
-    <div style="font-size: 10px; font-weight: 700; color: #8b949e; letter-spacing: 0.5px; margin-top: 2px; margin-bottom: 12px;">1930 24G 4SFP+ &bull; JL682A</div>
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px 14px;">
-      <div id="led-cloud-wrap" onclick="if(window.__arubaSyncNow)window.__arubaSyncNow();" title="Cloud: Conectado com Zabbix API (Clique para sincronizar agora)" style="display: flex; align-items: center; gap: 7px; cursor: pointer;">
+    <div style="font-size: 9.5px; font-weight: 700; color: #8b949e; letter-spacing: 0.4px; margin-top: 2px; margin-bottom: 10px;">1930 24G 4SFP+ &bull; JL682A</div>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 7px 10px;">
+      <div id="led-cloud-wrap" onclick="if(window.__arubaSyncNow)window.__arubaSyncNow();" title="Cloud: Conectado com Zabbix API (Clique para sincronizar agora)" style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
         <span id="led-cloud" style="width: 6px; height: 6px; border-radius: 50%; background-color: #00e676; box-shadow: 0 0 7px #00e676; display: inline-block; transition: all 0.3s ease;"></span>
         <span style="font-size: 9px; font-weight: 700; color: #94a3b8;">Cloud</span>
       </div>
-      <div id="led-power-wrap" title="$powerTitle" style="display: flex; align-items: center; gap: 7px;">
+      <div id="led-power-wrap" title="$powerTitle" style="display: flex; align-items: center; gap: 6px;">
         <span id="led-power" style="width: 6px; height: 6px; border-radius: 50%; background-color: $powerColor; $powerShadow display: inline-block; transition: all 0.3s ease;"></span>
         <span style="font-size: 9px; font-weight: 700; color: #94a3b8;">Power</span>
       </div>
-      <div id="led-fault-wrap" title="$faultTitle" style="display: flex; align-items: center; gap: 7px;">
+      <div id="led-fault-wrap" title="$faultTitle" style="display: flex; align-items: center; gap: 6px;">
         <span id="led-fault" style="width: 6px; height: 6px; border-radius: 50%; background-color: $faultColor; $faultShadow display: inline-block; transition: all 0.3s ease;"></span>
         <span style="font-size: 9px; font-weight: 700; color: #94a3b8;">Fault</span>
       </div>
-      <div id="led-loc-wrap" onclick="if(window.__arubaToggleLoc)window.__arubaToggleLoc();" title="Informa&ccedil;&otilde;es e Invent&aacute;rio do Ativo no Zabbix (Clique para abrir/fechar)" style="display: flex; align-items: center; gap: 7px; cursor: pointer;">
+      <div id="led-loc-wrap" onclick="if(window.__arubaToggleLoc)window.__arubaToggleLoc();" title="Informa&ccedil;&otilde;es e Invent&aacute;rio do Ativo no Zabbix (Clique para abrir/fechar)" style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
         <span id="led-loc" style="width: 6px; height: 6px; border-radius: 50%; background-color: #1e293b; display: inline-block; transition: all 0.3s ease;"></span>
         <span style="font-size: 9px; font-weight: 700; color: #00b0ff; text-decoration: underline;">Loc</span>
       </div>
     </div>
-    <div style="font-size: 8px; font-weight: 700; color: #475569; letter-spacing: 0.8px; margin-top: 10px;">L2+ MANAGED &bull; 1U RACKMOUNT</div>
+    <div style="font-size: 7.5px; font-weight: 700; color: #475569; letter-spacing: 0.7px; margin-top: 9px;">L2+ MANAGED &bull; 1U RACKMOUNT</div>
   </div>
 
-  <!-- Center 24 RJ45 Ports (Distributed in 2 Banks of 12 Ports across full bay) -->
-  <div style="flex: 1; margin: 0 16px; background: #080c14; border: 1.5px solid #1c2636; border-radius: 8px; padding: 12px 24px; box-shadow: inset 0 3px 12px rgba(0,0,0,0.9); display: flex; align-items: center; justify-content: space-around;">
+  <!-- Center 24 RJ45 Ports (Responsive 2 Banks of 12 Ports across full bay) -->
+  <div style="flex: 1; min-width: 0; background: #080c14; border: 1.5px solid #1c2636; border-radius: 8px; padding: 10px 12px; box-shadow: inset 0 3px 12px rgba(0,0,0,0.9); display: flex; align-items: center; justify-content: space-between; gap: 10px; box-sizing: border-box;">
 "@)
 
 function Get-Rj45PortHtml($pNum, $pt, $hasAlert, $selectedPortNum) {
     $isUp = ($pt.OperStatus -eq 1)
     $normSpd = $pt.Speed
     if ($normSpd -gt 0 -and $normSpd -lt 100000) { $normSpd = $normSpd * 1000000 }
-    $isDegraded = ($isUp -and $normSpd -lt 1000000000)
+    $isDegraded = ($isUp -and $normSpd -lt 1000000000 -and $normSpd -gt 0)
     
     $ledColor = if ($hasAlert) { "#ef4444" } elseif (-not $isUp) { "#27303f" } elseif ($isDegraded) { "#f59e0b" } else { "#00e676" }
     $ledShadow = if ($hasAlert) { "box-shadow: 0 0 8px #ef4444;" } elseif ($isUp) { "box-shadow: 0 0 6px $ledColor;" } else { "" }
@@ -526,40 +649,36 @@ function Get-Rj45PortHtml($pNum, $pt, $hasAlert, $selectedPortNum) {
     $poeDesc = if ($pt.PoEStatus -eq 3) { "&#10;PoE: Alimentando ($($pt.PoEPower) W)" } else { "" }
     $titleText = "$titleLabel&#10;Status: $statusDesc$poeDesc&#10;Velocidade: $speedLabel&#10;Entrada: $inFmt&#10;Saida: $outFmt"
     $selectedClass = if ($pNum -eq 24) { " sw-selected" } else { "" }
-    $borderStyle = if ($pNum -eq 24) { "2px solid #00b0ff" } elseif ($hasAlert) { "1px solid rgba(239, 68, 68, 0.6)" } else { "1px solid #263346" }
+    $borderStyle = if ($pNum -eq 24) { "2px solid #00b0ff" } elseif ($hasAlert) { "1px solid rgba(239, 68, 68, 0.7)" } elseif ($isDegraded) { "1px solid rgba(245, 158, 11, 0.65)" } else { "1px solid #263346" }
     $boxShadowStyle = if ($pNum -eq 24) { "0 0 14px rgba(0, 176, 255, 0.9)" } else { "none" }
 
     return @"
-          <div class="sw-port$selectedClass" data-port="$pNum" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort($pNum);" title="$titleText" style="width: 50px; height: 62px; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 4px 3px 4px; cursor: pointer; background: #101622; border: $borderStyle; box-shadow: $boxShadowStyle; box-sizing: border-box;">
-            <div style="width: 100%; display: flex; justify-content: space-between; padding: 0 3px;">
+          <div class="sw-port$selectedClass" data-port="$pNum" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort($pNum);" title="$titleText" style="width: 100%; max-width: 48px; min-width: 36px; height: 60px; margin: 0 auto; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 3px 3px 3px; cursor: pointer; background: #101622; border: $borderStyle; box-shadow: $boxShadowStyle; box-sizing: border-box;">
+            <div style="width: 100%; display: flex; justify-content: space-between; padding: 0 2px; box-sizing: border-box;">
               <span class="sw-led-1$ledPulseClass" style="width: 6px; height: 4px; border-radius: 1px; background-color: $ledColor; $ledShadow display: inline-block;"></span>
               <span class="sw-led-2$ledPulseClass$actClass" style="width: 6px; height: 4px; border-radius: 1px; background-color: $ledColor; opacity: 0.85; $ledShadow display: inline-block;"></span>
             </div>
             <!-- Authentic Shielded RJ45 Jack Receptacle -->
-            <div class="sw-rj45-jack" style="width: 36px; height: 30px; background: linear-gradient(180deg, #1c2433 0%, #101622 100%); border: 1.5px solid #2b384e; border-radius: 3px; position: relative; box-shadow: inset 0 1px 2px rgba(255,255,255,0.12), 0 2px 5px rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; box-sizing: border-box;">
-              <!-- Metallic Ground Shield Tabs -->
-              <div style="position: absolute; top: -1px; left: 6px; width: 4px; height: 1.5px; background: #475569; border-radius: 0 0 1px 1px;"></div>
-              <div style="position: absolute; top: -1px; right: 6px; width: 4px; height: 1.5px; background: #475569; border-radius: 0 0 1px 1px;"></div>
-              <!-- Inner Cavity with Stepped Silhouette -->
-              <div style="width: 28px; height: 23px; background: #030508; border-radius: 2px; position: relative; overflow: hidden; border: 1px solid #151d2a; box-shadow: inset 0 2px 6px rgba(0,0,0,0.95); display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 1px 0 0 0; box-sizing: border-box;">
-                <!-- 8 Gold Pins (8P8C) -->
-                <div style="width: 22px; height: 5px; display: flex; justify-content: space-between; align-items: flex-start; padding: 0 1px;">
+            <div class="sw-rj45-jack" style="width: 32px; height: 28px; background: linear-gradient(180deg, #1c2433 0%, #101622 100%); border: 1.5px solid #2b384e; border-radius: 3px; position: relative; box-shadow: inset 0 1px 2px rgba(255,255,255,0.12), 0 2px 5px rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; box-sizing: border-box;">
+              <div style="position: absolute; top: -1px; left: 5px; width: 4px; height: 1.5px; background: #475569; border-radius: 0 0 1px 1px;"></div>
+              <div style="position: absolute; top: -1px; right: 5px; width: 4px; height: 1.5px; background: #475569; border-radius: 0 0 1px 1px;"></div>
+              <div style="width: 24px; height: 21px; background: #030508; border-radius: 2px; position: relative; overflow: hidden; border: 1px solid #151d2a; box-shadow: inset 0 2px 6px rgba(0,0,0,0.95); display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 1px 0 0 0; box-sizing: border-box;">
+                <div style="width: 19px; height: 5px; display: flex; justify-content: space-between; align-items: flex-start; padding: 0 1px;">
                   <span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span>
                   <span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span><span class="sw-pin"></span>
                 </div>
-                <!-- Stepped Shoulders & Central Clip Retention Slot -->
                 <div style="width: 100%; display: flex; align-items: flex-end; justify-content: space-between;">
-                  <div style="width: 6px; height: 10px; background: #0d1420; border-top: 1px solid #1e293b; border-right: 1px solid #1e293b; border-radius: 1px 2px 0 0;"></div>
-                  <div style="width: 12px; height: 7px; background: #070b12; border-top: 1px solid #222f44; border-left: 1px solid #182232; border-right: 1px solid #182232; border-radius: 1px 1px 0 0; display: flex; justify-content: center; align-items: center;">
-                    <div style="width: 6px; height: 2px; background: #162030; border-radius: 1px;"></div>
+                  <div style="width: 5px; height: 9px; background: #0d1420; border-top: 1px solid #1e293b; border-right: 1px solid #1e293b; border-radius: 1px 2px 0 0;"></div>
+                  <div style="width: 10px; height: 6px; background: #070b12; border-top: 1px solid #222f44; border-left: 1px solid #182232; border-right: 1px solid #182232; border-radius: 1px 1px 0 0; display: flex; justify-content: center; align-items: center;">
+                    <div style="width: 5px; height: 2px; background: #162030; border-radius: 1px;"></div>
                   </div>
-                  <div style="width: 6px; height: 10px; background: #0d1420; border-top: 1px solid #1e293b; border-left: 1px solid #1e293b; border-radius: 2px 1px 0 0;"></div>
+                  <div style="width: 5px; height: 9px; background: #0d1420; border-top: 1px solid #1e293b; border-left: 1px solid #1e293b; border-radius: 2px 1px 0 0;"></div>
                 </div>
               </div>
             </div>
             <div style="width: 100%; display: flex; align-items: center; justify-content: center; position: relative;">
-              <div style="font-size: 10.5px; font-weight: 800; color: #8b949e; line-height: 1; font-family: monospace; margin-bottom: 1px;">$pNum</div>
-              <span class="sw-poe-icon" style="display: $(if ($pt.PoEStatus -eq 3) { 'inline-block' } else { 'none' }); position: absolute; right: 2px; font-size: 8px; color: #facc15; font-weight: 800; line-height: 1; text-shadow: 0 0 5px #eab308; pointer-events: none;" title="PoE: $($pt.PoEPower) W">&#9889;</span>
+              <div style="font-size: 10px; font-weight: 800; color: $(if ($isDegraded) { '#f59e0b' } elseif ($isUp) { '#e2e8f0' } else { '#64748b' }); line-height: 1; font-family: monospace; margin-bottom: 1px;">$pNum</div>
+              <span class="sw-poe-icon" style="display: $(if ($pt.PoEStatus -eq 3) { 'inline-block' } else { 'none' }); position: absolute; right: 1px; font-size: 7.5px; color: #facc15; font-weight: 800; line-height: 1; text-shadow: 0 0 5px #eab308; pointer-events: none;" title="PoE: $($pt.PoEPower) W">&#9889;</span>
             </div>
           </div>
 "@
@@ -567,9 +686,9 @@ function Get-Rj45PortHtml($pNum, $pt, $hasAlert, $selectedPortNum) {
 
 # Bank 1: Ports 1 - 12 (6 columns)
 $null = $sb.AppendLine(@"
-      <div style="display: flex; flex-direction: column; gap: 6px;">
-        <div style="font-size: 9px; font-weight: 700; color: #64748b; letter-spacing: 1px; text-align: center; text-transform: uppercase;">PORTAS 1 &ndash; 12 &bull; 10/100/1000M</div>
-        <div style="display: flex; gap: 18px;">
+      <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px;">
+        <div style="font-size: 8.5px; font-weight: 700; color: #64748b; letter-spacing: 0.8px; text-align: center; text-transform: uppercase;">PORTAS 1 &ndash; 12 &bull; 10/100/1000M</div>
+        <div style="display: grid; grid-template-columns: repeat(6, minmax(36px, 1fr)); gap: 6px; width: 100%;">
 "@)
 foreach ($col in 0..5) {
     $pNum = ($col * 2) + 1
@@ -577,7 +696,7 @@ foreach ($col in 0..5) {
 }
 $null = $sb.AppendLine(@"
         </div>
-        <div style="display: flex; gap: 18px;">
+        <div style="display: grid; grid-template-columns: repeat(6, minmax(36px, 1fr)); gap: 6px; width: 100%;">
 "@)
 foreach ($col in 0..5) {
     $pNum = ($col * 2) + 2
@@ -588,12 +707,12 @@ $null = $sb.AppendLine(@"
       </div>
 
       <!-- Vertical Bay Separator -->
-      <div style="width: 1px; height: 95px; background: linear-gradient(180deg, transparent, #283548, transparent);"></div>
+      <div style="width: 1px; height: 95px; background: linear-gradient(180deg, transparent, #283548, transparent); flex-shrink: 0;"></div>
 
       <!-- Bank 2: Ports 13 - 24 (6 columns) -->
-      <div style="display: flex; flex-direction: column; gap: 6px;">
-        <div style="font-size: 9px; font-weight: 700; color: #64748b; letter-spacing: 1px; text-align: center; text-transform: uppercase;">PORTAS 13 &ndash; 24 &bull; 10/100/1000M</div>
-        <div style="display: flex; gap: 18px;">
+      <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px;">
+        <div style="font-size: 8.5px; font-weight: 700; color: #64748b; letter-spacing: 0.8px; text-align: center; text-transform: uppercase;">PORTAS 13 &ndash; 24 &bull; 10/100/1000M</div>
+        <div style="display: grid; grid-template-columns: repeat(6, minmax(36px, 1fr)); gap: 6px; width: 100%;">
 "@)
 foreach ($col in 6..11) {
     $pNum = ($col * 2) + 1
@@ -601,7 +720,7 @@ foreach ($col in 6..11) {
 }
 $null = $sb.AppendLine(@"
         </div>
-        <div style="display: flex; gap: 18px;">
+        <div style="display: grid; grid-template-columns: repeat(6, minmax(36px, 1fr)); gap: 6px; width: 100%;">
 "@)
 foreach ($col in 6..11) {
     $pNum = ($col * 2) + 2
@@ -614,11 +733,11 @@ $null = $sb.AppendLine(@"
   </div> <!-- End 24 Ports Bay -->
 
   <!-- Right 4x SFP+ 10G Ports (Aruba Ports 25 to 28) -->
-  <div style="min-width: 185px; background: #080c14; border: 1.5px solid #1c2636; border-radius: 8px; padding: 12px 18px; box-shadow: inset 0 3px 12px rgba(0,0,0,0.9); flex-shrink: 0; display: flex; flex-direction: column; align-items: center;">
-    <div style="font-size: 9px; font-weight: 700; color: #8b949e; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px;">UPLINKS SFP+ 10G</div>
-    <div style="display: flex; flex-direction: column; gap: 8px;">
+  <div style="width: 148px; min-width: 148px; background: #080c14; border: 1.5px solid #1c2636; border-radius: 8px; padding: 10px 10px; box-shadow: inset 0 3px 12px rgba(0,0,0,0.9); flex-shrink: 0; display: flex; flex-direction: column; align-items: center; box-sizing: border-box;">
+    <div style="font-size: 8.5px; font-weight: 700; color: #8b949e; letter-spacing: 0.8px; text-transform: uppercase; margin-bottom: 6px;">UPLINKS SFP+ 10G</div>
+    <div style="display: flex; flex-direction: column; gap: 6px; width: 100%;">
       <!-- Row 1: 25, 27 -->
-      <div style="display: flex; gap: 14px;">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; width: 100%;">
 "@)
 
 foreach ($s in @(25, 27)) {
@@ -635,16 +754,17 @@ foreach ($s in @(25, 27)) {
     $sInFmt = Format-Bps $spt.InBps
     $sOutFmt = Format-Bps $spt.OutBps
     $sTitleLabel = if ($spt.Alias -and $spt.Alias.Length -gt 0) { "SFP+ $s | $($spt.Alias)" } else { "SFP+ $s | SFP+ 10G" }
-    $titleText = "$sTitleLabel&#10;Status: $statusDesc&#10;Velocidade: $(if ($isUp) { '10 Gb/s' } else { '--' })&#10;Entrada: $sInFmt&#10;Saida: $sOutFmt"
+    $sStatusDesc = if ($hasAlert) { "DOWN (ALARME)" } elseif ($isUp) { "UP" } else { "DOWN" }
+    $titleText = "$sTitleLabel&#10;Status: $sStatusDesc&#10;Velocidade: $(if ($isUp) { '10 Gb/s' } else { '--' })&#10;Entrada: $sInFmt&#10;Saida: $sOutFmt"
 
     $null = $sb.AppendLine(@"
-        <div class="sw-port" data-port="$s" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort($s);" title="$titleText" style="width: 72px; height: 44px; background: $sBg; border: $sBorder; border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 7px; position: relative; cursor: pointer; box-sizing: border-box;">
+        <div class="sw-port" data-port="$s" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort($s);" title="$titleText" style="width: 100%; height: 42px; background: $sBg; border: $sBorder; border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 3px 5px; position: relative; cursor: pointer; box-sizing: border-box;">
           <div style="width: 100%; display: flex; justify-content: space-between; align-items: center;">
             <span class="sw-led-1$sLedPulseClass$sActClass" style="width: 6px; height: 4px; border-radius: 1px; background: $sLed; $sLedShadow display: inline-block;"></span>
-            <span style="font-size: 8px; font-weight: 700; color: #64748b; letter-spacing: 0.5px;">10G</span>
+            <span style="font-size: 7.5px; font-weight: 700; color: #64748b; letter-spacing: 0.4px;">10G</span>
           </div>
-          <div style="width: 48px; height: 10px; border-radius: 2px; background: $sBar; border: 1px solid rgba(0,0,0,0.5);"></div>
-          <div style="font-size: 10.5px; font-weight: 800; color: #8b949e; font-family: monospace; line-height: 1;">$s</div>
+          <div style="width: 40px; height: 9px; border-radius: 2px; background: $sBar; border: 1px solid rgba(0,0,0,0.5);"></div>
+          <div style="font-size: 10px; font-weight: 800; color: #8b949e; font-family: monospace; line-height: 1;">$s</div>
         </div>
 "@)
 }
@@ -652,7 +772,7 @@ foreach ($s in @(25, 27)) {
 $null = $sb.AppendLine(@"
       </div>
       <!-- Row 2: 26, 28 -->
-      <div style="display: flex; gap: 14px;">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; width: 100%;">
 "@)
 
 foreach ($s in @(26, 28)) {
@@ -669,16 +789,17 @@ foreach ($s in @(26, 28)) {
     $sInFmt = Format-Bps $spt.InBps
     $sOutFmt = Format-Bps $spt.OutBps
     $sTitleLabel = if ($spt.Alias -and $spt.Alias.Length -gt 0) { "SFP+ $s | $($spt.Alias)" } else { "SFP+ $s | SFP+ 10G" }
-    $titleText = "$sTitleLabel&#10;Status: $statusDesc&#10;Velocidade: $(if ($isUp) { '10 Gb/s' } else { '--' })&#10;Entrada: $sInFmt&#10;Saida: $sOutFmt"
+    $sStatusDesc = if ($hasAlert) { "DOWN (ALARME)" } elseif ($isUp) { "UP" } else { "DOWN" }
+    $titleText = "$sTitleLabel&#10;Status: $sStatusDesc&#10;Velocidade: $(if ($isUp) { '10 Gb/s' } else { '--' })&#10;Entrada: $sInFmt&#10;Saida: $sOutFmt"
 
     $null = $sb.AppendLine(@"
-        <div class="sw-port" data-port="$s" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort($s);" title="$titleText" style="width: 72px; height: 44px; background: $sBg; border: $sBorder; border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 7px; position: relative; cursor: pointer; box-sizing: border-box;">
+        <div class="sw-port" data-port="$s" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort($s);" title="$titleText" style="width: 100%; height: 42px; background: $sBg; border: $sBorder; border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 3px 5px; position: relative; cursor: pointer; box-sizing: border-box;">
           <div style="width: 100%; display: flex; justify-content: space-between; align-items: center;">
             <span class="sw-led-1$sLedPulseClass$sActClass" style="width: 6px; height: 4px; border-radius: 1px; background: $sLed; $sLedShadow display: inline-block;"></span>
-            <span style="font-size: 8px; font-weight: 700; color: #64748b; letter-spacing: 0.5px;">10G</span>
+            <span style="font-size: 7.5px; font-weight: 700; color: #64748b; letter-spacing: 0.4px;">10G</span>
           </div>
-          <div style="width: 48px; height: 10px; border-radius: 2px; background: $sBar; border: 1px solid rgba(0,0,0,0.5);"></div>
-          <div style="font-size: 10.5px; font-weight: 800; color: #8b949e; font-family: monospace; line-height: 1;">$s</div>
+          <div style="width: 40px; height: 9px; border-radius: 2px; background: $sBar; border: 1px solid rgba(0,0,0,0.5);"></div>
+          <div style="font-size: 10px; font-weight: 800; color: #8b949e; font-family: monospace; line-height: 1;">$s</div>
         </div>
 "@)
 }
@@ -686,61 +807,61 @@ foreach ($s in @(26, 28)) {
 $null = $sb.AppendLine(@"
       </div>
     </div>
-    <div style="font-size: 8px; font-weight: 700; color: #64748b; margin-top: 8px;">Portas 25 &ndash; 28</div>
+    <div style="font-size: 8px; font-weight: 700; color: #64748b; margin-top: 6px;">Portas 25 &ndash; 28</div>
   </div>
 
   <!-- Right Rack Ear -->
-  <div style="width: 18px; height: 120px; background: #1c222e; border: 1px solid #333f52; border-radius: 4px; display: flex; flex-direction: column; justify-content: space-around; align-items: center; box-shadow: inset 0 0 6px rgba(0,0,0,0.6); flex-shrink: 0;">
-    <div style="width: 10px; height: 10px; border-radius: 50%; background: radial-gradient(circle, #5b6980 20%, #202733 90%); border: 1px solid #111;"></div>
-    <div style="width: 10px; height: 10px; border-radius: 50%; background: radial-gradient(circle, #5b6980 20%, #202733 90%); border: 1px solid #111;"></div>
+  <div style="width: 14px; height: 116px; background: #1c222e; border: 1px solid #333f52; border-radius: 4px; display: flex; flex-direction: column; justify-content: space-around; align-items: center; box-shadow: inset 0 0 6px rgba(0,0,0,0.6); flex-shrink: 0;">
+    <div style="width: 8px; height: 8px; border-radius: 50%; background: radial-gradient(circle, #5b6980 20%, #202733 90%); border: 1px solid #111;"></div>
+    <div style="width: 8px; height: 8px; border-radius: 50%; background: radial-gradient(circle, #5b6980 20%, #202733 90%); border: 1px solid #111;"></div>
   </div>
 
 </div> <!-- End Aruba Chassis -->
 
 <!-- ASSET INVENTORY DRAWER (ZABBIX sysDescr) -->
-<div id="aruba-loc-drawer" style="display: none; background: #0c121e; border: 1.5px solid #00b0ff; border-radius: 8px; padding: 16px 20px; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0, 176, 255, 0.22); transition: all 0.3s ease;">
-  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; border-bottom: 1px solid rgba(0, 176, 255, 0.25); padding-bottom: 10px;">
+<div id="aruba-loc-drawer" style="display: none; background: #0c121e; border: 1.5px solid #00b0ff; border-radius: 8px; padding: 14px 18px; margin-bottom: 16px; box-shadow: 0 10px 30px rgba(0, 176, 255, 0.22); transition: all 0.3s ease;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid rgba(0, 176, 255, 0.25); padding-bottom: 8px;">
     <div style="display: flex; align-items: center; gap: 10px;">
       <span style="width: 9px; height: 9px; border-radius: 50%; background: #00b0ff; box-shadow: 0 0 10px #00b0ff; display: inline-block;"></span>
-      <span style="font-size: 12px; font-weight: 800; letter-spacing: 1px; color: #00b0ff; text-transform: uppercase;">INFORMA&Ccedil;&Otilde;ES E INVENT&Aacute;RIO DO ATIVO &bull; ZABBIX SNMP</span>
-      <span style="background: rgba(0, 176, 255, 0.15); color: #38bdf8; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px; border: 1px solid rgba(0, 176, 255, 0.3);">CADASTRO SNMP</span>
+      <span style="font-size: 11.5px; font-weight: 800; letter-spacing: 1px; color: #00b0ff; text-transform: uppercase;">INFORMA&Ccedil;&Otilde;ES E INVENT&Aacute;RIO DO ATIVO &bull; ZABBIX SNMP</span>
+      <span style="background: rgba(0, 176, 255, 0.15); color: #38bdf8; font-size: 9.5px; font-weight: 700; padding: 2px 7px; border-radius: 4px; border: 1px solid rgba(0, 176, 255, 0.3);">CADASTRO SNMP</span>
     </div>
     <div style="display: flex; align-items: center; gap: 10px;">
-      <a id="drawer-gui-link" href="http://$switchIp" target="_blank" rel="noopener noreferrer" style="background: rgba(0, 230, 118, 0.15); color: #00e676; text-decoration: none; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 4px; border: 1px solid rgba(0, 230, 118, 0.3); display: flex; align-items: center; gap: 4px;">
+      <a id="drawer-gui-link" href="http://$switchIp" target="_blank" rel="noopener noreferrer" style="background: rgba(0, 230, 118, 0.15); color: #00e676; text-decoration: none; font-size: 10.5px; font-weight: 700; padding: 4px 10px; border-radius: 4px; border: 1px solid rgba(0, 230, 118, 0.3); display: flex; align-items: center; gap: 4px;">
         <span>Abrir Web GUI Aruba ($switchIp)</span> &#x2197;
       </a>
-      <button id="btn-close-drawer" type="button" onclick="if(window.__arubaCloseLoc)window.__arubaCloseLoc();" style="background: #1e293b; border: 1px solid #334155; color: #94a3b8; padding: 4px 12px; border-radius: 4px; font-size: 11px; font-weight: 700; cursor: pointer; transition: all 0.2s ease;">Fechar &times;</button>
+      <button id="btn-close-drawer" type="button" onclick="if(window.__arubaCloseLoc)window.__arubaCloseLoc();" style="background: #1e293b; border: 1px solid #334155; color: #94a3b8; padding: 4px 12px; border-radius: 4px; font-size: 10.5px; font-weight: 700; cursor: pointer; transition: all 0.2s ease;">Fechar &times;</button>
     </div>
   </div>
 
-  <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px; margin-bottom: 12px;">
-    <div style="background: #111724; padding: 10px 14px; border-radius: 6px; border: 1px solid #1c2638;">
-      <div style="font-size: 9px; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 4px;">HOSTNAME (sysName)</div>
-      <div id="drawer-sysname" style="font-size: 14px; font-weight: 800; color: #ffffff;">$sysName</div>
+  <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+    <div style="background: #111724; padding: 9px 12px; border-radius: 6px; border: 1px solid #1c2638;">
+      <div style="font-size: 8.5px; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 3px;">HOSTNAME (sysName)</div>
+      <div id="drawer-sysname" style="font-size: 13.5px; font-weight: 800; color: #ffffff;">$sysName</div>
     </div>
-    <div style="background: #111724; padding: 10px 14px; border-radius: 6px; border: 1px solid #1c2638;">
-      <div style="font-size: 9px; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 4px;">LOCAL FISICO (sysLocation)</div>
-      <div id="drawer-syslocation" style="font-size: 14px; font-weight: 800; color: #00e676;">$sysLocation</div>
+    <div style="background: #111724; padding: 9px 12px; border-radius: 6px; border: 1px solid #1c2638;">
+      <div style="font-size: 8.5px; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 3px;">LOCAL F&Iacute;SICO (sysLocation)</div>
+      <div id="drawer-syslocation" style="font-size: 13.5px; font-weight: 800; color: #00e676;">$sysLocation</div>
     </div>
-    <div style="background: #111724; padding: 10px 14px; border-radius: 6px; border: 1px solid #1c2638;">
-      <div style="font-size: 9px; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 4px;">CONTATO / RESPONSAVEL</div>
-      <div id="drawer-syscontact" style="font-size: 14px; font-weight: 800; color: #ffffff;">$sysContact</div>
+    <div style="background: #111724; padding: 9px 12px; border-radius: 6px; border: 1px solid #1c2638;">
+      <div style="font-size: 8.5px; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 3px;">CONTATO / RESPONS&Aacute;VEL</div>
+      <div id="drawer-syscontact" style="font-size: 13.5px; font-weight: 800; color: #ffffff;">$sysContact</div>
     </div>
-    <div style="background: #111724; padding: 10px 14px; border-radius: 6px; border: 1px solid #1c2638;">
-      <div style="font-size: 9px; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 4px;">IP GERENCIA / SNMP</div>
-      <div id="drawer-switch-ip" style="font-size: 14px; font-weight: 800; color: #38bdf8;">$switchIp</div>
+    <div style="background: #111724; padding: 9px 12px; border-radius: 6px; border: 1px solid #1c2638;">
+      <div style="font-size: 8.5px; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 3px;">IP GER&Ecirc;NCIA / SNMP</div>
+      <div id="drawer-switch-ip" style="font-size: 13.5px; font-weight: 800; color: #38bdf8;">$switchIp</div>
     </div>
   </div>
 
-  <div style="background: #111724; padding: 12px 14px; border-radius: 6px; border: 1px solid #1c2638;">
-    <div style="font-size: 9px; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 4px;">DESCRICAO DO ATIVO NO ZABBIX (sysDescr)</div>
-    <div id="drawer-sysdescr" style="font-size: 12px; font-family: monospace; color: #cbd5e1; line-height: 1.5; word-break: break-all;">
+  <div style="background: #111724; padding: 10px 12px; border-radius: 6px; border: 1px solid #1c2638;">
+    <div style="font-size: 8.5px; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 3px;">DESCRI&Ccedil;&Atilde;O DO ATIVO NO ZABBIX (sysDescr)</div>
+    <div id="drawer-sysdescr" style="font-size: 11.5px; font-family: monospace; color: #cbd5e1; line-height: 1.4; word-break: break-all;">
       $sysDescr
     </div>
-    <div style="margin-top: 6px; font-size: 10px; color: #64748b; display: flex; gap: 14px; align-items: center;">
+    <div style="margin-top: 5px; font-size: 9.5px; color: #64748b; display: flex; gap: 12px; align-items: center;">
       <span>OID: $sysObjectId</span>
       <span>&bull;</span>
-      <span>Template: SNMP Network Device</span>
+      <span>Template: Aruba Instant On 1930 64-bit HC</span>
       <span>&bull;</span>
       <span>Host ID Zabbix: $hostId</span>
       <span id="drawer-cpu-wrap" style="$(if (-not $cpuItem) { 'display: none;' })">&bull; CPU: <span id="drawer-cpu" style="color: #c084fc; font-weight: 700;">$cpuDisplay</span></span>
@@ -749,8 +870,8 @@ $null = $sb.AppendLine(@"
 </div>
 
 <!-- LEGEND ROW -->
-<div style="display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: #8b949e; padding: 2px 4px; margin-bottom: 22px;">
-  <div style="display: flex; align-items: center; gap: 20px;">
+<div style="display: flex; justify-content: space-between; align-items: center; font-size: 10.5px; color: #8b949e; padding: 2px 4px; margin-bottom: 14px; flex-wrap: wrap; gap: 8px;">
+  <div style="display: flex; align-items: center; gap: 18px; flex-wrap: wrap;">
     <div style="display: flex; align-items: center; gap: 6px;">
       <span style="width: 14px; height: 3px; border-radius: 2px; background-color: #00e676; display: inline-block;"></span>
       <span>Link 1 Gb/s ou 10 Gb/s</span>
@@ -768,69 +889,81 @@ $null = $sb.AppendLine(@"
       <span>Sem link / dispon&iacute;vel</span>
     </div>
   </div>
-  <div style="display: flex; align-items: center; gap: 6px; color: #64748b; font-size: 10.5px;">
-    <span>&#9758; Clique em qualquer porta para inspecionar &bull; Clique no bot&atilde;o 'Loc' para abrir as informa&ccedil;&otilde;es do ativo</span>
+  <div style="display: flex; align-items: center; gap: 6px; color: #64748b; font-size: 10px;">
+    <span>&#9758; Clique em qualquer porta, KPI ou evento para inspecionar no Oscilosc&oacute;pio</span>
   </div>
 </div>
 
-<!-- BOTTOM GRID: SELECTED PORT DETAIL + EVENTS -->
-<div style="display: grid; grid-template-columns: 1.6fr 1.1fr; gap: 18px; align-items: stretch;">
+<!-- BOTTOM GRID: SELECTED PORT DETAIL + COMPLETE PORT RANKING & EVENTS -->
+<div style="display: grid; grid-template-columns: 1.55fr 1.15fr; gap: 14px; align-items: stretch;">
 
   <!-- Selected Port Detail Panel -->
-  <div style="background: #121620; border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 8px; padding: 16px 20px; display: flex; flex-direction: column;">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-      <div style="font-size: 10.5px; font-weight: 700; letter-spacing: 0.8px; color: #8b949e; text-transform: uppercase;">DETALHE DA PORTA SELECIONADA</div>
-      <div id="sel-port-type" style="font-size: 11px; font-weight: 700; color: #ff8300; letter-spacing: 0.5px;">ARUBA 1GBE RJ45</div>
+  <div style="background: #121620; border: 1px solid rgba(255, 255, 255, 0.07); border-radius: 8px; padding: 14px 18px; display: flex; flex-direction: column;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+      <div style="font-size: 10px; font-weight: 700; letter-spacing: 0.8px; color: #8b949e; text-transform: uppercase;">INSPE&Ccedil;&Atilde;O &amp; OSCILOSC&Oacute;PIO DA PORTA SELECIONADA</div>
+      <div id="sel-port-type" style="font-size: 10.5px; font-weight: 700; color: #ff8300; letter-spacing: 0.5px;">ARUBA 1GBE RJ45</div>
     </div>
 
-    <div style="display: flex; align-items: baseline; gap: 10px; margin-bottom: 14px;">
-      <h2 id="sel-port-title" style="font-size: 25px; font-weight: 800; color: #ffffff; margin: 0; letter-spacing: -0.5px;">Porta 24</h2>
-      <span id="sel-port-name" style="font-size: 13px; color: #8b949e; font-weight: 500;">$($initP.Name) &bull; $initSub</span>
-      <span id="sel-port-status" style="background: rgba(0, 230, 118, 0.15); color: #00e676; font-size: 10.5px; font-weight: 800; padding: 2px 8px; border-radius: 4px; border: 1px solid rgba(0, 230, 118, 0.3);">UP</span>
-      <span id="sel-port-poe" style="display: $(if ($initP.PoEStatus -eq 3) { 'inline-block' } else { 'none' }); background: rgba(234, 179, 8, 0.15); color: #facc15; font-size: 10.5px; font-weight: 800; padding: 2px 8px; border-radius: 4px; border: 1px solid rgba(234, 179, 8, 0.3);">&#9889; POE: <span id="sel-port-poe-val">$($initP.PoEPower) W</span></span>
+    <div style="display: flex; align-items: baseline; gap: 10px; margin-bottom: 12px; flex-wrap: wrap;">
+      <h2 id="sel-port-title" style="font-size: 24px; font-weight: 800; color: #ffffff; margin: 0; letter-spacing: -0.5px;">Porta 24</h2>
+      <span id="sel-port-name" style="font-size: 12.5px; color: #8b949e; font-weight: 500;">$($initP.Name) &bull; $initSub</span>
+      <span id="sel-port-status" style="background: rgba(0, 230, 118, 0.15); color: #00e676; font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 4px; border: 1px solid rgba(0, 230, 118, 0.3);">UP</span>
+      <span id="sel-port-poe" style="display: $(if ($initP.PoEStatus -eq 3) { 'inline-block' } else { 'none' }); background: rgba(234, 179, 8, 0.15); color: #facc15; font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 4px; border: 1px solid rgba(234, 179, 8, 0.3);">&#9889; POE: <span id="sel-port-poe-val">$($initP.PoEPower) W</span></span>
     </div>
 
-    <!-- 5 Stats Cards -->
-    <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 14px;">
-      <div>
-        <div style="font-size: 9px; font-weight: 700; color: #8b949e; text-transform: uppercase; margin-bottom: 3px;">VELOCIDADE</div>
-        <div id="sel-port-speed" style="font-size: 16px; font-weight: 800; color: #ffffff;">$initSpeedStr</div>
+    <!-- 6 Precision Telemetry Mini-Cards (including Peak w/ Timestamp & P95) -->
+    <div style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin-bottom: 12px;">
+      <div style="background: #0c1018; border: 1px solid #1b2434; border-radius: 6px; padding: 7px 9px;">
+        <div style="font-size: 8.5px; font-weight: 700; color: #8b949e; text-transform: uppercase; margin-bottom: 2px;">VELOCIDADE</div>
+        <div id="sel-port-speed" style="font-size: 14.5px; font-weight: 800; color: #ffffff; font-family: monospace;">$initSpeedStr</div>
+        <div id="sel-port-util-sub" style="font-size: 8.5px; color: #64748b; font-family: monospace; margin-top: 2px;">USO: <span id="sel-port-util" style="color: #38bdf8; font-weight: 700;">$initUtilStr</span></div>
       </div>
-      <div>
-        <div style="font-size: 9px; font-weight: 700; color: #8b949e; text-transform: uppercase; margin-bottom: 3px;">ENTRADA</div>
-        <div id="sel-port-in" style="font-size: 16px; font-weight: 800; color: #ffffff;">$initInFmt</div>
+      <div style="background: #0c1018; border: 1px solid #1b2434; border-radius: 6px; padding: 7px 9px;">
+        <div style="font-size: 8.5px; font-weight: 700; color: #8b949e; text-transform: uppercase; margin-bottom: 2px;">ENTRADA (IN)</div>
+        <div id="sel-port-in" style="font-size: 14.5px; font-weight: 800; color: #00b0ff; font-family: monospace;">$initInFmt</div>
+        <div style="font-size: 8.5px; color: #64748b; margin-top: 2px;">RX Tempo Real</div>
       </div>
-      <div>
-        <div style="font-size: 9px; font-weight: 700; color: #8b949e; text-transform: uppercase; margin-bottom: 3px;">SA&Iacute;DA</div>
-        <div id="sel-port-out" style="font-size: 16px; font-weight: 800; color: #ffffff;">$initOutFmt</div>
+      <div style="background: #0c1018; border: 1px solid #1b2434; border-radius: 6px; padding: 7px 9px;">
+        <div style="font-size: 8.5px; font-weight: 700; color: #8b949e; text-transform: uppercase; margin-bottom: 2px;">SA&Iacute;DA (OUT)</div>
+        <div id="sel-port-out" style="font-size: 14.5px; font-weight: 800; color: #00e676; font-family: monospace;">$initOutFmt</div>
+        <div style="font-size: 8.5px; color: #64748b; margin-top: 2px;">TX Tempo Real</div>
       </div>
-      <div>
-        <div style="font-size: 9px; font-weight: 700; color: #8b949e; text-transform: uppercase; margin-bottom: 3px;">UTILIZA&Ccedil;&Atilde;O</div>
-        <div id="sel-port-util" style="font-size: 16px; font-weight: 800; color: #ffffff;">$initUtilStr</div>
+      <div style="background: #0c1018; border: 1px solid #1b2434; border-radius: 6px; padding: 7px 9px;">
+        <div style="font-size: 8.5px; font-weight: 700; color: #8b949e; text-transform: uppercase; margin-bottom: 2px;">PICO NA JANELA</div>
+        <div id="sel-port-peak" style="font-size: 14.5px; font-weight: 800; color: #ffffff; font-family: monospace;">--</div>
+        <div id="sel-port-peak-time" style="font-size: 8.5px; color: #38bdf8; font-family: monospace; margin-top: 2px;">CARREGANDO...</div>
       </div>
-      <div>
-        <div style="font-size: 9px; font-weight: 700; color: #8b949e; text-transform: uppercase; margin-bottom: 3px;">ERROS / DESC</div>
-        <div id="sel-port-errors" style="font-size: 16px; font-weight: 800; color: #ffffff;" title="Erros e Descartes de Buffer">$initErrorsStr</div>
+      <div style="background: #0c1018; border: 1px solid rgba(250, 204, 21, 0.25); border-radius: 6px; padding: 7px 9px;">
+        <div style="font-size: 8.5px; font-weight: 700; color: #facc15; text-transform: uppercase; margin-bottom: 2px;">PERCENTIL 95</div>
+        <div id="sel-port-p95" style="font-size: 14.5px; font-weight: 800; color: #facc15; font-family: monospace;">--</div>
+        <div style="font-size: 8.5px; color: #64748b; margin-top: 2px;">Sustentado (P95)</div>
+      </div>
+      <div style="background: #0c1018; border: 1px solid #1b2434; border-radius: 6px; padding: 7px 9px;">
+        <div style="font-size: 8.5px; font-weight: 700; color: #8b949e; text-transform: uppercase; margin-bottom: 2px;">ERROS / DESC</div>
+        <div id="sel-port-errors" style="font-size: 14.5px; font-weight: 800; color: #ffffff; font-family: monospace;" title="Erros e Descartes de Buffer">$initErrorsStr</div>
+        <div style="font-size: 8.5px; color: #64748b; margin-top: 2px;">Sa&uacute;de F&iacute;sica</div>
       </div>
     </div>
 
-    <!-- Real Historical Traffic Canvas -->
-    <div id="chart-card-container" style="background: #090c12; border: 1px solid #1a2230; border-radius: 6px; padding: 10px 14px; position: relative; height: 260px; max-height: 260px; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+    <!-- Real Historical Traffic Canvas (v12 Engine with P95 & padLeft=84) -->
+    <div id="chart-card-container" style="background: #090c12; border: 1px solid #1a2230; border-radius: 6px; padding: 10px 14px; position: relative; height: 265px; max-height: 265px; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 6px;">
         <div style="display: flex; align-items: center; gap: 8px;">
           <span style="font-size: 10px; font-weight: 800; letter-spacing: 0.6px; color: #94a3b8; text-transform: uppercase;">HIST&Oacute;RICO DE TR&Aacute;FEGO (SNMP)</span>
           <span id="canvas-max-label" style="font-size: 9.5px; color: #38bdf8; font-family: monospace; font-weight: 700; background: rgba(0, 176, 255, 0.1); padding: 1px 6px; border-radius: 3px; border: 1px solid rgba(0, 176, 255, 0.2);">Hist&oacute;rico Real Zabbix</span>
         </div>
-        <div style="display: flex; align-items: center; gap: 10px;">
-          <div style="display: flex; align-items: center; gap: 4px; background: #0c121e; border: 1px solid #1e293b; border-radius: 6px; padding: 2px 4px;">
-            <span style="font-size: 8.5px; font-weight: 800; color: #64748b; margin-right: 4px; letter-spacing: 0.5px;">JANELA:</span>
-            <button id="btn-range-3" type="button" onclick="if(window.__arubaChangeRange)window.__arubaChangeRange(3);" style="background: #00b0ff; color: #050b14; border: none; border-radius: 4px; padding: 2px 8px; font-size: 10px; font-weight: 800; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 0 8px rgba(0, 176, 255, 0.6);">3h</button>
-            <button id="btn-range-6" type="button" onclick="if(window.__arubaChangeRange)window.__arubaChangeRange(6);" style="background: transparent; color: #94a3b8; border: none; border-radius: 4px; padding: 2px 8px; font-size: 10px; font-weight: 700; cursor: pointer; transition: all 0.2s ease;">6h</button>
-            <button id="btn-range-12" type="button" onclick="if(window.__arubaChangeRange)window.__arubaChangeRange(12);" style="background: transparent; color: #94a3b8; border: none; border-radius: 4px; padding: 2px 8px; font-size: 10px; font-weight: 700; cursor: pointer; transition: all 0.2s ease;">12h</button>
-            <button id="btn-range-24" type="button" onclick="if(window.__arubaChangeRange)window.__arubaChangeRange(24);" style="background: transparent; color: #94a3b8; border: none; border-radius: 4px; padding: 2px 8px; font-size: 10px; font-weight: 700; cursor: pointer; transition: all 0.2s ease;">24h</button>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <div style="display: flex; align-items: center; gap: 3px; background: #0c121e; border: 1px solid #1e293b; border-radius: 6px; padding: 2px 4px;">
+            <span style="font-size: 8.5px; font-weight: 800; color: #64748b; margin-right: 3px; letter-spacing: 0.5px;">JANELA:</span>
+            <button id="btn-range-1" type="button" onclick="if(window.__arubaChangeRange)window.__arubaChangeRange(1);" style="background: transparent; color: #94a3b8; border: none; border-radius: 4px; padding: 2px 7px; font-size: 9.5px; font-weight: 700; cursor: pointer; transition: all 0.2s ease;">1h</button>
+            <button id="btn-range-3" type="button" onclick="if(window.__arubaChangeRange)window.__arubaChangeRange(3);" style="background: #00b0ff; color: #050b14; border: none; border-radius: 4px; padding: 2px 7px; font-size: 9.5px; font-weight: 800; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 0 8px rgba(0, 176, 255, 0.6);">3h</button>
+            <button id="btn-range-6" type="button" onclick="if(window.__arubaChangeRange)window.__arubaChangeRange(6);" style="background: transparent; color: #94a3b8; border: none; border-radius: 4px; padding: 2px 7px; font-size: 9.5px; font-weight: 700; cursor: pointer; transition: all 0.2s ease;">6h</button>
+            <button id="btn-range-12" type="button" onclick="if(window.__arubaChangeRange)window.__arubaChangeRange(12);" style="background: transparent; color: #94a3b8; border: none; border-radius: 4px; padding: 2px 7px; font-size: 9.5px; font-weight: 700; cursor: pointer; transition: all 0.2s ease;">12h</button>
+            <button id="btn-range-24" type="button" onclick="if(window.__arubaChangeRange)window.__arubaChangeRange(24);" style="background: transparent; color: #94a3b8; border: none; border-radius: 4px; padding: 2px 7px; font-size: 9.5px; font-weight: 700; cursor: pointer; transition: all 0.2s ease;">24h</button>
+            <button id="btn-range-168" type="button" onclick="if(window.__arubaChangeRange)window.__arubaChangeRange(168);" style="background: transparent; color: #94a3b8; border: none; border-radius: 4px; padding: 2px 7px; font-size: 9.5px; font-weight: 700; cursor: pointer; transition: all 0.2s ease;">7d</button>
           </div>
-          <button id="btn-reset-zoom" type="button" onclick="if(window.__arubaResetZoom)window.__arubaResetZoom();" style="display: none; background: rgba(0, 176, 255, 0.15); color: #38bdf8; border: 1px solid #00b0ff; border-radius: 4px; padding: 2px 8px; font-size: 10px; font-weight: 700; cursor: pointer; transition: all 0.2s ease; position: relative; z-index: 999; pointer-events: auto;">&#x21bb; RESET ZOOM</button>
-          <span id="canvas-hint-label" style="font-size: 9px; color: #64748b; font-family: monospace;">&#10022; arraste para zoom &bull; duplo clique reset</span>
+          <button id="btn-reset-zoom" type="button" onclick="if(window.__arubaResetZoom)window.__arubaResetZoom();" style="display: none; background: rgba(0, 176, 255, 0.15); color: #38bdf8; border: 1px solid #00b0ff; border-radius: 4px; padding: 2px 8px; font-size: 9.5px; font-weight: 700; cursor: pointer; transition: all 0.2s ease; position: relative; z-index: 999; pointer-events: auto;">&#x21bb; RESET ZOOM</button>
+          <span id="canvas-hint-label" style="font-size: 9px; color: #64748b; font-family: monospace;">&#10022; passe o mouse &bull; arraste p/ zoom</span>
         </div>
       </div>
 
@@ -852,13 +985,16 @@ $null = $sb.AppendLine(@"
 
       <canvas id="port-chart-canvas" width="700" height="190" style="width: 100%; height: 190px; max-height: 190px; display: block; cursor: crosshair;"></canvas>
       
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px; font-size: 10.5px;">
-        <div style="display: flex; gap: 18px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px; font-size: 10px;">
+        <div style="display: flex; gap: 16px; align-items: center;">
           <span id="legend-in" style="color: #00b0ff; display: flex; align-items: center; gap: 6px; cursor: pointer; user-select: none; font-weight: 600; transition: all 0.2s ease;" title="Clique para alternar exibi&ccedil;&atilde;o de Entrada">
             <span style="width: 12px; height: 3px; border-radius: 1px; background: #00b0ff; display: inline-block;"></span> Entrada (Inbound)
           </span>
           <span id="legend-out" style="color: #00e676; display: flex; align-items: center; gap: 6px; cursor: pointer; user-select: none; font-weight: 600; transition: all 0.2s ease;" title="Clique para alternar exibi&ccedil;&atilde;o de Sa&iacute;da">
             <span style="width: 12px; height: 3px; border-radius: 1px; background: #00e676; display: inline-block;"></span> Sa&iacute;da (Outbound)
+          </span>
+          <span id="legend-p95" style="color: #facc15; display: flex; align-items: center; gap: 6px; cursor: pointer; user-select: none; font-weight: 600; transition: all 0.2s ease;" title="Clique para alternar linha de Percentil 95">
+            <span style="width: 12px; height: 0; border-top: 2px dashed #facc15; display: inline-block;"></span> P95 (Percentil 95)
           </span>
         </div>
         <span id="canvas-hover-val" style="color: #38bdf8; font-family: monospace; font-size: 10px; font-weight: 600;"></span>
@@ -867,28 +1003,32 @@ $null = $sb.AppendLine(@"
 
   </div> <!-- End Selected Port Panel -->
 
-  <!-- Right Column: Top Talkers + Real Events -->
+  <!-- Right Column: Complete Live Port Ranking (Filterable) + Real Events -->
   <div style="display: flex; flex-direction: column; gap: 12px; height: 100%;">
-    <!-- Top Talkers Widget -->
-    <div style="background: #121620; border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 8px; padding: 12px 16px; flex-shrink: 0;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-        <div style="font-size: 10.5px; font-weight: 700; letter-spacing: 0.8px; color: #8b949e; text-transform: uppercase; display: flex; align-items: center; gap: 6px;">
-          <span style="color: #ffd700;">&#9733;</span> TOP CONSUMIDORES DE TR&Aacute;FEGO
+    <!-- Live Port Ranking & Filter Widget -->
+    <div style="background: #121620; border: 1px solid rgba(255, 255, 255, 0.07); border-radius: 8px; padding: 12px 14px; flex-shrink: 0;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 6px;">
+        <div style="font-size: 10px; font-weight: 700; letter-spacing: 0.7px; color: #8b949e; text-transform: uppercase; display: flex; align-items: center; gap: 5px;">
+          <span style="color: #ffd700;">&#9733;</span> PORTAS &amp; CONSUMO AO VIVO
         </div>
-        <div style="font-size: 9.5px; font-weight: 700; color: #38bdf8; font-family: monospace; background: rgba(0, 176, 255, 0.1); padding: 1px 6px; border-radius: 3px; border: 1px solid rgba(0, 176, 255, 0.2);">TOP 3 AO VIVO</div>
+        <div style="display: flex; align-items: center; gap: 4px; background: #090d14; border: 1px solid #1e293b; border-radius: 5px; padding: 2px 3px;">
+          <button id="btn-pf-up" type="button" onclick="if(window.__arubaSetPortFilter)window.__arubaSetPortFilter('up');" style="background: #00b0ff; color: #050b14; border: none; border-radius: 4px; padding: 2px 7px; font-size: 9px; font-weight: 800; cursor: pointer;">ATIVAS UP (<span id="pf-count-up">$activeCount</span>)</button>
+          <button id="btn-pf-deg" type="button" onclick="if(window.__arubaSetPortFilter)window.__arubaSetPortFilter('deg');" style="background: transparent; color: #f59e0b; border: none; border-radius: 4px; padding: 2px 7px; font-size: 9px; font-weight: 700; cursor: pointer;">DEGRADADAS (<span id="pf-count-deg">$degradedCount</span>)</button>
+          <button id="btn-pf-all" type="button" onclick="if(window.__arubaSetPortFilter)window.__arubaSetPortFilter('all');" style="background: transparent; color: #94a3b8; border: none; border-radius: 4px; padding: 2px 7px; font-size: 9px; font-weight: 700; cursor: pointer;">TODAS (28)</button>
+        </div>
       </div>
-      <div id="top-talkers-container" style="display: flex; flex-direction: column; gap: 6px;">
+      <div id="top-talkers-container" class="sw-custom-scroll" style="display: flex; flex-direction: column; gap: 5px; max-height: 178px; overflow-y: auto; padding-right: 3px;">
 $topTalkersInitialHtml
       </div>
     </div>
 
     <!-- Real Events Timeline Panel -->
-    <div style="background: #121620; border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 8px; padding: 12px 16px; flex: 1; display: flex; flex-direction: column; min-height: 0;">
+    <div style="background: #121620; border: 1px solid rgba(255, 255, 255, 0.07); border-radius: 8px; padding: 12px 14px; flex: 1; display: flex; flex-direction: column; min-height: 0;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-shrink: 0;">
-        <div style="font-size: 10.5px; font-weight: 700; letter-spacing: 0.8px; color: #8b949e; text-transform: uppercase;">EVENTOS DE PORTA &bull; BAMEX $switchShortName</div>
-        <div style="font-size: 10px; font-weight: 700; color: #64748b; text-transform: uppercase;">ZABBIX EVENT.GET</div>
+        <div style="font-size: 10px; font-weight: 700; letter-spacing: 0.7px; color: #8b949e; text-transform: uppercase;">EVENTOS DE PORTA &bull; BAMEX $switchShortName</div>
+        <div style="font-size: 9.5px; font-weight: 700; color: #64748b; text-transform: uppercase;">ZABBIX EVENT.GET</div>
       </div>
-      <div id="event-list-container" style="display: flex; flex-direction: column; gap: 6px; flex: 1;">
+      <div id="event-list-container" style="display: flex; flex-direction: column; gap: 5px; flex: 1;">
 $eventsHtml
       </div>
     </div>
@@ -969,10 +1109,12 @@ $jsCodeTemplate = @'
 
     const ports = __PORTS_JSON_PLACEHOLDER__;
     let selectedPortNum = 24;
+    let currentPortFilter = 'up'; // 'up' | 'deg' | 'all'
+    window.switchIp = '__SWITCH_IP_PLACEHOLDER__';
 
     // 2. LRU History Cache with 60s TTL
     const CACHE_TTL_MS = 60000;
-    const MAX_CACHE_ENTRIES = 12;
+    const MAX_CACHE_ENTRIES = 18;
     const historyCache = new Map();
 
     function getCachedHistory(key) {
@@ -1006,7 +1148,8 @@ $jsCodeTemplate = @'
     }
 
     let selectedTimeRangeHours = 3;
-    let activeAlertPorts = new Set(__INITIAL_ALERT_PORTS_PLACEHOLDER__);
+    const _initAlertsRaw = __INITIAL_ALERT_PORTS_PLACEHOLDER__;
+    let activeAlertPorts = new Set(Array.isArray(_initAlertsRaw) ? _initAlertsRaw : (_initAlertsRaw ? [_initAlertsRaw] : []));
     window.__arubaSelectedTimeRange = selectedTimeRangeHours;
 
     window.__arubaChangeRange = function(val) {
@@ -1020,7 +1163,7 @@ $jsCodeTemplate = @'
         }
 
         // Visual highlight for active range button
-        [3, 6, 12, 24].forEach(h => {
+        [1, 3, 6, 12, 24, 168].forEach(h => {
           const btn = getEl('btn-range-' + h);
           if (btn) {
             if (h === hrs) {
@@ -1039,7 +1182,7 @@ $jsCodeTemplate = @'
 
         historyCache.clear();
 
-        safeSetText('canvas-hint-label', 'Carregando ' + hrs + 'h...');
+        safeSetText('canvas-hint-label', 'Carregando ' + (hrs === 168 ? '7d' : (hrs + 'h')) + '...');
         fetchPortHistory(selectedPortNum);
       } catch (e) {
         console.warn('changeRange error:', e);
@@ -1088,6 +1231,89 @@ $jsCodeTemplate = @'
       if (b > 0) return Math.round(b) + ' bps';
       return '0 bps';
     }
+
+    function calcP95(vals) {
+      if (!vals || !vals.length) return 0;
+      const sorted = vals.slice().sort((a, b) => a - b);
+      const idx = Math.min(sorted.length - 1, Math.floor(sorted.length * 0.95));
+      return sorted[idx] || 0;
+    }
+
+    // Copy IP helper
+    window.__arubaCopyIp = function() {
+      try {
+        const ip = window.switchIp || '__SWITCH_IP_PLACEHOLDER__';
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(ip);
+        }
+        const badge = getEl('header-ip-copy');
+        if (badge) {
+          const orig = badge.innerHTML;
+          badge.innerHTML = '\u2713 IP COPIADO (' + ip + ')';
+          badge.style.color = '#00e676';
+          badge.style.borderColor = 'rgba(0, 230, 118, 0.5)';
+          setTimeout(() => {
+            try {
+              badge.innerHTML = 'IP: <span id="header-ip-text">' + ip + '</span> &#10064;';
+              badge.style.color = '#38bdf8';
+              badge.style.borderColor = 'rgba(56, 189, 248, 0.3)';
+            } catch (e) {}
+          }, 1600);
+        }
+      } catch (e) {}
+    };
+
+    // Quick KPI Shortcuts
+    window.__arubaInspectFirstDegraded = function() {
+      try {
+        for (let p = 1; p <= 28; p++) {
+          const pt = ports[p];
+          if (pt && pt.OperStatus === 1) {
+            const spd = normalizeSpeedBps(pt.Speed, p);
+            if (spd > 0 && spd < 1000000000) {
+              if (window.__arubaSetPortFilter) window.__arubaSetPortFilter('deg');
+              selectPort(p);
+              return;
+            }
+          }
+        }
+      } catch (e) {}
+    };
+
+    window.__arubaInspectFirstAlert = function() {
+      try {
+        if (activeAlertPorts && activeAlertPorts.size > 0) {
+          const firstPort = activeAlertPorts.values().next().value;
+          if (firstPort) selectPort(firstPort);
+        }
+      } catch (e) {}
+    };
+
+    window.__arubaSetPortFilter = function(mode) {
+      try {
+        currentPortFilter = mode || 'up';
+        const btns = [
+          { id: 'btn-pf-up', m: 'up', activeBg: '#00b0ff', activeColor: '#050b14', idleColor: '#94a3b8' },
+          { id: 'btn-pf-deg', m: 'deg', activeBg: '#f59e0b', activeColor: '#050b14', idleColor: '#f59e0b' },
+          { id: 'btn-pf-all', m: 'all', activeBg: '#00b0ff', activeColor: '#050b14', idleColor: '#94a3b8' }
+        ];
+        btns.forEach(b => {
+          const el = getEl(b.id);
+          if (el) {
+            if (b.m === currentPortFilter) {
+              el.style.background = b.activeBg;
+              el.style.color = b.activeColor;
+              el.style.fontWeight = '800';
+            } else {
+              el.style.background = 'transparent';
+              el.style.color = b.idleColor;
+              el.style.fontWeight = '700';
+            }
+          }
+        });
+        updateTopTalkers();
+      } catch (e) {}
+    };
 
     // Interactive Unit Locator button function + Asset Drawer
     window.__arubaLocActive = false;
@@ -1168,10 +1394,17 @@ $jsCodeTemplate = @'
             window.__arubaToggleLoc();
           };
         }
+        const hdrLocBtn = getEl('btn-header-loc');
+        if (hdrLocBtn) {
+          hdrLocBtn.onclick = function(e) {
+            if (e) e.stopPropagation();
+            window.__arubaToggleLoc();
+          };
+        }
       } catch (e) {}
-    };
+    }
 
-    // Interactive Chart State & Render Engine
+    // Interactive Chart State & Render Engine (v12 Standard with P95 & padLeft=84)
     const chartState = {
       inPts: [],
       outPts: [],
@@ -1181,6 +1414,8 @@ $jsCodeTemplate = @'
       currentOutBps: 0,
       showIn: true,
       showOut: true,
+      showP95: true,
+      p95Val: 0,
       hoveredIdx: null,
       isInteractivityBound: false,
       isZoomed: false,
@@ -1201,9 +1436,10 @@ $jsCodeTemplate = @'
 
         if (restoredIn.length === 0 || restoredOut.length === 0) {
           const cacheKey = selectedPortNum + '_' + selectedTimeRangeHours;
-          if (historyCache[cacheKey]) {
-            restoredIn = [...(historyCache[cacheKey].inPts || [])];
-            restoredOut = [...(historyCache[cacheKey].outPts || [])];
+          const cached = getCachedHistory(cacheKey);
+          if (cached) {
+            restoredIn = [...(cached.inPts || [])];
+            restoredOut = [...(cached.outPts || [])];
             chartState.fullInPts = restoredIn;
             chartState.fullOutPts = restoredOut;
           }
@@ -1214,7 +1450,7 @@ $jsCodeTemplate = @'
 
         const btn = getEl('btn-reset-zoom');
         if (btn) btn.style.display = 'none';
-        safeSetText('canvas-hint-label', '\u2726 arraste para zoom \u2022 duplo clique reset');
+        safeSetText('canvas-hint-label', '\u2726 passe o mouse \u2022 arraste p/ zoom');
         renderCanvas();
       } catch (e) {
         console.warn('resetZoom error:', e);
@@ -1243,8 +1479,8 @@ $jsCodeTemplate = @'
         const h = canvas.height || 190;
         ctx.clearRect(0, 0, w, h);
 
-        const padLeft = 62;
-        const padRight = 14;
+        const padLeft = 84;
+        const padRight = 16;
         const padTop = 14;
         const padBottom = 22;
         const plotW = w - padLeft - padRight;
@@ -1259,6 +1495,39 @@ $jsCodeTemplate = @'
 
         const allVals = [...inVals, ...outVals, chartState.currentInBps || 0, chartState.currentOutBps || 0];
         let maxVal = Math.max(...allVals, 0);
+
+        // Compute Peak & Timestamp + P95
+        const combinedSeries = [];
+        let peakVal = 0;
+        let peakClock = 0;
+        const maxLen = Math.max(chartState.inPts.length, chartState.outPts.length);
+        for (let i = 0; i < maxLen; i++) {
+          const iv = chartState.inPts[i] ? (parseFloat(chartState.inPts[i].value) || 0) : 0;
+          const ov = chartState.outPts[i] ? (parseFloat(chartState.outPts[i].value) || 0) : 0;
+          const m = Math.max(iv, ov);
+          combinedSeries.push(m);
+          if (m >= peakVal) {
+            peakVal = m;
+            peakClock = (chartState.inPts[i] && chartState.inPts[i].clock) || (chartState.outPts[i] && chartState.outPts[i].clock) || 0;
+          }
+        }
+        const p95Val = calcP95(combinedSeries.length ? combinedSeries : allVals);
+        chartState.p95Val = p95Val;
+
+        safeSetText('sel-port-peak', formatTrafficBps(peakVal > 0 ? peakVal : maxVal));
+        if (peakClock > 0) {
+          const pd = new Date(parseInt(peakClock, 10) * 1000);
+          const pTime = pd.toTimeString().split(' ')[0].substring(0, 5);
+          if (selectedTimeRangeHours >= 24) {
+            const pDay = String(pd.getDate()).padStart(2, '0') + '/' + String(pd.getMonth() + 1).padStart(2, '0');
+            safeSetText('sel-port-peak-time', 'EM ' + pDay + ' ' + pTime);
+          } else {
+            safeSetText('sel-port-peak-time', '\u00c0S ' + pTime);
+          }
+        } else {
+          safeSetText('sel-port-peak-time', 'JANELA ATUAL');
+        }
+        safeSetText('sel-port-p95', formatTrafficBps(p95Val));
 
         function fmtBps(b) {
           return formatTrafficBps(b);
@@ -1283,7 +1552,7 @@ $jsCodeTemplate = @'
         }
 
         const peakScale = maxVal * 1.25;
-        safeSetText('canvas-max-label', fmtBps(peakScale) + ' m\u00e1x');
+        safeSetText('canvas-max-label', 'Pico: ' + fmtBps(maxVal) + ' \u2022 P95: ' + fmtBps(p95Val));
 
         // Draw Y-axis scale lines and numeric labels
         ctx.textAlign = 'right';
@@ -1313,7 +1582,7 @@ $jsCodeTemplate = @'
           ctx.fillStyle = '#64748b';
           ctx.font = '9.5px monospace';
           ctx.textAlign = 'center';
-          const stepsCount = (w > 700) ? 5 : 3;
+          const stepsCount = (w > 640) ? 5 : 3;
           const timeIndices = [];
           for (let s = 0; s < stepsCount; s++) {
             timeIndices.push(Math.round((s * (count - 1)) / (stepsCount - 1)));
@@ -1371,9 +1640,9 @@ $jsCodeTemplate = @'
           ctx.closePath();
           ctx.fill();
 
-          // Stroke Line (direct line segments, no artificial Bezier distortion)
+          // Stroke Line
           ctx.strokeStyle = colorHex;
-          ctx.lineWidth = 2.5;
+          ctx.lineWidth = 2.4;
           ctx.beginPath();
           coords.forEach((pt, idx) => {
             if (idx === 0) ctx.moveTo(pt.x, pt.y);
@@ -1381,13 +1650,13 @@ $jsCodeTemplate = @'
           });
           ctx.stroke();
 
-          // Dots (downsample if large point count to prevent GPU/CPU bottleneck)
+          // Sample Dots
           if (coords.length <= 150) {
             coords.forEach((pt, idx) => {
               const isLast = (idx === coords.length - 1);
               ctx.fillStyle = colorHex;
               ctx.beginPath();
-              ctx.arc(pt.x, pt.y, isLast ? 4 : 2.5, 0, Math.PI * 2);
+              ctx.arc(pt.x, pt.y, isLast ? 4 : 2.3, 0, Math.PI * 2);
               ctx.fill();
 
               if (isLast && chartState.hoveredIdx == null) {
@@ -1417,6 +1686,34 @@ $jsCodeTemplate = @'
 
         drawSeries(inCoords, '#00b0ff', 0, 176, 255, chartState.showIn);
         drawSeries(outCoords, '#00e676', 0, 230, 118, chartState.showOut);
+
+        // Draw 95th Percentile (P95) Dashed Reference Line
+        if (chartState.showP95 && p95Val > 0) {
+          const p95Y = Math.max(padTop + 6, Math.min(bottomY - 4, bottomY - ((p95Val / peakScale) * plotH)));
+          ctx.save();
+          ctx.strokeStyle = 'rgba(250, 204, 21, 0.8)';
+          ctx.lineWidth = 1.4;
+          ctx.setLineDash([6, 4]);
+          ctx.beginPath();
+          ctx.moveTo(padLeft, p95Y);
+          ctx.lineTo(w - padRight, p95Y);
+          ctx.stroke();
+          ctx.setLineDash([]);
+
+          const p95Label = 'P95: ' + fmtBps(p95Val);
+          ctx.font = 'bold 9.5px monospace';
+          const tw = ctx.measureText(p95Label).width + 10;
+          const lx = w - padRight - tw - 4;
+          const ly = Math.max(padTop + 2, p95Y - 15);
+          ctx.fillStyle = 'rgba(12, 16, 24, 0.9)';
+          ctx.fillRect(lx, ly, tw, 13);
+          ctx.strokeStyle = 'rgba(250, 204, 21, 0.45)';
+          ctx.strokeRect(lx, ly, tw, 13);
+          ctx.fillStyle = '#facc15';
+          ctx.textAlign = 'left';
+          ctx.fillText(p95Label, lx + 5, ly + 9.5);
+          ctx.restore();
+        }
 
         // Hover Crosshair & Glowing Target Halos
         if (chartState.hoveredIdx != null && count > 0) {
@@ -1495,7 +1792,6 @@ $jsCodeTemplate = @'
       if (canvas.__hasInteractiveBindings) return;
       canvas.__hasInteractiveBindings = true;
 
-      // Auto-resize listener to re-render chart whenever window or full screen state changes
       if (!canvas.__hasResizeObserver) {
         canvas.__hasResizeObserver = true;
         if (window.ResizeObserver) {
@@ -1517,8 +1813,8 @@ $jsCodeTemplate = @'
           if (count < 3) return;
           const rect = canvas.getBoundingClientRect();
           const clientX = (e.clientX - rect.left) * (canvas.width / rect.width);
-          const padLeft = 62;
-          const padRight = 14;
+          const padLeft = 84;
+          const padRight = 16;
           if (clientX >= padLeft && clientX <= canvas.width - padRight) {
             chartState.isDragging = true;
             chartState.dragStartX = clientX;
@@ -1535,8 +1831,8 @@ $jsCodeTemplate = @'
 
           const rect = canvas.getBoundingClientRect();
           const clientX = (e.clientX - rect.left) * (canvas.width / rect.width);
-          const padLeft = 62;
-          const padRight = 14;
+          const padLeft = 84;
+          const padRight = 16;
           const plotW = canvas.width - padLeft - padRight;
 
           if (chartState.isDragging) {
@@ -1591,17 +1887,14 @@ $jsCodeTemplate = @'
           if (tooltip) {
             const hoverPct = count === 1 ? 50 : ((padLeft + (bestIdx / (count - 1)) * plotW) / canvas.width) * 100;
             if (hoverPct > 68) {
-              // Right edge: dock to right border with comfortable breathing room, never squashing
               tooltip.style.left = 'auto';
               tooltip.style.right = '14px';
               tooltip.style.transform = 'none';
-            } else if (hoverPct < 32) {
-              // Left edge: dock past the Y-axis numeric scale
-              tooltip.style.left = '64px';
+            } else if (hoverPct < 34) {
+              tooltip.style.left = '86px';
               tooltip.style.right = 'auto';
               tooltip.style.transform = 'none';
             } else {
-              // Center zone: smoothly follow cursor centered
               tooltip.style.left = hoverPct + '%';
               tooltip.style.right = 'auto';
               tooltip.style.transform = 'translateX(-50%)';
@@ -1626,8 +1919,8 @@ $jsCodeTemplate = @'
           chartState.dragStartX = null;
           chartState.dragCurrentX = null;
 
-          const padLeft = 62;
-          const padRight = 14;
+          const padLeft = 84;
+          const padRight = 16;
           const plotW = canvas.width - padLeft - padRight;
           const count = Math.max(chartState.inPts.length, chartState.outPts.length);
 
@@ -1705,6 +1998,15 @@ $jsCodeTemplate = @'
           renderCanvas();
         };
       }
+      const legP95 = getEl('legend-p95');
+      if (legP95) {
+        legP95.onclick = function() {
+          chartState.showP95 = !chartState.showP95;
+          legP95.style.opacity = chartState.showP95 ? '1' : '0.35';
+          legP95.style.textDecoration = chartState.showP95 ? 'none' : 'line-through';
+          renderCanvas();
+        };
+      }
     }
 
     function drawRealChart(inPts, outPts, currentInBps, currentOutBps, preserveZoom) {
@@ -1719,14 +2021,14 @@ $jsCodeTemplate = @'
         chartState.isZoomed = false;
         const btn = getEl('btn-reset-zoom');
         if (btn) btn.style.display = 'none';
-        safeSetText('canvas-hint-label', '\u2726 arraste para zoom \u2022 duplo clique reset');
+        safeSetText('canvas-hint-label', '\u2726 passe o mouse \u2022 arraste p/ zoom');
       }
 
       initChartInteractivity();
       renderCanvas();
     }
 
-    // Fetch granular history for selected port based on selectedTimeRangeHours
+    // Fetch granular history (or trend.get for 7d) for selected port
     async function fetchPortHistory(pNum, preserveZoom) {
       const p = ports[pNum];
       if (!p) return;
@@ -1748,66 +2050,111 @@ $jsCodeTemplate = @'
       try {
         const nowSec = Math.floor(Date.now() / 1000);
         const timeFrom = nowSec - (selectedTimeRangeHours * 3600);
-        const maxLimit = Math.min(1000, selectedTimeRangeHours * 35);
         const inVt = (p.InValueType != null) ? p.InValueType : 3;
         const outVt = (p.OutValueType != null) ? p.OutValueType : 3;
 
-        const [inResp, outResp] = await Promise.all([
-          fetchWithTimeout('__ZABBIX_URL_PLACEHOLDER__', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              jsonrpc: '2.0',
-              method: 'history.get',
-              params: {
-                itemids: [p.InItemId],
-                history: inVt,
-                time_from: timeFrom,
-                sortfield: 'clock',
-                sortorder: 'DESC',
-                limit: maxLimit
-              },
-              auth: '__ZABBIX_TOKEN_PLACEHOLDER__',
-              id: Date.now()
-            })
-          }),
-          fetchWithTimeout('__ZABBIX_URL_PLACEHOLDER__', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              jsonrpc: '2.0',
-              method: 'history.get',
-              params: {
-                itemids: [p.OutItemId],
-                history: outVt,
-                time_from: timeFrom,
-                sortfield: 'clock',
-                sortorder: 'DESC',
-                limit: maxLimit
-              },
-              auth: '__ZABBIX_TOKEN_PLACEHOLDER__',
-              id: Date.now() + 1
-            })
-          })
-        ]);
+        let inPts = [];
+        let outPts = [];
 
-        const inData = await inResp.json();
-        const outData = await outResp.json();
-        const inPts = (inData && inData.result) ? inData.result.slice().reverse() : [];
-        const outPts = (outData && outData.result) ? outData.result.slice().reverse() : [];
+        if (selectedTimeRangeHours <= 24) {
+          const maxLimit = Math.min(1200, selectedTimeRangeHours * 45);
+          const [inResp, outResp] = await Promise.all([
+            fetchWithTimeout('__ZABBIX_URL_PLACEHOLDER__', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                jsonrpc: '2.0',
+                method: 'history.get',
+                params: {
+                  itemids: [p.InItemId],
+                  history: inVt,
+                  time_from: timeFrom,
+                  sortfield: 'clock',
+                  sortorder: 'DESC',
+                  limit: maxLimit
+                },
+                auth: '__ZABBIX_TOKEN_PLACEHOLDER__',
+                id: Date.now()
+              })
+            }),
+            fetchWithTimeout('__ZABBIX_URL_PLACEHOLDER__', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                jsonrpc: '2.0',
+                method: 'history.get',
+                params: {
+                  itemids: [p.OutItemId],
+                  history: outVt,
+                  time_from: timeFrom,
+                  sortfield: 'clock',
+                  sortorder: 'DESC',
+                  limit: maxLimit
+                },
+                auth: '__ZABBIX_TOKEN_PLACEHOLDER__',
+                id: Date.now() + 1
+              })
+            })
+          ]);
+
+          const inData = await inResp.json();
+          const outData = await outResp.json();
+          inPts = (inData && inData.result) ? inData.result.slice().reverse() : [];
+          outPts = (outData && outData.result) ? outData.result.slice().reverse() : [];
+        }
+
+        // Fallback to trend.get for 7d (168h) or if history.get returned empty
+        if (inPts.length === 0 && outPts.length === 0) {
+          const [tInResp, tOutResp] = await Promise.all([
+            fetchWithTimeout('__ZABBIX_URL_PLACEHOLDER__', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                jsonrpc: '2.0',
+                method: 'trend.get',
+                params: {
+                  itemids: [p.InItemId],
+                  time_from: timeFrom,
+                  output: ['clock', 'value_avg', 'value_max']
+                },
+                auth: '__ZABBIX_TOKEN_PLACEHOLDER__',
+                id: Date.now() + 2
+              })
+            }),
+            fetchWithTimeout('__ZABBIX_URL_PLACEHOLDER__', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                jsonrpc: '2.0',
+                method: 'trend.get',
+                params: {
+                  itemids: [p.OutItemId],
+                  time_from: timeFrom,
+                  output: ['clock', 'value_avg', 'value_max']
+                },
+                auth: '__ZABBIX_TOKEN_PLACEHOLDER__',
+                id: Date.now() + 3
+              })
+            })
+          ]);
+          const tInData = await tInResp.json();
+          const tOutData = await tOutResp.json();
+          inPts = (tInData && tInData.result) ? tInData.result.map(x => ({ clock: x.clock, value: x.value_max || x.value_avg })) : [];
+          outPts = (tOutData && tOutData.result) ? tOutData.result.map(x => ({ clock: x.clock, value: x.value_max || x.value_avg })) : [];
+        }
 
         setCachedHistory(cacheKey, inPts, outPts);
         if (selectedPortNum === pNum) {
           drawRealChart(inPts, outPts, p.InBps || 0, p.OutBps || 0, preserveZoom);
         }
         if (!chartState.isZoomed) {
-          safeSetText('canvas-hint-label', '\u2726 passe o mouse');
+          safeSetText('canvas-hint-label', '\u2726 passe o mouse \u2022 arraste p/ zoom');
         }
       } catch (e) {
         console.warn('History fetch error for port ' + pNum, e);
         drawRealChart([], [], p.InBps || 0, p.OutBps || 0, preserveZoom);
         if (!chartState.isZoomed) {
-          safeSetText('canvas-hint-label', '\u2726 passe o mouse');
+          safeSetText('canvas-hint-label', '\u2726 passe o mouse \u2022 arraste p/ zoom');
         }
       }
     }
@@ -1820,27 +2167,52 @@ $jsCodeTemplate = @'
         const list = [];
         for (let p = 1; p <= 28; p++) {
           const pt = ports[p];
-          if (pt && pt.OperStatus === 1) {
-            const tot = (pt.InBps || 0) + (pt.OutBps || 0);
-            const alias = (pt && pt.Alias) ? pt.Alias : (pt.Name || ('Porta ' + p));
-            const spd = normalizeSpeedBps(pt.Speed, p);
-            const maxTraffic = Math.max(pt.InBps || 0, pt.OutBps || 0);
-            const utilPct = (spd > 0) ? ((maxTraffic / spd) * 100).toFixed(1) + '%' : '--';
-            list.push({
-              port: p,
-              name: pt.Name,
-              alias: alias,
-              inBps: pt.InBps || 0,
-              outBps: pt.OutBps || 0,
-              total: tot,
-              utilPct: utilPct
-            });
+          if (!pt) continue;
+          const isUp = (pt.OperStatus === 1);
+          const spd = normalizeSpeedBps(pt.Speed, p);
+          const isDeg = (isUp && spd > 0 && spd < 1000000000);
+
+          if (currentPortFilter === 'up' && !isUp) continue;
+          if (currentPortFilter === 'deg' && !isDeg) continue;
+
+          const tot = isUp ? ((pt.InBps || 0) + (pt.OutBps || 0)) : 0;
+          const alias = (pt && pt.Alias) ? pt.Alias : (pt.Name || ('Porta ' + p));
+          const maxTraffic = Math.max(pt.InBps || 0, pt.OutBps || 0);
+          const utilPct = (isUp && spd > 0) ? ((maxTraffic / spd) * 100).toFixed(1) + '%' : '--';
+          let spdShort = 'DOWN';
+          if (isUp) {
+            if (spd >= 10000000000) spdShort = '10G';
+            else if (spd >= 1000000000) spdShort = '1G';
+            else if (spd >= 100000000) spdShort = '100M';
+            else if (spd >= 10000000) spdShort = '10M';
+            else spdShort = 'UP';
           }
+          list.push({
+            port: p,
+            name: pt.Name,
+            alias: alias,
+            isUp: isUp,
+            isDeg: isDeg,
+            spdShort: spdShort,
+            inBps: pt.InBps || 0,
+            outBps: pt.OutBps || 0,
+            total: tot,
+            utilPct: utilPct
+          });
         }
 
-        list.sort((a, b) => b.total - a.total);
-        const top3 = list.slice(0, 3);
-        const maxTraffic = (top3.length > 0 && top3[0].total > 0) ? top3[0].total : 1;
+        if (currentPortFilter === 'all') {
+          list.sort((a, b) => (b.isUp - a.isUp) || (b.total - a.total) || (a.port - b.port));
+        } else {
+          list.sort((a, b) => (b.total - a.total) || (a.port - b.port));
+        }
+
+        if (list.length === 0) {
+          topContainer.innerHTML = `<div style="font-size: 11.5px; color: #8b949e; text-align: center; padding: 18px 8px;">Nenhuma porta encontrada neste filtro</div>`;
+          return;
+        }
+
+        const maxTraffic = (list.length > 0 && list[0].total > 0) ? list[0].total : 1;
 
         const medals = [
           { badge: '1\u00ba', color: '#ffd700', bg: 'rgba(255, 215, 0, 0.15)' },
@@ -1849,30 +2221,36 @@ $jsCodeTemplate = @'
         ];
 
         let html = '';
-        top3.forEach((item, idx) => {
-          const m = medals[idx] || medals[2];
-          const pct = Math.max(5, Math.min(100, Math.round((item.total / maxTraffic) * 100)));
+        list.forEach((item, idx) => {
+          const m = (idx < 3 && item.isUp)
+            ? medals[idx]
+            : { badge: '#' + (idx + 1), color: '#94a3b8', bg: 'rgba(148, 163, 184, 0.12)' };
+          const pct = item.isUp ? Math.max(4, Math.min(100, Math.round((item.total / maxTraffic) * 100))) : 0;
           const isSelected = (item.port === selectedPortNum);
           const borderStyle = isSelected
             ? 'border: 1px solid #00b0ff; box-shadow: 0 0 8px rgba(0, 176, 255, 0.3);'
-            : 'border: 1px solid #1e293b;';
+            : (item.isDeg ? 'border: 1px solid rgba(245, 158, 11, 0.4);' : 'border: 1px solid #1e293b;');
+          const spdColor = !item.isUp ? '#64748b' : (item.isDeg ? '#f59e0b' : '#00e676');
+          const spdBg = !item.isUp ? 'rgba(100, 116, 139, 0.12)' : (item.isDeg ? 'rgba(245, 158, 11, 0.16)' : 'rgba(0, 230, 118, 0.12)');
+          const barColor = item.isDeg ? '#f59e0b' : '#00b0ff';
 
           html += `
-            <div class="sw-top-talker" data-tt-port="${item.port}" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(${item.port});" style="background: #0d121c; border-radius: 4px; padding: 6px 10px; cursor: pointer; ${borderStyle} transition: all 0.2s ease;">
+            <div class="sw-top-talker" data-tt-port="${item.port}" onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(${item.port});" style="background: #0d121c; border-radius: 4px; padding: 5px 9px; cursor: pointer; ${borderStyle} transition: all 0.15s ease;">
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 3px;">
-                <div style="display: flex; align-items: center; gap: 7px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                <div style="display: flex; align-items: center; gap: 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                   <span style="font-size: 9px; font-weight: 800; color: ${m.color}; background: ${m.bg}; padding: 1px 5px; border-radius: 3px; font-family: monospace;">${m.badge}</span>
                   <span style="font-size: 11px; font-weight: 700; color: #ffffff;">Porta ${item.port}</span>
+                  <span style="font-size: 8.5px; font-weight: 800; color: ${spdColor}; background: ${spdBg}; padding: 1px 4px; border-radius: 3px; font-family: monospace;">${item.spdShort}</span>
                   <span style="font-size: 10px; color: #8b949e; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${item.alias}</span>
                 </div>
-                <div style="display: flex; align-items: center; gap: 6px;">
-                  <span style="font-size: 9px; font-weight: 700; color: #a78bfa; background: rgba(167, 139, 250, 0.12); padding: 1px 5px; border-radius: 3px; font-family: monospace;">${item.utilPct} uso</span>
-                  <div style="font-size: 11px; font-weight: 800; color: #38bdf8; font-family: monospace; white-space: nowrap; margin-left: 4px;">${formatTrafficBps(item.total)}</div>
+                <div style="display: flex; align-items: center; gap: 6px; flex-shrink: 0;">
+                  <span style="font-size: 8.5px; font-weight: 700; color: #a78bfa; background: rgba(167, 139, 250, 0.12); padding: 1px 4px; border-radius: 3px; font-family: monospace;">${item.utilPct} uso</span>
+                  <div style="font-size: 11px; font-weight: 800; color: #38bdf8; font-family: monospace; white-space: nowrap; margin-left: 2px;">${formatTrafficBps(item.total)}</div>
                 </div>
               </div>
               <div style="display: flex; align-items: center; gap: 8px;">
                 <div style="flex: 1; height: 3px; background: #1c2230; border-radius: 2px; overflow: hidden;">
-                  <div style="width: ${pct}%; height: 100%; background: #00b0ff; border-radius: 2px;"></div>
+                  <div style="width: ${pct}%; height: 100%; background: ${barColor}; border-radius: 2px;"></div>
                 </div>
                 <span style="font-size: 8.5px; color: #64748b; font-family: monospace; white-space: nowrap;">In: ${formatTrafficBps(item.inBps)} &bull; Out: ${formatTrafficBps(item.outBps)}</span>
               </div>
@@ -1901,8 +2279,17 @@ $jsCodeTemplate = @'
               try {
                 el.classList.remove('sw-selected');
                 const pId = parseInt(el.getAttribute('data-port') || '0', 10);
-                if (pId >= 25) {
-                  el.style.border = '1px solid #283344';
+                const ptObj = ports[pId];
+                const isUp = ptObj && ptObj.OperStatus === 1;
+                const spd = ptObj ? normalizeSpeedBps(ptObj.Speed, pId) : 0;
+                const isDeg = isUp && spd > 0 && spd < 1000000000;
+                const hasAlert = activeAlertPorts && activeAlertPorts.has(pId);
+                if (hasAlert) {
+                  el.style.border = '1px solid rgba(239, 68, 68, 0.7)';
+                } else if (isDeg) {
+                  el.style.border = '1px solid rgba(245, 158, 11, 0.65)';
+                } else if (pId >= 25) {
+                  el.style.border = isUp ? '1px solid #00b0ff' : '1px solid #283344';
                 } else {
                   el.style.border = '1px solid #263346';
                 }
@@ -1953,10 +2340,10 @@ $jsCodeTemplate = @'
             badge.style.borderColor = 'rgba(239, 68, 68, 0.4)';
           } else if (p.OperStatus === 1) {
             if (normSpeed < 1000000000 && normSpeed > 0) {
-              badge.innerText = 'UP (DEGRADADO)';
+              badge.innerText = 'UP (DEGRADADO 10/100M)';
               badge.style.color = '#f59e0b';
               badge.style.background = 'rgba(245, 158, 11, 0.15)';
-              badge.style.borderColor = 'rgba(245, 158, 11, 0.3)';
+              badge.style.borderColor = 'rgba(245, 158, 11, 0.35)';
             } else {
               badge.innerText = 'UP';
               badge.style.color = '#00e676';
@@ -1994,9 +2381,9 @@ $jsCodeTemplate = @'
         safeSetText('sel-port-in', formatTrafficBps(p.InBps));
         safeSetText('sel-port-out', formatTrafficBps(p.OutBps));
 
-        let util = '0,00%';
+        let util = '0.00%';
         if (normSpeed > 0 && p.OperStatus === 1) {
-          util = ((((p.InBps || 0) + (p.OutBps || 0)) / normSpeed) * 100).toFixed(2) + '%';
+          util = ((Math.max(p.InBps || 0, p.OutBps || 0) / normSpeed) * 100).toFixed(2) + '%';
         }
         safeSetText('sel-port-util', util);
 
@@ -2035,6 +2422,94 @@ $jsCodeTemplate = @'
               if (p) selectPort(p);
             } catch (err) {}
           };
+        });
+      } catch (e) {}
+    }
+
+    // Background Fleet Health Check for SW01..SW04 in Top Navigation Bar
+    async function pollBamexFleetStatus() {
+      if (document.hidden) return;
+      try {
+        const fleet = [
+          { short: 'SW01', hostId: '10682' },
+          { short: 'SW02', hostId: '10772' },
+          { short: 'SW03', hostId: '10773' },
+          { short: 'SW04', hostId: '10774' }
+        ];
+        const hostIds = fleet.map(f => f.hostId);
+        const [itemsRes, probsRes] = await Promise.all([
+          fetchWithTimeout('__ZABBIX_URL_PLACEHOLDER__', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              jsonrpc: '2.0',
+              method: 'item.get',
+              params: {
+                hostids: hostIds,
+                output: ['hostid', 'key_', 'lastvalue'],
+                search: { key_: 'net.if.status' }
+              },
+              auth: '__ZABBIX_TOKEN_PLACEHOLDER__',
+              id: Date.now() + 50
+            })
+          }),
+          fetchWithTimeout('__ZABBIX_URL_PLACEHOLDER__', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              jsonrpc: '2.0',
+              method: 'problem.get',
+              params: {
+                hostids: hostIds,
+                output: ['eventid', 'name'],
+                selectHosts: ['hostid']
+              },
+              auth: '__ZABBIX_TOKEN_PLACEHOLDER__',
+              id: Date.now() + 51
+            })
+          })
+        ]);
+        const itemsJson = await itemsRes.json();
+        const probsJson = await probsRes.json();
+        const upCountByHost = {};
+        const probCountByHost = {};
+        fleet.forEach(f => { upCountByHost[f.hostId] = 0; probCountByHost[f.hostId] = 0; });
+
+        if (itemsJson && itemsJson.result) {
+          itemsJson.result.forEach(it => {
+            if (it.key_ && it.key_.startsWith('net.if.status[') && parseInt(it.lastvalue, 10) === 1) {
+              if (it.key_.match(/\.(\d+)\]/) && parseInt(RegExp.$1, 10) >= 100000) return;
+              upCountByHost[it.hostid] = (upCountByHost[it.hostid] || 0) + 1;
+            }
+          });
+        }
+        if (probsJson && probsJson.result) {
+          probsJson.result.forEach(pr => {
+            if (pr.hosts && pr.hosts[0] && pr.hosts[0].hostid) {
+              const hid = pr.hosts[0].hostid;
+              probCountByHost[hid] = (probCountByHost[hid] || 0) + 1;
+            }
+          });
+        }
+
+        fleet.forEach(f => {
+          const dot = getEl('sw-nav-dot-' + f.short);
+          const meta = getEl('sw-nav-meta-' + f.short);
+          const probs = probCountByHost[f.hostId] || 0;
+          const ups = upCountByHost[f.hostId] || 0;
+          if (dot) {
+            if (probs > 0) {
+              dot.style.background = '#f59e0b';
+              dot.style.boxShadow = '0 0 7px #f59e0b';
+            } else {
+              dot.style.background = '#00e676';
+              dot.style.boxShadow = '0 0 6px #00e676';
+            }
+          }
+          if (meta && ups > 0) {
+            meta.innerHTML = `${ups}/28 UP &#8599;`;
+            meta.style.color = '#94a3b8';
+          }
         });
       } catch (e) {}
     }
@@ -2137,7 +2612,7 @@ $jsCodeTemplate = @'
           if (mainIf && mainIf.ip) {
             const liveIp = mainIf.ip;
             window.switchIp = liveIp;
-            safeSetText('header-switch-ip', '24x GbE RJ45 + 4x SFP+ 10G \u2022 L2+ Managed \u2022 JL682A \u2022 IP: ' + liveIp);
+            safeSetText('header-ip-text', liveIp);
             safeSetText('drawer-switch-ip', liveIp);
             const guiLink = getEl('drawer-gui-link');
             if (guiLink) {
@@ -2184,6 +2659,7 @@ $jsCodeTemplate = @'
         const faultLed = getEl('led-fault');
         const faultWrap = getEl('led-fault-wrap');
         const kpiAlert = getEl('kpi-alert-count');
+        const kpiAlertChips = getEl('kpi-alert-chips');
 
         if (faultLed) {
           if (problems.length > 0) {
@@ -2208,8 +2684,17 @@ $jsCodeTemplate = @'
           kpiAlert.innerText = problems.length + '';
           kpiAlert.style.color = (problems.length > 0) ? '#ef4444' : '#00e676';
         }
+        if (kpiAlertChips) {
+          if (activeAlertPorts.size > 0) {
+            kpiAlertChips.innerHTML = Array.from(activeAlertPorts).map(pNum =>
+              `<span onclick="event.stopPropagation();if(window.__arubaSelectPort)window.__arubaSelectPort(${pNum});" style="background: rgba(239, 68, 68, 0.18); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.4); font-size: 9.5px; font-weight: 800; padding: 1px 6px; border-radius: 4px; cursor: pointer; font-family: monospace;">&#9888; Porta ${pNum}</span>`
+            ).join(' ');
+          } else {
+            kpiAlertChips.innerHTML = `<span style="background: rgba(0, 230, 118, 0.12); color: #00e676; font-size: 9px; font-weight: 700; padding: 1px 6px; border-radius: 4px; font-family: monospace;">&#10003; SAUD&Aacute;VEL</span>`;
+          }
+        }
 
-        // 3. Process Events & Render List
+        // 3. Process Events & Render Clickable List
         if (eventsData && eventsData.result && eventsData.result.length > 0) {
           const eventsContainer = getEl('event-list-container');
           if (eventsContainer) {
@@ -2222,15 +2707,20 @@ $jsCodeTemplate = @'
               const badgeColor = isResolved ? '#00e676' : '#ef4444';
               const badgeText = isResolved ? 'RESOLVIDO' : 'PROBLEMA';
               const safeName = (ev.name || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+              const mPort = (ev.name || '').match(/\b(?:Interface|Port|GigabitEthernet|TenGigabitEthernet|SFP\+?)\s+(\d{1,2})(?:\s|\(|:|$|\b)/i);
+              const pNum = mPort ? parseInt(mPort[1], 10) : 0;
+              const clickAttr = (pNum >= 1 && pNum <= 28)
+                ? `onclick="if(window.__arubaSelectPort)window.__arubaSelectPort(${pNum});" title="Clique para inspecionar a Porta ${pNum}"`
+                : '';
 
               return `
-                <div style="display: flex; align-items: center; justify-content: space-between; font-size: 11.5px; color: #e2e8f0; background: #0d121c; padding: 5px 9px; border-radius: 4px; border-left: 3px solid ${dotColor};">
-                  <div style="display: flex; align-items: center; gap: 8px;">
-                    <span style="color: #8b949e; font-family: monospace; min-width: 54px; font-size: 10.5px;">${dt}</span>
-                    <span style="width: 6px; height: 6px; border-radius: 50%; background: ${dotColor}; ${shadow} display: inline-block;"></span>
-                    <span style="font-weight: 500;">${safeName}</span>
+                <div class="sw-event-row" ${clickAttr} style="display: flex; align-items: center; justify-content: space-between; font-size: 11px; color: #e2e8f0; background: #0d121c; padding: 5px 9px; border-radius: 4px; border-left: 3px solid ${dotColor}; cursor: pointer; transition: background 0.15s ease;">
+                  <div style="display: flex; align-items: center; gap: 7px; overflow: hidden;">
+                    <span style="color: #8b949e; font-family: monospace; min-width: 52px; font-size: 10px;">${dt}</span>
+                    <span style="width: 6px; height: 6px; border-radius: 50%; background: ${dotColor}; ${shadow} display: inline-block; flex-shrink: 0;"></span>
+                    <span style="font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${safeName}</span>
                   </div>
-                  <span style="background: ${badgeBg}; color: ${badgeColor}; font-size: 9px; font-weight: 700; padding: 2px 5px; border-radius: 3px; font-family: monospace;">${badgeText}</span>
+                  <span style="background: ${badgeBg}; color: ${badgeColor}; font-size: 8.5px; font-weight: 700; padding: 2px 5px; border-radius: 3px; font-family: monospace; flex-shrink: 0; margin-left: 6px;">${badgeText}</span>
                 </div>
               `;
             }).join('');
@@ -2242,8 +2732,12 @@ $jsCodeTemplate = @'
         if (res && res.result) {
           let activeTotal = 0;
           let degradedTotal = 0;
+          let sfpActiveTotal = 0;
+          let totalIn = 0;
+          let totalOut = 0;
           let trafficTotal = 0;
           let pingStatus = 1;
+          const degradedList = [];
 
           res.result.forEach(it => {
             try {
@@ -2350,9 +2844,24 @@ $jsCodeTemplate = @'
 
               if (isUp) {
                 activeTotal++;
-                if (isDegraded) degradedTotal++;
+                if (p >= 25) sfpActiveTotal++;
+                if (isDegraded) {
+                  degradedTotal++;
+                  degradedList.push({ port: p, spdLabel: Math.round(normSpd / 1000000) + 'M' });
+                }
               }
+              totalIn += (pt.InBps || 0);
+              totalOut += (pt.OutBps || 0);
               trafficTotal += ((pt.InBps || 0) + (pt.OutBps || 0));
+
+              // Update SFP+ mini pill in KPI 5
+              if (p >= 25) {
+                const sfpPill = getEl('kpi-sfp-pill-' + p);
+                if (sfpPill) {
+                  sfpPill.style.background = isUp ? 'rgba(0, 230, 118, 0.18)' : '#1c2230';
+                  sfpPill.style.color = isUp ? '#00e676' : '#64748b';
+                }
+              }
 
               let ledColor = '#27303f';
               let ledShadow = 'none';
@@ -2407,12 +2916,16 @@ $jsCodeTemplate = @'
                     led1.classList.remove('sw-led-act');
                   }
                 }
-                if (hasAlert) {
-                  pEl.style.border = (p === selectedPortNum) ? '2px solid #00b0ff' : '1px solid rgba(239, 68, 68, 0.6)';
+                if (p === selectedPortNum) {
+                  pEl.style.border = '2px solid #00b0ff';
+                } else if (hasAlert) {
+                  pEl.style.border = '1px solid rgba(239, 68, 68, 0.7)';
+                } else if (isDegraded) {
+                  pEl.style.border = '1px solid rgba(245, 158, 11, 0.65)';
                 }
                 const statusDesc = hasAlert ? 'DOWN (ALARME)' : (isUp ? (isDegraded ? 'UP (DEGRADADO)' : 'UP') : 'DOWN');
                 const speedText = (!isUp ? '--' : (normSpd >= 10000000000 ? '10 Gb/s' : (normSpd >= 1000000000 ? '1 Gb/s' : (normSpd >= 100000000 ? '100 Mb/s' : (normSpd >= 10000000 ? '10 Mb/s' : '--')))));
-                const pSub = pt.Alias ? pt.Alias : (p >= 25 ? 'SFP+ 10G' : pt.Name);
+                const portLabel = pt.Alias ? `Porta ${p} | ${pt.Alias}` : `Porta ${p} | ${pt.Name || ('Porta ' + p)}`;
                 const poeDesc = (pt.PoEStatus === 3) ? `\nPoE: Alimentando (${pt.PoEPower} W)` : '';
                 pEl.title = `${portLabel}\nStatus: ${statusDesc}${poeDesc}\nVelocidade: ${speedText}\nEntrada: ${formatTrafficBps(pt.InBps)}\nSaida: ${formatTrafficBps(pt.OutBps)}`;
 
@@ -2447,11 +2960,29 @@ $jsCodeTemplate = @'
           }
 
           // Update KPIs safely
+          const occPct = Math.round((activeTotal / 28.0) * 100);
           safeSetText('kpi-active-ports', activeTotal + '');
+          safeSetText('kpi-active-pct', occPct + '% USO');
           safeSetText('kpi-degraded-ports', degradedTotal + '');
           safeSetText('kpi-total-traffic', formatTrafficBps(trafficTotal));
+          safeSetHtml('kpi-traffic-sub', `&#8595; In: ${formatTrafficBps(totalIn)} &bull; &#8593; Out: ${formatTrafficBps(totalOut)}`);
+          safeSetText('kpi-sfp-active', sfpActiveTotal + '');
+          safeSetText('pf-count-up', activeTotal + '');
+          safeSetText('pf-count-deg', degradedTotal + '');
+
+          const kpiDegChips = getEl('kpi-degraded-chips');
+          if (kpiDegChips) {
+            if (degradedList.length > 0) {
+              kpiDegChips.innerHTML = degradedList.map(d =>
+                `<span onclick="event.stopPropagation();if(window.__arubaSelectPort)window.__arubaSelectPort(${d.port});" style="background: rgba(245, 158, 11, 0.16); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.38); font-size: 9.5px; font-weight: 800; padding: 1px 6px; border-radius: 4px; cursor: pointer; font-family: monospace;" title="Clique para inspecionar a Porta ${d.port}">&#9888; Porta ${d.port} (${d.spdLabel})</span>`
+              ).join(' ');
+            } else {
+              kpiDegChips.innerHTML = `<span style="background: rgba(0, 230, 118, 0.12); color: #00e676; font-size: 9px; font-weight: 700; padding: 1px 6px; border-radius: 4px; font-family: monospace;">&#10003; TODAS 1G/10G</span>`;
+            }
+          }
+
           const kBar = getEl('kpi-active-bar');
-          if (kBar && kBar.style) kBar.style.width = Math.round((activeTotal / 28.0) * 100) + '%';
+          if (kBar && kBar.style) kBar.style.width = occPct + '%';
 
           // Update Top Talkers live
           updateTopTalkers();
@@ -2500,19 +3031,21 @@ $jsCodeTemplate = @'
     runtime.visibilityListener = () => {
       if (!document.hidden) {
         fetchZabbixTelemetry();
+        pollBamexFleetStatus();
       }
     };
     document.addEventListener('visibilitychange', runtime.visibilityListener);
 
-    // Poll Zabbix every 15 seconds
+    // Poll Zabbix every 15 seconds & Fleet status every 45 seconds
     addTimer(fetchZabbixTelemetry, 15000);
+    addTimer(pollBamexFleetStatus, 45000);
 
     // Live Clock (1s)
     addTimer(() => {
       safeSetText('live-clock', new Date().toTimeString().split(' ')[0]);
     }, 1000);
 
-    // Bind Reset Zoom button explicitly via JS (prevent DOMPurify/React click drop)
+    // Bind Reset Zoom button explicitly via JS
     function bindResetZoomButton() {
       try {
         const btn = getEl('btn-reset-zoom');
@@ -2537,7 +3070,7 @@ $jsCodeTemplate = @'
 
     // Bind time range buttons
     function bindRangeButtons() {
-      [3, 6, 12, 24].forEach(h => {
+      [1, 3, 6, 12, 24, 168].forEach(h => {
         const btn = getEl('btn-range-' + h);
         if (btn) {
           btn.onclick = function() { window.__arubaChangeRange(h); };
@@ -2553,6 +3086,7 @@ $jsCodeTemplate = @'
     bindDrawerControls();
     updateTopTalkers();
     selectPort(24);
+    pollBamexFleetStatus();
 
     // Defer a secondary binding & selection to ensure React DOM has completed rendering
     setTimeout(() => {
@@ -2642,6 +3176,28 @@ body { background: #0c0f17; margin: 0; padding: 12px; }
   border-color: #00b0ff !important;
   background: #141c2b !important;
   transform: translateX(2px);
+}
+.sw-event-row:hover {
+  background: #141c2b !important;
+}
+.sw-fleet-pill:hover {
+  border-color: #38bdf8 !important;
+  background: #162032 !important;
+  transform: translateY(-1px);
+}
+.sw-custom-scroll::-webkit-scrollbar {
+  width: 5px;
+}
+.sw-custom-scroll::-webkit-scrollbar-track {
+  background: #090d14;
+  border-radius: 3px;
+}
+.sw-custom-scroll::-webkit-scrollbar-thumb {
+  background: #263346;
+  border-radius: 3px;
+}
+.sw-custom-scroll::-webkit-scrollbar-thumb:hover {
+  background: #00b0ff;
 }
 #btn-reset-zoom:hover {
   background: #00b0ff !important;
@@ -2749,6 +3305,28 @@ $cssStyles = @"
   background: #141c2b !important;
   transform: translateX(2px);
 }
+.sw-event-row:hover {
+  background: #141c2b !important;
+}
+.sw-fleet-pill:hover {
+  border-color: #38bdf8 !important;
+  background: #162032 !important;
+  transform: translateY(-1px);
+}
+.sw-custom-scroll::-webkit-scrollbar {
+  width: 5px;
+}
+.sw-custom-scroll::-webkit-scrollbar-track {
+  background: #090d14;
+  border-radius: 3px;
+}
+.sw-custom-scroll::-webkit-scrollbar-thumb {
+  background: #263346;
+  border-radius: 3px;
+}
+.sw-custom-scroll::-webkit-scrollbar-thumb:hover {
+  background: #00b0ff;
+}
 #btn-reset-zoom:hover {
   background: #00b0ff !important;
   color: #050b14 !important;
@@ -2804,11 +3382,13 @@ $panel = @{
     type = "marcusolsson-dynamictext-panel"
     title = ""
     transparent = $true
-    gridPos = @{ x = 0; y = 0; w = 24; h = 28 }
+    datasource = @{ type = "datasource"; uid = "-- Mixed --" }
+    targets = @()
+    gridPos = @{ x = 0; y = 0; w = 24; h = 29 }
     options = @{
         content = $htmlClean
         defaultContent = $htmlClean
-        renderMode = "all"
+        renderMode = "everyRow"
         styles = $cssStyles
         afterRender = $jsCode
     }
